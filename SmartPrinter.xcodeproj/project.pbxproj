@@ -365,14 +365,14 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "HP Smart Printer App : AiPrint";
-				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Smart Printer needs local network access to discover printers on your Wi-Fi network.";
-				INFOPLIST_KEY_NSCameraUsageDescription = "PrintMate uses the camera to scan documents to PDF.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Smart Printer needs photo access to print your photos.";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
-				INFOPLIST_KEY_UIFileSharingEnabled = YES;
+				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
+				INFOPLIST_KEY_NSCameraUsageDescription = "PrintMate uses the camera to scan documents to PDF.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Smart Printer needs local network access to discover printers on your Wi-Fi network.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Smart Printer needs photo access to print your photos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -382,7 +382,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = hp.smart.printer.app.ac;
 				PRODUCT_NAME = "HP Smart Printer App : AiPrint";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -402,14 +402,14 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "HP Smart Printer App : AiPrint";
-				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Smart Printer needs local network access to discover printers on your Wi-Fi network.";
-				INFOPLIST_KEY_NSCameraUsageDescription = "PrintMate uses the camera to scan documents to PDF.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Smart Printer needs photo access to print your photos.";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
-				INFOPLIST_KEY_UIFileSharingEnabled = YES;
+				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
+				INFOPLIST_KEY_NSCameraUsageDescription = "PrintMate uses the camera to scan documents to PDF.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Smart Printer needs local network access to discover printers on your Wi-Fi network.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Smart Printer needs photo access to print your photos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -419,7 +419,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = hp.smart.printer.app.ac;
 				PRODUCT_NAME = "HP Smart Printer App : AiPrint";
 				SWIFT_EMIT_LOC_STRINGS = YES;

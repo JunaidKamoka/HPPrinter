@@ -6,9 +6,10 @@ import SwiftUI
 
 struct PDFToolsView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var vm: AppViewModel
 
     var body: some View {
-        PDFToolsRepresentable(onDismiss: { dismiss() })
+        PDFToolsRepresentable(onDismiss: { dismiss() }, onPrintFile: { url in vm.printFile(url: url) })
             .ignoresSafeArea()
     }
 }
@@ -17,10 +18,12 @@ struct PDFToolsView: View {
 
 private struct PDFToolsRepresentable: UIViewControllerRepresentable {
     let onDismiss: () -> Void
+    let onPrintFile: (URL) -> Void
 
     func makeUIViewController(context: Context) -> UINavigationController {
         let vc = PDFToolsViewController()
         vc.onDismiss = onDismiss
+        vc.onPrintFile = onPrintFile
         let nav = UINavigationController(rootViewController: vc)
         nav.navigationBar.prefersLargeTitles = false
         // Match PrintMate dark theme

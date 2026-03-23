@@ -134,6 +134,9 @@ class PDFToolsViewController: UIViewController,
     /// Called when the user finishes with the tool and wants to dismiss.
     var onDismiss: (() -> Void)?
 
+    /// Called when the user taps Print — opens native print sheet and saves to history.
+    var onPrintFile: ((URL) -> Void)?
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -374,8 +377,38 @@ class PDFToolsViewController: UIViewController,
               let data = Data(base64Encoded: b64) else { return }
         let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(name)
         guard (try? data.write(to: tmp)) != nil else { return }
+
         DispatchQueue.main.async {
-            self.present(UIDocumentPickerViewController(forExporting: [tmp], asCopy: true), animated: true)
+            let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+            sheet.addAction(UIAlertAction(title: "Save to Files", style: .default) { [weak self] _ in
+                self?.present(UIDocumentPickerViewController(forExporting: [tmp], asCopy: true), animated: true)
+            })
+
+            sheet.addAction(UIAlertAction(title: "Print", style: .default) { [weak self] _ in
+                guard let self = self else { return }
+                if let onPrint = self.onPrintFile {
+                    onPrint(tmp)
+                } else {
+                    let info = UIPrintInfo.printInfo()
+                    info.outputType = .general
+                    info.jobName = name
+                    let ctrl = UIPrintInteractionController.shared
+                    ctrl.printInfo = info
+                    ctrl.printingItem = tmp
+                    ctrl.present(animated: true, completionHandler: nil)
+                }
+            })
+
+            sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+            if let pop = sheet.popoverPresentationController {
+                pop.sourceView = self.view
+                pop.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.maxY - 60, width: 0, height: 0)
+                pop.permittedArrowDirections = []
+            }
+
+            self.present(sheet, animated: true)
         }
     }
 
@@ -403,18 +436,28 @@ class PDFToolsViewController: UIViewController,
 
     private func handlePrint(_ body: Any) {
         let b64: String
-        if let str = body as? String { b64 = str }
-        else if let dict = body as? [String: Any], let s = dict["data"] as? String { b64 = s }
-        else { return }
+        let jobName: String
+        if let str = body as? String {
+            b64 = str; jobName = "PrintMate PDF"
+        } else if let dict = body as? [String: Any], let s = dict["data"] as? String {
+            b64 = s
+            jobName = (dict["filename"] as? String) ?? "PrintMate PDF"
+        } else { return }
         guard let data = Data(base64Encoded: b64) else { return }
+
         DispatchQueue.main.async {
-            let info = UIPrintInfo.printInfo()
-            info.outputType = .general
-            info.jobName = "PrintMate PDF"
-            let ctrl = UIPrintInteractionController.shared
-            ctrl.printInfo = info
-            ctrl.printingItem = data
-            ctrl.present(animated: true, completionHandler: nil)
+            let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(jobName)
+            if let onPrint = self.onPrintFile, (try? data.write(to: tmp)) != nil {
+                onPrint(tmp)
+            } else {
+                let info = UIPrintInfo.printInfo()
+                info.outputType = .general
+                info.jobName = jobName
+                let ctrl = UIPrintInteractionController.shared
+                ctrl.printInfo = info
+                ctrl.printingItem = data
+                ctrl.present(animated: true, completionHandler: nil)
+            }
         }
     }
 
