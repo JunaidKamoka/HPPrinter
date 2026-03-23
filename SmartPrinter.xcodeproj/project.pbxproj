@@ -1,0 +1,433 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA0000010000000000000020 /* SmartPrinterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000010 /* SmartPrinterApp.swift */; };
+		AA0000010000000000000021 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000011 /* ContentView.swift */; };
+		AA0000010000000000000022 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000012 /* Theme.swift */; };
+		AA0000010000000000000023 /* Printer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000013 /* Printer.swift */; };
+		AA0000010000000000000024 /* PrintJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000014 /* PrintJob.swift */; };
+		AA0000010000000000000025 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000015 /* AppViewModel.swift */; };
+		AA0000010000000000000026 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000016 /* HomeView.swift */; };
+		AA0000010000000000000027 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000017 /* DiscoverView.swift */; };
+		AA0000010000000000000028 /* QueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000018 /* QueueView.swift */; };
+		AA0000010000000000000029 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000019 /* SettingsView.swift */; };
+		AA000001000000000000002A /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000001A /* HistoryView.swift */; };
+		AA000001000000000000002B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000001C /* Assets.xcassets */; };
+		AA000001000000000000002C /* PrinterDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000001D /* PrinterDiscoveryService.swift */; };
+		AA000001000000000000002D /* PrintService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000001E /* PrintService.swift */; };
+		AA000001000000000000002E /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000001F /* PersistenceService.swift */; };
+		AA000001000000000000002F /* DocumentPickerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000009 /* DocumentPickerService.swift */; };
+		AA0000010000000000000070 /* writing_paper.html in Resources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000071 /* writing_paper.html */; };
+		AA0000010000000000000072 /* WritingPaperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000073 /* WritingPaperView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AA0000010000000000000005 /* HP Smart Printer App : AiPrint.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HP Smart Printer App : AiPrint.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000010000000000000009 /* DocumentPickerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerService.swift; sourceTree = "<group>"; };
+		AA0000010000000000000010 /* SmartPrinterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartPrinterApp.swift; sourceTree = "<group>"; };
+		AA0000010000000000000011 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AA0000010000000000000012 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		AA0000010000000000000013 /* Printer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Printer.swift; sourceTree = "<group>"; };
+		AA0000010000000000000014 /* PrintJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintJob.swift; sourceTree = "<group>"; };
+		AA0000010000000000000015 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		AA0000010000000000000016 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		AA0000010000000000000017 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
+		AA0000010000000000000018 /* QueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueView.swift; sourceTree = "<group>"; };
+		AA0000010000000000000019 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA000001000000000000001A /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		AA000001000000000000001C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA000001000000000000001D /* PrinterDiscoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterDiscoveryService.swift; sourceTree = "<group>"; };
+		AA000001000000000000001E /* PrintService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintService.swift; sourceTree = "<group>"; };
+		AA000001000000000000001F /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
+		AA0000010000000000000071 /* writing_paper.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = writing_paper.html; sourceTree = "<group>"; };
+		AA0000010000000000000073 /* WritingPaperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingPaperView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA0000010000000000000041 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AA0000010000000000000003 = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000000000000030 /* SmartPrinter */,
+				AA0000010000000000000004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AA0000010000000000000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000000000000005 /* HP Smart Printer App : AiPrint.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AA0000010000000000000030 /* SmartPrinter */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000000000000010 /* SmartPrinterApp.swift */,
+				AA0000010000000000000011 /* ContentView.swift */,
+				AA0000010000000000000012 /* Theme.swift */,
+				AA0000010000000000000031 /* Models */,
+				AA0000010000000000000032 /* ViewModels */,
+				AA0000010000000000000033 /* Views */,
+				AA0000010000000000000034 /* Services */,
+				AA000001000000000000001C /* Assets.xcassets */,
+				AA0000010000000000000071 /* writing_paper.html */,
+			);
+			path = SmartPrinter;
+			sourceTree = "<group>";
+		};
+		AA0000010000000000000031 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000000000000013 /* Printer.swift */,
+				AA0000010000000000000014 /* PrintJob.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AA0000010000000000000032 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000000000000015 /* AppViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		AA0000010000000000000033 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000000000000016 /* HomeView.swift */,
+				AA0000010000000000000017 /* DiscoverView.swift */,
+				AA0000010000000000000018 /* QueueView.swift */,
+				AA0000010000000000000019 /* SettingsView.swift */,
+				AA000001000000000000001A /* HistoryView.swift */,
+				AA0000010000000000000073 /* WritingPaperView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AA0000010000000000000034 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AA000001000000000000001D /* PrinterDiscoveryService.swift */,
+				AA000001000000000000001E /* PrintService.swift */,
+				AA000001000000000000001F /* PersistenceService.swift */,
+				AA0000010000000000000009 /* DocumentPickerService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AA0000010000000000000002 /* SmartPrinter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0000010000000000000061 /* Build configuration list for PBXNativeTarget "SmartPrinter" */;
+			buildPhases = (
+				AA0000010000000000000040 /* Sources */,
+				AA0000010000000000000041 /* Frameworks */,
+				AA0000010000000000000042 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SmartPrinter;
+			productName = SmartPrinter;
+			productReference = AA0000010000000000000005 /* HP Smart Printer App : AiPrint.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA0000010000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					AA0000010000000000000002 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = AA0000010000000000000060 /* Build configuration list for PBXProject "SmartPrinter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AA0000010000000000000003;
+			productRefGroup = AA0000010000000000000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AA0000010000000000000002 /* SmartPrinter */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AA0000010000000000000042 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000001000000000000002B /* Assets.xcassets in Resources */,
+				AA0000010000000000000070 /* writing_paper.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA0000010000000000000040 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000010000000000000020 /* SmartPrinterApp.swift in Sources */,
+				AA0000010000000000000021 /* ContentView.swift in Sources */,
+				AA0000010000000000000022 /* Theme.swift in Sources */,
+				AA0000010000000000000023 /* Printer.swift in Sources */,
+				AA0000010000000000000024 /* PrintJob.swift in Sources */,
+				AA0000010000000000000025 /* AppViewModel.swift in Sources */,
+				AA0000010000000000000026 /* HomeView.swift in Sources */,
+				AA0000010000000000000027 /* DiscoverView.swift in Sources */,
+				AA0000010000000000000028 /* QueueView.swift in Sources */,
+				AA0000010000000000000029 /* SettingsView.swift in Sources */,
+				AA000001000000000000002A /* HistoryView.swift in Sources */,
+				AA000001000000000000002C /* PrinterDiscoveryService.swift in Sources */,
+				AA000001000000000000002D /* PrintService.swift in Sources */,
+				AA000001000000000000002E /* PersistenceService.swift in Sources */,
+				AA000001000000000000002F /* DocumentPickerService.swift in Sources */,
+				AA0000010000000000000072 /* WritingPaperView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AA0000010000000000000050 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AA0000010000000000000051 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA0000010000000000000052 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 44AXYL9JVD;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "HP Smart Printer App : AiPrint";
+				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Smart Printer needs local network access to discover printers on your Wi-Fi network.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Smart Printer needs photo access to print your photos.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = hp.smart.printer.app.ac;
+				PRODUCT_NAME = "HP Smart Printer App : AiPrint";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA0000010000000000000053 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 44AXYL9JVD;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "HP Smart Printer App : AiPrint";
+				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Smart Printer needs local network access to discover printers on your Wi-Fi network.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Smart Printer needs photo access to print your photos.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = hp.smart.printer.app.ac;
+				PRODUCT_NAME = "HP Smart Printer App : AiPrint";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AA0000010000000000000060 /* Build configuration list for PBXProject "SmartPrinter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000010000000000000050 /* Debug */,
+				AA0000010000000000000051 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA0000010000000000000061 /* Build configuration list for PBXNativeTarget "SmartPrinter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000010000000000000052 /* Debug */,
+				AA0000010000000000000053 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AA0000010000000000000001 /* Project object */;
+}
