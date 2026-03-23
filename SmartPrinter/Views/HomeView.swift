@@ -6,6 +6,7 @@ struct HomeView: View {
     @State private var showPhotoPicker = false
     @State private var showTestPrintPicker = false
     @State private var showWritingPaper = false
+    @State private var showPDFTools = false
 
     var body: some View {
         NavigationView {
@@ -75,6 +76,9 @@ struct HomeView: View {
             .fullScreenCover(isPresented: $showWritingPaper) {
                 WritingPaperView()
             }
+            .fullScreenCover(isPresented: $showPDFTools) {
+                PDFToolsView()
+            }
             .onAppear { if vm.autoReconnect { vm.startScan() } }
         }
         .navigationViewStyle(.stack)
@@ -135,6 +139,29 @@ struct HomeView: View {
                     showTestPrintPicker = true
                 }
             }
+            // PDF Tools — full-width
+            Button { showPDFTools = true } label: {
+                HStack(spacing: 12) {
+                    Text("📄").font(.system(size: 24))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("PDF Tools")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.textPrimary)
+                        Text("95 tools — merge, convert, sign, OCR...")
+                            .font(.system(size: 11))
+                            .foregroundColor(.textSecondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.textTertiary)
+                }
+                .padding(16)
+                .background(Color.bg2)
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.accent.opacity(0.3), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
             // Writing Paper — full-width
             Button { showWritingPaper = true } label: {
                 HStack(spacing: 12) {

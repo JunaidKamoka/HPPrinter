@@ -1,839 +1,754 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Writing Paper Generator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-            color: #333;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Writing Paper Generator</title>
+<style>
+/* ── Reset & base ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
+:root {
+  --bg:        #0f0f1c;
+  --bg2:       #171728;
+  --bg3:       #1e1e30;
+  --border:    rgba(120,117,240,.22);
+  --accent:    #7875f0;
+  --accent2:   #5e5bc8;
+  --text:      #f2f2f8;
+  --text2:     rgba(242,242,248,.6);
+  --text3:     rgba(242,242,248,.38);
+  --radius:    16px;
+  --radius-sm: 10px;
+}
 
-        .sidebar {
-            width: 350px;
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 20px;
-            overflow-y: auto;
-        }
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  font-size: 15px;
+  height: 100%;
+  overflow-x: hidden;
+}
 
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+/* ── Layout ────────────────────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: 0 0 120px; /* space for sticky button */
+}
 
-        .main-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 20px;
-        }
+/* ── Preview ───────────────────────────────────────────────────── */
+.preview-wrap {
+  width: 100%;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 16px 12px;
+}
 
-        h1 {
-            text-align: center;
-            color: #ecf0f1;
-            margin-bottom: 30px;
-            font-size: 24px;
-        }
+#paperCanvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.07),
+    0 8px 32px rgba(0,0,0,.45);
+  background: #fff;
+  /* Cap preview height so controls stay visible */
+  max-height: 38vh;
+  object-fit: contain;
+}
 
-        .main-content h1 {
-            color: #2c3e50;
-            margin: 0;
-        }
+/* ── Controls area ─────────────────────────────────────────────── */
+.controls {
+  flex: 1;
+  padding: 18px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-        .control-section {
-            background-color: #34495e;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
+/* ── Section card ──────────────────────────────────────────────── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 14px 12px;
+}
 
-        .control-section h2 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 18px;
-            color: #3498db;
-        }
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
 
-        .control-group {
-            margin-bottom: 15px;
-        }
+/* ── Chip selector ─────────────────────────────────────────────── */
+.chips {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #bdc3c7;
-        }
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 13px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.chip:active { transform: scale(.96); }
+.chip.active {
+  background: var(--accent);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(120,117,240,.4);
+}
+.chip .icon { font-size: 14px; }
 
-        select,
-        input[type="number"],
-        input[type="color"],
-        input[type="checkbox"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #7f8c8d;
-            border-radius: 4px;
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            box-sizing: border-box;
-        }
+/* ── Slider row ────────────────────────────────────────────────── */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.slider-row label {
+  font-size: 13px;
+  color: var(--text2);
+  min-width: 28px;
+  text-align: right;
+}
+.slider-row input[type=range] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--bg3);
+  outline: none;
+  border: none;
+}
+.slider-row input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 2px 8px rgba(120,117,240,.5);
+  cursor: pointer;
+}
+.slider-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 34px;
+}
 
-        input[type="checkbox"] {
-            width: auto;
-            margin-right: 5px;
-        }
+/* ── Color swatches ────────────────────────────────────────────── */
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.swatch {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: transform .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.swatch:active { transform: scale(.9); }
+.swatch.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(120,117,240,.3);
+}
+.swatch-custom {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg3) !important;
+  border-color: var(--border) !important;
+  font-size: 16px;
+  overflow: hidden;
+}
+.swatch-custom input[type=color] {
+  position: absolute; inset: 0;
+  opacity: 0; width: 100%; height: 100%;
+  cursor: pointer;
+  border: none; padding: 0;
+}
 
-        .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
+/* ── Toggle rows ───────────────────────────────────────────────── */
+.toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.toggle-row.full { grid-column: 1 / -1; }
+.toggle-label {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 500;
+}
 
-        .color-picker input[type="color"] {
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            border: none;
-        }
+/* iOS-style toggle */
+.toggle {
+  position: relative;
+  width: 42px; height: 26px;
+  flex-shrink: 0;
+}
+.toggle input { display: none; }
+.toggle-track {
+  display: block;
+  width: 100%; height: 100%;
+  border-radius: 99px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  transition: background .2s, border-color .2s;
+  position: relative;
+}
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--text3);
+  transition: transform .2s, background .2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.4);
+}
+.toggle input:checked ~ .toggle-track {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.toggle input:checked ~ .toggle-track .toggle-thumb {
+  transform: translateX(16px);
+  background: #fff;
+}
 
-        canvas {
-            border: 1px solid #7f8c8d;
-            max-width: 100%;
-            height: auto;
-            display: block;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-        }
+/* ── Line options (collapsible) ────────────────────────────────── */
+#lineOptionsCard { display: none; }
+#lineOptionsCard.visible { display: block; }
 
-        button {
-            display: block;
-            width: 100%;
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #8e87cd;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            z-index: 10000;
-        }
+/* Header height sub-row */
+.sub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 0;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+.sub-row label { font-size: 13px; color: var(--text2); font-weight: 500; }
+.sub-row .slider-row { flex: 1; margin-left: 12px; }
 
-        button:hover {
-            background-color: #a8a0ea;
-        }
+/* ── Print button (sticky) ─────────────────────────────────────── */
+.print-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  padding: 12px 16px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, var(--bg) 60%, transparent);
+  z-index: 100;
+}
+.print-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--accent), #5e5bc8);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(120,117,240,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity .15s, transform .12s;
+}
+.print-btn:active { opacity: .85; transform: scale(.98); }
+.print-btn.loading { opacity: .6; pointer-events: none; }
 
-        #sidebarToggle {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 0%;
-                position: fixed;
-                top: 0;
-                left: -100%;
-                bottom: 0;
-                transition: left 0.3s ease;
-                z-index: 1000;
-                scrollbar-width: none;
-            }
-
-            .sidebar::-webkit-scrollbar {
-                display: none;
-            }
-
-            .sidebar .control-section {
-                display: none;
-            }
-
-            .sidebar.open .control-section {
-                display: block;
-            }
-
-            .sidebar .sidebar-title {
-                display: none;
-            }
-
-            .sidebar.open {
-                width: 80%;
-                left: 0;
-            }
-
-            .main-content {
-                padding-top: 20px;
-            }
-
-            .main-header {
-                top: 0;
-                left: 0;
-                right: 0;
-                background-color: #f0f0f0;
-                padding: 10px 20px;
-                z-index: 999;
-            }
-
-            #sidebarToggle {
-                display: block;
-                background: none;
-                border: none;
-                cursor: pointer;
-                padding: 0;
-                width: 40px;
-                height: 40px;
-            }
-
-            .main-content h1 {
-                flex-grow: 1;
-            }
-
-            .sidebar h1 {
-                position: static;
-                color: #ecf0f1;
-                background-color: transparent;
-            }
-
-            canvas {
-                margin-top: 60px;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .main-header {
-                display: none;
-            }
-        }
-    </style>
+/* ── Divider ───────────────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+</style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="sidebar" id="sidebar">
-            <h1 class="sidebar-title">Writing Paper Generator</h1>
-            <div class="control-section">
-                <h2>General Settings</h2>
-                <div class="control-group">
-                    <label for="paperType">Paper Type:</label>
-                    <select id="paperType">
-                        <option value="empty">Empty</option>
-                        <option value="grid">Grid</option>
-                        <option value="dot">Dot</option>
-                        <option value="line">Line</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="spacing">Spacing (mm):</label>
-                    <select id="spacing">
-                        <option value="3">3mm</option>
-                        <option value="4">4mm</option>
-                        <option value="5">5mm</option>
-                        <option value="6">6mm</option>
-                        <option value="7">7mm</option>
-                        <option value="8">8mm</option>
-                        <option value="9">9mm</option>
-                        <option value="10">10mm</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="pageSize">Page Size:</label>
-                    <select id="pageSize">
-                        <option value="A4">A4</option>
-                        <option value="A5">A5</option>
-                        <option value="B5">B5</option>
-                        <option value="B6">B6</option>
-                        <option value="A6">A6</option>
-                    </select>
-                </div>
-            </div>
-            <div class="control-section">
-                <h2>Color Settings</h2>
-                <div class="control-group color-picker">
-                    <label for="bgColor">Background Color:</label>
-                    <select id="bgColor">
-                        <option value="white">White</option>
-                        <option value="#FFFFD4">Pale Yellow</option>
-                        <option value="#F0F8FF">Light Blue</option>
-                        <option value="custom">Custom</option>
-                    </select>
-                    <input type="color" id="customBgColor" value="#FFFFFF" style="display: none;">
-                </div>
-                <div class="control-group color-picker">
-                    <label for="lineColor">Line Color:</label>
-                    <select id="lineColor">
-                        <option value="#CCCCCC">Light Gray</option>
-                        <option value="#0000FF">Blue</option>
-                        <option value="#800080">Purple</option>
-                        <option value="custom">Custom</option>
-                    </select>
-                    <input type="color" id="customLineColor" value="#CCCCCC" style="display: none;">
-                </div>
-            </div>
-            <div class="control-section" id="lineOptions">
-                <h2>Line Paper Options</h2>
-                <div class="control-group">
-                    <label for="headerHeight">Header Height (mm):</label>
-                    <input type="number" id="headerHeight" min="0" max="50" value="20">
-                </div>
-                <div class="control-group checkbox-wrapper">
-                    <input type="checkbox" id="redLine">
-                    <label for="redLine">Red Line</label>
-                </div>
-                <div class="control-group">
-                    <label for="redLinePadding">Red Line Padding (mm):</label>
-                    <input type="number" id="redLinePadding" min="0" value="20">
-                </div>
-                <div class="control-group checkbox-wrapper">
-                    <input type="checkbox" id="titleSection">
-                    <label for="titleSection">Title Section</label>
-                </div>
-                <div class="control-group checkbox-wrapper">
-                    <input type="checkbox" id="noField">
-                    <label for="noField">No. Field</label>
-                </div>
-                <div class="control-group checkbox-wrapper">
-                    <input type="checkbox" id="dateField">
-                    <label for="dateField">Date Field</label>
-                </div>
-                <div class="control-group checkbox-wrapper">
-                    <input type="checkbox" id="footer">
-                    <label for="footer">Footer</label>
-                </div>
-                <div class="control-group">
-                    <label for="footerStart">Footer start on last n line:</label>
-                    <input type="number" id="footerStart" min="1" max="5" value="1">
-                </div>
-                <div class="control-group checkbox-wrapper">
-                    <input type="checkbox" id="ruler">
-                    <label for="ruler">Ruler</label>
-                </div>
-            </div>
-            <button onclick="printPaper()">🖨️ Print Paper</button>
+<div class="page">
+
+  <!-- ── Live Preview ─────────────────────────────────────────── -->
+  <div class="preview-wrap">
+    <canvas id="paperCanvas"></canvas>
+  </div>
+
+  <!-- ── Controls ─────────────────────────────────────────────── -->
+  <div class="controls">
+
+    <!-- Paper Type -->
+    <div class="card">
+      <div class="card-title">Paper Type</div>
+      <div class="chips" id="paperTypeChips">
+        <div class="chip active" data-val="empty" onclick="setChip('paperTypeChips',this);update()">
+          <span class="icon">⬜</span> Empty
         </div>
-        <div class="main-content">
-            <div class="main-header">
-                <button id="sidebarToggle">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="20" cy="20" r="20" fill="#2c3e50" />
-                        <path d="M13 20H27M13 14H27M13 26H27" stroke="white" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </button>
-                <h1>Writing Paper Generator</h1>
-            </div>
-            <canvas id="paperCanvas"></canvas>
+        <div class="chip" data-val="grid" onclick="setChip('paperTypeChips',this);update()">
+          <span class="icon">⊞</span> Grid
         </div>
+        <div class="chip" data-val="dot" onclick="setChip('paperTypeChips',this);update()">
+          <span class="icon">⠿</span> Dot
+        </div>
+        <div class="chip" data-val="line" onclick="setChip('paperTypeChips',this);update()">
+          <span class="icon">≡</span> Lined
+        </div>
+      </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script>
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
+    <!-- Page Size -->
+    <div class="card">
+      <div class="card-title">Page Size</div>
+      <div class="chips" id="pageSizeChips">
+        <div class="chip active" data-val="A4" onclick="setChip('pageSizeChips',this);update()">A4</div>
+        <div class="chip" data-val="A5" onclick="setChip('pageSizeChips',this);update()">A5</div>
+        <div class="chip" data-val="B5" onclick="setChip('pageSizeChips',this);update()">B5</div>
+        <div class="chip" data-val="B6" onclick="setChip('pageSizeChips',this);update()">B6</div>
+        <div class="chip" data-val="A6" onclick="setChip('pageSizeChips',this);update()">A6</div>
+      </div>
+    </div>
 
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-        });
+    <!-- Spacing -->
+    <div class="card">
+      <div class="card-title">Spacing</div>
+      <div class="slider-row">
+        <label>3</label>
+        <input type="range" id="spacingSlider" min="3" max="10" value="5" oninput="updateSpacingLabel();update()">
+        <label>10</label>
+        <span class="slider-val" id="spacingVal">5 mm</span>
+      </div>
+    </div>
 
-        document.addEventListener('click', (event) => {
-            if (window.innerWidth <= 768 && !sidebar.contains(event.target) && !sidebarToggle.contains(event.target) && sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-            }
-        });
+    <!-- Paper Color -->
+    <div class="card">
+      <div class="card-title">Paper Color</div>
+      <div class="swatches" id="bgSwatches">
+        <div class="swatch active" data-val="white" style="background:#fff"
+             onclick="setSwatch('bgSwatches',this);update()"></div>
+        <div class="swatch" data-val="#FFFFD4" style="background:#FFFFD4"
+             onclick="setSwatch('bgSwatches',this);update()"></div>
+        <div class="swatch" data-val="#D4E8FF" style="background:#D4E8FF"
+             onclick="setSwatch('bgSwatches',this);update()"></div>
+        <div class="swatch" data-val="#D4FFD4" style="background:#D4FFD4"
+             onclick="setSwatch('bgSwatches',this);update()"></div>
+        <div class="swatch" data-val="#FFD4D4" style="background:#FFD4D4"
+             onclick="setSwatch('bgSwatches',this);update()"></div>
+        <div class="swatch swatch-custom" data-val="custom" id="bgCustomSwatch"
+             title="Custom color" onclick="setSwatch('bgSwatches',this)">
+          🎨
+          <input type="color" id="customBgColor" value="#ffffff"
+                 oninput="setSwatchCustom('bgSwatches','bgCustomSwatch',this.value);update()">
+        </div>
+      </div>
+    </div>
 
-        const canvas = document.getElementById('paperCanvas');
-        const ctx = canvas.getContext('2d');
+    <!-- Line Color -->
+    <div class="card">
+      <div class="card-title">Line Color</div>
+      <div class="swatches" id="lineSwatches">
+        <div class="swatch active" data-val="#CCCCCC" style="background:#CCCCCC"
+             onclick="setSwatch('lineSwatches',this);update()"></div>
+        <div class="swatch" data-val="#9999CC" style="background:#9999CC"
+             onclick="setSwatch('lineSwatches',this);update()"></div>
+        <div class="swatch" data-val="#4488FF" style="background:#4488FF"
+             onclick="setSwatch('lineSwatches',this);update()"></div>
+        <div class="swatch" data-val="#7875f0" style="background:#7875f0"
+             onclick="setSwatch('lineSwatches',this);update()"></div>
+        <div class="swatch" data-val="#888888" style="background:#888888"
+             onclick="setSwatch('lineSwatches',this);update()"></div>
+        <div class="swatch swatch-custom" data-val="custom" id="lineCustomSwatch"
+             title="Custom color" onclick="setSwatch('lineSwatches',this)">
+          🎨
+          <input type="color" id="customLineColor" value="#CCCCCC"
+                 oninput="setSwatchCustom('lineSwatches','lineCustomSwatch',this.value);update()">
+        </div>
+      </div>
+    </div>
 
-        const pageSizes = {
-            'A4': [210, 297],
-            'A5': [148, 210],
-            'B5': [176, 250],
-            'B6': [125, 176],
-            'A6': [105, 148]
-        };
+    <!-- Line Paper Options (shown only for "line" type) -->
+    <div class="card" id="lineOptionsCard">
+      <div class="card-title">Line Options</div>
 
-        const defaultRedLinePadding = {
-            'A4': 20,
-            'A5': 15,
-            'B5': 18,
-            'B6': 12,
-            'A6': 10
-        };
+      <!-- Header height slider -->
+      <div class="slider-row" style="margin-bottom:10px">
+        <span style="font-size:13px;color:var(--text2);white-space:nowrap">Header</span>
+        <input type="range" id="headerSlider" min="0" max="50" value="20"
+               oninput="updateHeaderLabel();update()" style="margin:0 10px">
+        <span class="slider-val" id="headerVal">20 mm</span>
+      </div>
 
-        function drawRulerLine(y, above) {
-            const markingInterval = 0.5 * 3.78;
-            const shortMarkHeight = 0;
-            const longMarkHeight = 2;
+      <!-- Red margin slider (shown when redLine toggle is on) -->
+      <div class="slider-row" id="redPaddingRow" style="margin-bottom:10px;display:none">
+        <span style="font-size:13px;color:var(--text2);white-space:nowrap">Margin</span>
+        <input type="range" id="redPaddingSlider" min="5" max="40" value="20"
+               oninput="updateRedPaddingLabel();update()" style="margin:0 10px">
+        <span class="slider-val" id="redPaddingVal">20 mm</span>
+      </div>
 
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(canvas.width, y);
-            ctx.stroke();
+      <div class="toggle-grid">
+        <div class="toggle-row">
+          <span class="toggle-label">Red Margin</span>
+          <label class="toggle" for="redLineToggle">
+            <input type="checkbox" id="redLineToggle"
+                   onchange="toggleRedPadding();update()">
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Title Area</span>
+          <label class="toggle" for="titleToggle">
+            <input type="checkbox" id="titleToggle" onchange="update()">
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">No. Field</span>
+          <label class="toggle" for="noToggle">
+            <input type="checkbox" id="noToggle" onchange="update()">
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Date Field</span>
+          <label class="toggle" for="dateToggle">
+            <input type="checkbox" id="dateToggle" onchange="update()">
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Footer</span>
+          <label class="toggle" for="footerToggle">
+            <input type="checkbox" id="footerToggle" onchange="update()">
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Ruler</span>
+          <label class="toggle" for="rulerToggle">
+            <input type="checkbox" id="rulerToggle" onchange="update()">
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+        </div>
+      </div>
+    </div>
 
-            for (let x = 0; x <= canvas.width; x += markingInterval) {
-                const markCount = Math.round(x / markingInterval);
-                const markHeight = (markCount % 10 === 0) ? longMarkHeight : shortMarkHeight;
+  </div><!-- /controls -->
+</div><!-- /page -->
 
-                ctx.beginPath();
-                ctx.moveTo(x, y);
-                if (above) {
-                    ctx.lineTo(x, y - markHeight);
-                } else {
-                    ctx.lineTo(x, y + markHeight);
-                }
-                ctx.stroke();
-            }
+<!-- ── Print Button ──────────────────────────────────────────────── -->
+<div class="print-bar">
+  <button class="print-btn" id="printBtn" onclick="printPaper()">
+    🖨️ Print Paper
+  </button>
+</div>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ── State helpers ───────────────────────────────────────────────────
+const pageSizes = { A4:[210,297], A5:[148,210], B5:[176,250], B6:[125,176], A6:[105,148] };
+const defaultRedLinePadding = { A4:20, A5:15, B5:18, B6:12, A6:10 };
+const PX = 3.78; // mm → px
+
+function getChipVal(groupId) {
+  const active = document.querySelector(`#${groupId} .chip.active`);
+  return active ? active.dataset.val : null;
+}
+function setChip(groupId, el) {
+  document.querySelectorAll(`#${groupId} .chip`).forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  if (groupId === 'paperTypeChips') toggleLineOptions();
+  if (groupId === 'pageSizeChips') resetRedPadding();
+}
+
+function getSwatchVal(groupId) {
+  const active = document.querySelector(`#${groupId} .swatch.active`);
+  if (!active) return '#ffffff';
+  if (active.dataset.val === 'custom') {
+    const inp = active.querySelector('input[type=color]');
+    return inp ? inp.value : '#ffffff';
+  }
+  return active.dataset.val === 'white' ? '#ffffff' : active.dataset.val;
+}
+function setSwatch(groupId, el) {
+  document.querySelectorAll(`#${groupId} .swatch`).forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+}
+function setSwatchCustom(groupId, swatchId, val) {
+  const swatch = document.getElementById(swatchId);
+  swatch.style.background = val;
+  setSwatch(groupId, swatch);
+}
+
+function toggleLineOptions() {
+  const card = document.getElementById('lineOptionsCard');
+  const isLine = getChipVal('paperTypeChips') === 'line';
+  card.classList.toggle('visible', isLine);
+  // Update spacing range for line vs others
+  const slider = document.getElementById('spacingSlider');
+  if (isLine) { slider.min=6; slider.max=10; if (slider.value<6) slider.value=7; }
+  else { slider.min=3; slider.max=6; if (slider.value>6) slider.value=5; }
+  updateSpacingLabel();
+}
+function toggleRedPadding() {
+  document.getElementById('redPaddingRow').style.display =
+    document.getElementById('redLineToggle').checked ? 'flex' : 'none';
+}
+function resetRedPadding() {
+  const ps = getChipVal('pageSizeChips') || 'A4';
+  document.getElementById('redPaddingSlider').value = defaultRedLinePadding[ps] || 20;
+  updateRedPaddingLabel();
+}
+function updateSpacingLabel() {
+  document.getElementById('spacingVal').textContent = document.getElementById('spacingSlider').value + ' mm';
+}
+function updateHeaderLabel() {
+  document.getElementById('headerVal').textContent = document.getElementById('headerSlider').value + ' mm';
+}
+function updateRedPaddingLabel() {
+  document.getElementById('redPaddingVal').textContent = document.getElementById('redPaddingSlider').value + ' mm';
+}
+
+// ── Canvas drawing ──────────────────────────────────────────────────
+const canvas = document.getElementById('paperCanvas');
+const ctx = canvas.getContext('2d');
+
+function drawPaper() {
+  const paperType   = getChipVal('paperTypeChips') || 'empty';
+  const pageSize    = getChipVal('pageSizeChips') || 'A4';
+  const spacing     = parseInt(document.getElementById('spacingSlider').value);
+  const bgColor     = getSwatchVal('bgSwatches');
+  const lineColor   = getSwatchVal('lineSwatches');
+  const redLine     = document.getElementById('redLineToggle').checked;
+  const redPadding  = parseInt(document.getElementById('redPaddingSlider').value);
+  const headerH     = parseInt(document.getElementById('headerSlider').value);
+  const titleSec    = document.getElementById('titleToggle').checked;
+  const noField     = document.getElementById('noToggle').checked;
+  const dateField   = document.getElementById('dateToggle').checked;
+  const footer      = document.getElementById('footerToggle').checked;
+  const footerStart = 1;
+  const ruler       = document.getElementById('rulerToggle').checked;
+
+  const [wMM, hMM] = pageSizes[pageSize];
+  canvas.width  = wMM * PX;
+  canvas.height = hMM * PX;
+
+  // Background
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = lineColor;
+  ctx.lineWidth = 0.5;
+
+  const size = spacing * PX;
+
+  const drawGrid = () => {
+    for (let x = 0; x <= canvas.width; x += size) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+    for (let y = 0; y <= canvas.height; y += size) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+  };
+
+  const drawDots = () => {
+    ctx.fillStyle = lineColor;
+    for (let x = size; x < canvas.width; x += size)
+      for (let y = size; y < canvas.height; y += size) { ctx.beginPath(); ctx.arc(x,y,0.7,0,2*Math.PI); ctx.fill(); }
+  };
+
+  const drawRulerLine = (y, above) => {
+    const mi = 0.5 * PX, lh = 2;
+    ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
+    for (let x = 0; x <= canvas.width; x += mi) {
+      if (Math.round(x/mi) % 10 === 0) { ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x, above ? y-lh : y+lh); ctx.stroke(); }
+    }
+  };
+
+  const drawLines = () => {
+    let headerEnd = headerH * PX;
+    let curY = headerEnd;
+    if (titleSec) {
+      ctx.lineWidth = 1; ctx.strokeStyle = lineColor;
+      ctx.beginPath(); ctx.moveTo(0,curY); ctx.lineTo(canvas.width,curY); ctx.stroke();
+      curY += 10 * PX;
+      ruler ? drawRulerLine(curY,false) : (ctx.beginPath(), ctx.moveTo(0,curY), ctx.lineTo(canvas.width,curY), ctx.stroke());
+      ctx.lineWidth = 0.5; curY += size;
+    }
+    if (noField || dateField) {
+      ctx.font = `${10*PX/3.78}px Arial`; ctx.fillStyle = lineColor;
+      let fy = headerEnd - 10*PX;
+      if (noField) {
+        ctx.fillText('No:', canvas.width-50*PX, fy);
+        ctx.save(); ctx.setLineDash([2,2]);
+        ctx.beginPath(); ctx.moveTo(canvas.width-40*PX, fy+2); ctx.lineTo(canvas.width-5*PX, fy+2); ctx.stroke();
+        ctx.restore();
+      }
+      if (dateField) {
+        fy += 6*PX; ctx.fillText('Date:', canvas.width-50*PX, fy);
+      }
+    }
+    const totalLines = Math.floor((canvas.height - curY) / size) + 1;
+    const footerIdx = footer ? totalLines - footerStart : totalLines;
+    for (let i = 0; i < totalLines; i++) {
+      const y = curY + i * size;
+      if (i === 0 && footer && !titleSec) {
+        ruler ? drawRulerLine(y,false) : (ctx.lineWidth=1, ctx.beginPath(), ctx.moveTo(0,y), ctx.lineTo(canvas.width,y), ctx.stroke());
+      } else if (i < footerIdx) {
+        ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
+      } else if (i === footerIdx && footer) {
+        ruler ? drawRulerLine(y,true) : (ctx.lineWidth=1, ctx.beginPath(), ctx.moveTo(0,y), ctx.lineTo(canvas.width,y), ctx.stroke());
+      }
+    }
+    if (redLine) {
+      ctx.strokeStyle='red'; ctx.lineWidth=0.5;
+      const rx = redPadding * PX;
+      const startY = titleSec ? curY - size : curY;
+      ctx.beginPath(); ctx.moveTo(rx, startY); ctx.lineTo(rx, curY + footerIdx * size); ctx.stroke();
+    }
+  };
+
+  switch(paperType) {
+    case 'grid': drawGrid(); break;
+    case 'dot':  drawDots(); break;
+    case 'line': drawLines(); break;
+  }
+}
+
+function update() { drawPaper(); }
+
+// ── Print / Export PDF ──────────────────────────────────────────────
+function printPaper() {
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert('PDF library not loaded. Please check your connection.');
+    return;
+  }
+  const btn = document.getElementById('printBtn');
+  btn.classList.add('loading');
+  btn.textContent = 'Generating…';
+
+  setTimeout(() => {
+    try {
+      const { jsPDF } = window.jspdf;
+      const paperType   = getChipVal('paperTypeChips') || 'empty';
+      const pageSize    = getChipVal('pageSizeChips') || 'A4';
+      const spacing     = parseInt(document.getElementById('spacingSlider').value);
+      const bgColor     = getSwatchVal('bgSwatches');
+      const lineColor   = getSwatchVal('lineSwatches');
+      const redLine     = document.getElementById('redLineToggle').checked;
+      const redPadding  = parseInt(document.getElementById('redPaddingSlider').value);
+      const headerH     = parseInt(document.getElementById('headerSlider').value);
+      const titleSec    = document.getElementById('titleToggle').checked;
+      const noField     = document.getElementById('noToggle').checked;
+      const dateField   = document.getElementById('dateToggle').checked;
+      const footer      = document.getElementById('footerToggle').checked;
+      const footerStart = 1;
+      const ruler       = document.getElementById('rulerToggle').checked;
+
+      const [W,H] = pageSizes[pageSize];
+      const pdf = new jsPDF({ orientation: W>H?'l':'p', unit:'mm', format: pageSize });
+
+      const hexToRgb = h => {
+        if (h === 'white') return [255,255,255];
+        const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);
+        return r ? [parseInt(r[1],16),parseInt(r[2],16),parseInt(r[3],16)] : [255,255,255];
+      };
+      const [br,bg,bb] = hexToRgb(bgColor);
+      pdf.setFillColor(br,bg,bb); pdf.rect(0,0,W,H,'F');
+
+      const [lr,lg,lb] = hexToRgb(lineColor);
+      pdf.setDrawColor(lr,lg,lb); pdf.setLineWidth(0.1);
+
+      const drawRLP = (y, above) => {
+        pdf.setLineWidth(0.2); pdf.line(0,y,W,y);
+        for (let x=0; x<=W; x+=0.5) if (Math.round(x/0.5)%10===0) above ? pdf.line(x,y,x,y-0.5) : pdf.line(x,y,x,y+0.5);
+      };
+      const drawLinesP = () => {
+        let curY = headerH;
+        if (titleSec) {
+          pdf.setLineWidth(0.2); pdf.line(0,curY,W,curY); curY+=10;
+          ruler ? drawRLP(curY,false) : pdf.line(0,curY,W,curY);
+          pdf.setLineWidth(0.1); curY+=spacing;
         }
-
-        function drawPaper() {
-            const paperType = document.getElementById('paperType').value;
-            const spacing = parseInt(document.getElementById('spacing').value);
-            const bgColorSelect = document.getElementById('bgColor');
-            const lineColorSelect = document.getElementById('lineColor');
-            const pageSize = document.getElementById('pageSize').value;
-            const redLine = document.getElementById('redLine').checked;
-            const redLinePadding = parseInt(document.getElementById('redLinePadding').value);
-            const headerHeight = parseInt(document.getElementById('headerHeight').value);
-            const titleSection = document.getElementById('titleSection').checked;
-            const noField = document.getElementById('noField').checked;
-            const dateField = document.getElementById('dateField').checked;
-            const footer = document.getElementById('footer').checked;
-            const footerStart = parseInt(document.getElementById('footerStart').value);
-            const ruler = document.getElementById('ruler').checked;
-
-            const [width, height] = pageSizes[pageSize];
-            canvas.width = width * 3.78;
-            canvas.height = height * 3.78;
-
-            let bgColor = bgColorSelect.value;
-            if (bgColor === 'custom') {
-                bgColor = document.getElementById('customBgColor').value;
-            }
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            let lineColor = lineColorSelect.value;
-            if (lineColor === 'custom') {
-                lineColor = document.getElementById('customLineColor').value;
-            }
-            ctx.strokeStyle = lineColor;
-            ctx.lineWidth = 0.5;
-
-            const drawGrid = (size) => {
-                for (let x = 0; x <= canvas.width; x += size) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, canvas.height);
-                    ctx.stroke();
-                }
-                for (let y = 0; y <= canvas.height; y += size) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(canvas.width, y);
-                    ctx.stroke();
-                }
-            };
-
-            const drawDots = (size) => {
-                ctx.fillStyle = lineColor;
-                for (let x = size; x < canvas.width; x += size) {
-                    for (let y = size; y < canvas.height; y += size) {
-                        ctx.beginPath();
-                        ctx.arc(x, y, 0.5, 0, 2 * Math.PI);
-                        ctx.fill();
-                    }
-                }
-            };
-
-            const drawLines = (size) => {
-                let headerEnd = headerHeight * 3.78;
-                let currentY = headerEnd;
-                const titleSectionHeight = titleSection ? 20 * 3.78 : 0;
-
-                if (titleSection) {
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = lineColor;
-
-                    ctx.beginPath();
-                    ctx.moveTo(0, currentY);
-                    ctx.lineTo(canvas.width, currentY);
-                    ctx.stroke();
-
-                    currentY += 10 * 3.78;
-
-                    if (ruler) {
-                        drawRulerLine(currentY, false);
-                    } else {
-                        ctx.beginPath();
-                        ctx.moveTo(0, currentY);
-                        ctx.lineTo(canvas.width, currentY);
-                        ctx.stroke();
-                    }
-
-                    ctx.lineWidth = 0.5;
-                    currentY += spacing * 3.78;
-                }
-
-                if (noField || dateField) {
-                    ctx.font = '10px Arial';
-                    ctx.fillStyle = lineColor;
-                    let fieldY = headerEnd - 10 * 3.78;
-
-                    if (noField) {
-                        ctx.fillText('No:', canvas.width - 50 * 3.78, fieldY);
-                        ctx.save();
-                        ctx.setLineDash([2, 2]);
-                        ctx.beginPath();
-                        ctx.moveTo(canvas.width - 40 * 3.78, fieldY + 2);
-                        ctx.lineTo(canvas.width - 5 * 3.78, fieldY + 2);
-                        ctx.stroke();
-                        ctx.restore();
-                    }
-
-                    if (dateField) {
-                        fieldY += 6 * 3.78;
-                        ctx.fillText('Date:', canvas.width - 50 * 3.78, fieldY);
-                        for (let i = 0; i < 2; i++) {
-                            const x = canvas.width - (40 - (i + 1) * 35 / 3) * 3.78;
-                            ctx.fillText('.', x, fieldY);
-                        }
-                    }
-                }
-
-                const totalLines = Math.floor((canvas.height - currentY) / size) + 1;
-                const footerLineIndex = footer ? totalLines - footerStart : totalLines;
-
-                for (let i = 0; i < totalLines; i++) {
-                    const y = currentY + i * size;
-
-                    if (i == 0 && footer && !titleSection) {
-                        if (ruler) {
-                            drawRulerLine(y, false);
-                        } else {
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(0, y);
-                            ctx.lineTo(canvas.width, y);
-                            ctx.stroke();
-                        }
-                    } else if (i < footerLineIndex) {
-                        ctx.lineWidth = 0.5;
-                        ctx.beginPath();
-                        ctx.moveTo(0, y);
-                        ctx.lineTo(canvas.width, y);
-                        ctx.stroke();
-                    } else if (i === footerLineIndex && footer) {
-                        if (ruler) {
-                            drawRulerLine(y, true);
-                        } else {
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(0, y);
-                            ctx.lineTo(canvas.width, y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-
-                if (redLine) {
-                    ctx.strokeStyle = 'red';
-                    ctx.lineWidth = 0.5;
-                    ctx.beginPath();
-                    if (titleSection) {
-                        ctx.moveTo(redLinePadding * 3.78, currentY - spacing * 3.78);
-                    } else {
-                        ctx.moveTo(redLinePadding * 3.78, currentY);
-                    }
-                    ctx.lineTo(redLinePadding * 3.78, currentY + footerLineIndex * size);
-                    ctx.stroke();
-                }
-            };
-
-            const size = spacing * 3.78;
-
-            switch (paperType) {
-                case 'grid':
-                    drawGrid(size);
-                    break;
-                case 'dot':
-                    drawDots(size);
-                    break;
-                case 'line':
-                    drawLines(size);
-                    break;
-            }
+        if (noField||dateField) {
+          pdf.setFontSize(8); pdf.setTextColor(lr,lg,lb);
+          let fy=headerH-10;
+          if(noField){ pdf.text('No:',W-50,fy); pdf.setLineDash([0.5,0.5]); pdf.line(W-40,fy+1,W-5,fy+1); pdf.setLineDash([]); }
+          if(dateField){ fy+=6; pdf.text('Date:',W-50,fy); }
         }
-
-        function printPaper() {
-            if (!window.jspdf || !window.jspdf.jsPDF) {
-                alert('PDF library not loaded. Please check your internet connection and try again.');
-                return;
-            }
-
-            try {
-                const { jsPDF } = window.jspdf;
-                const paperType = document.getElementById('paperType').value;
-                const spacing = parseInt(document.getElementById('spacing').value);
-                const bgColorSelect = document.getElementById('bgColor');
-                const lineColorSelect = document.getElementById('lineColor');
-                const pageSize = document.getElementById('pageSize').value;
-                const redLine = document.getElementById('redLine').checked;
-                const redLinePadding = parseInt(document.getElementById('redLinePadding').value);
-                const headerHeight = parseInt(document.getElementById('headerHeight').value);
-                const titleSection = document.getElementById('titleSection').checked;
-                const noField = document.getElementById('noField').checked;
-                const dateField = document.getElementById('dateField').checked;
-                const footer = document.getElementById('footer').checked;
-                const footerStart = parseInt(document.getElementById('footerStart').value);
-                const ruler = document.getElementById('ruler').checked;
-
-                const [width, height] = pageSizes[pageSize];
-                const pdf = new jsPDF({
-                    orientation: width > height ? 'l' : 'p',
-                    unit: 'mm',
-                    format: pageSize
-                });
-
-                let bgColor = bgColorSelect.value;
-                if (bgColor === 'custom') {
-                    bgColor = document.getElementById('customBgColor').value;
-                }
-                pdf.setFillColor(bgColor);
-                pdf.rect(0, 0, width, height, 'F');
-
-                let lineColor = lineColorSelect.value;
-                if (lineColor === 'custom') {
-                    lineColor = document.getElementById('customLineColor').value;
-                }
-                pdf.setDrawColor(lineColor);
-                pdf.setLineWidth(0.1);
-
-                const drawRulerLinePDF = (y, above) => {
-                    const markingInterval = 0.5;
-                    const longMarkHeight = 0.5;
-
-                    pdf.setLineWidth(0.2);
-                    pdf.line(0, y, width, y);
-
-                    for (let x = 0; x <= width; x += markingInterval) {
-                        const markCount = Math.round(x / markingInterval);
-                        const markHeight = (markCount % 10 === 0) ? longMarkHeight : 0;
-
-                        if (markHeight > 0) {
-                            if (above) {
-                                pdf.line(x, y, x, y - markHeight);
-                            } else {
-                                pdf.line(x, y, x, y + markHeight);
-                            }
-                        }
-                    }
-                };
-
-                const drawLines = () => {
-                    let headerEnd = headerHeight;
-                    let currentY = headerEnd;
-
-                    if (titleSection) {
-                        pdf.setLineWidth(0.2);
-                        pdf.line(0, currentY, width, currentY);
-                        currentY += 10;
-
-                        if (ruler) {
-                            drawRulerLinePDF(currentY, false);
-                        } else {
-                            pdf.line(0, currentY, width, currentY);
-                        }
-
-                        pdf.setLineWidth(0.1);
-                        currentY += spacing;
-                    }
-
-                    if (noField || dateField) {
-                        pdf.setFontSize(8);
-                        pdf.setTextColor(lineColor);
-                        let fieldY = headerEnd - 10;
-
-                        if (noField) {
-                            pdf.text('No:', width - 50, fieldY);
-                            pdf.setLineDash([0.5, 0.5]);
-                            pdf.line(width - 40, fieldY + 1, width - 5, fieldY + 1);
-                            pdf.setLineDash([]);
-                        }
-
-                        if (dateField) {
-                            fieldY += 6;
-                            pdf.text('Date:', width - 50, fieldY);
-                            for (let i = 0; i < 2; i++) {
-                                const x = width - (40 - (i + 1) * 35 / 3);
-                                pdf.text('.', x, fieldY);
-                            }
-                        }
-                    }
-
-                    const totalLines = Math.floor((height - currentY) / spacing) + 1;
-                    const footerLineIndex = footer ? totalLines - footerStart : totalLines;
-
-                    for (let i = 0; i < totalLines; i++) {
-                        const y = currentY + i * spacing;
-
-                        if (i == 0 && footer && !titleSection) {
-                            if (ruler) {
-                                drawRulerLinePDF(y, false);
-                            } else {
-                                pdf.setLineWidth(0.2);
-                                pdf.line(0, y, width, y);
-                            }
-                        } else if (i < footerLineIndex) {
-                            pdf.setLineWidth(0.1);
-                            pdf.line(0, y, width, y);
-                        } else if (i === footerLineIndex && footer) {
-                            if (ruler) {
-                                drawRulerLinePDF(y, true);
-                            } else {
-                                pdf.setLineWidth(0.2);
-                                pdf.line(0, y, width, y);
-                            }
-                        }
-                    }
-
-                    if (redLine) {
-                        pdf.setDrawColor('red');
-                        pdf.setLineWidth(0.1);
-                        if (titleSection) {
-                            pdf.line(redLinePadding, currentY - spacing, redLinePadding, currentY + footerLineIndex * spacing);
-                        } else {
-                            pdf.line(redLinePadding, currentY, redLinePadding, currentY + footerLineIndex * spacing);
-                        }
-                        pdf.setDrawColor(lineColor);
-                    }
-                };
-
-                const drawGrid = () => {
-                    for (let x = 0; x <= width; x += spacing) {
-                        pdf.line(x, 0, x, height);
-                    }
-                    for (let y = 0; y <= height; y += spacing) {
-                        pdf.line(0, y, width, y);
-                    }
-                };
-
-                const drawDots = () => {
-                    pdf.setFillColor(lineColor);
-                    for (let x = spacing; x < width; x += spacing) {
-                        for (let y = spacing; y < height; y += spacing) {
-                            pdf.circle(x, y, 0.2, 'F');
-                        }
-                    }
-                };
-
-                switch (paperType) {
-                    case 'grid':
-                        drawGrid();
-                        break;
-                    case 'dot':
-                        drawDots();
-                        break;
-                    case 'line':
-                        drawLines();
-                        break;
-                }
-
-                // Send to iOS native print sheet, or download if not in iOS app
-                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.printPaper) {
-                    const base64 = pdf.output('datauristring').split(',')[1];
-                    window.webkit.messageHandlers.printPaper.postMessage(base64);
-                } else {
-                    pdf.save('writing_paper.pdf');
-                }
-            } catch (e) {
-                alert('Error generating PDF: ' + (e.message || e));
-            }
+        const total=Math.floor((H-curY)/spacing)+1;
+        const fi=footer?total-footerStart:total;
+        for(let i=0;i<total;i++){
+          const y=curY+i*spacing;
+          if(i===0&&footer&&!titleSec){ ruler?drawRLP(y,false):(pdf.setLineWidth(0.2),pdf.line(0,y,W,y)); }
+          else if(i<fi){ pdf.setLineWidth(0.1); pdf.line(0,y,W,y); }
+          else if(i===fi&&footer){ ruler?drawRLP(y,true):(pdf.setLineWidth(0.2),pdf.line(0,y,W,y)); }
         }
+        if(redLine){ pdf.setDrawColor(255,0,0); pdf.setLineWidth(0.1);
+          const ry=titleSec?curY-spacing:curY;
+          pdf.line(redPadding,ry,redPadding,curY+fi*spacing); pdf.setDrawColor(lr,lg,lb); }
+      };
+      const drawGridP = () => {
+        for(let x=0;x<=W;x+=spacing) pdf.line(x,0,x,H);
+        for(let y=0;y<=H;y+=spacing) pdf.line(0,y,W,y);
+      };
+      const drawDotsP = () => {
+        pdf.setFillColor(lr,lg,lb);
+        for(let x=spacing;x<W;x+=spacing) for(let y=spacing;y<H;y+=spacing) pdf.circle(x,y,0.2,'F');
+      };
 
-        function updateSpacingOptions() {
-            const paperType = document.getElementById('paperType').value;
-            const spacingSelect = document.getElementById('spacing');
-            const options = spacingSelect.options;
+      switch(paperType){ case'grid':drawGridP();break; case'dot':drawDotsP();break; case'line':drawLinesP();break; }
 
-            while (options.length > 0) {
-                options.remove(0);
-            }
+      if (window.webkit?.messageHandlers?.printPaper) {
+        const b64 = pdf.output('datauristring').split(',')[1];
+        window.webkit.messageHandlers.printPaper.postMessage(b64);
+      } else {
+        pdf.save('writing_paper.pdf');
+      }
+    } catch(e) {
+      alert('Error: ' + (e.message || e));
+    } finally {
+      btn.classList.remove('loading');
+      btn.innerHTML = '🖨️ Print Paper';
+    }
+  }, 30);
+}
 
-            if (paperType === 'line') {
-                for (let i = 6; i <= 10; i++) {
-                    options.add(new Option(`${i}mm`, i));
-                }
-            } else {
-                for (let i = 3; i <= 6; i++) {
-                    options.add(new Option(`${i}mm`, i));
-                }
-            }
-
-            spacingSelect.value = paperType === 'line' ? '7' : '3';
-        }
-
-        function updateRedLinePadding() {
-            const pageSize = document.getElementById('pageSize').value;
-            document.getElementById('redLinePadding').value = defaultRedLinePadding[pageSize];
-        }
-
-        function updateByPaperType() {
-            const paperType = document.getElementById('paperType').value;
-            const controlSection = document.getElementById('lineOptions');
-            controlSection.style.display = paperType === 'line' ? 'block' : 'none';
-        }
-
-        function updateColorPickerVisibility(selectId, pickerId) {
-            const select = document.getElementById(selectId);
-            const picker = document.getElementById(pickerId);
-            picker.style.display = select.value === 'custom' ? 'inline-block' : 'none';
-        }
-
-        document.querySelectorAll('select, input').forEach(el => {
-            el.addEventListener('change', drawPaper);
-        });
-
-        document.getElementById('paperType').addEventListener('change', () => {
-            updateSpacingOptions();
-            updateByPaperType();
-            drawPaper();
-        });
-
-        document.getElementById('pageSize').addEventListener('change', () => {
-            updateRedLinePadding();
-            drawPaper();
-        });
-
-        document.getElementById('bgColor').addEventListener('change', () => updateColorPickerVisibility('bgColor', 'customBgColor'));
-        document.getElementById('lineColor').addEventListener('change', () => updateColorPickerVisibility('lineColor', 'customLineColor'));
-
-        updateSpacingOptions();
-        updateRedLinePadding();
-        updateByPaperType();
-        updateColorPickerVisibility('bgColor', 'customBgColor');
-        updateColorPickerVisibility('lineColor', 'customLineColor');
-        drawPaper();
-    </script>
+// ── Init ────────────────────────────────────────────────────────────
+updateSpacingLabel();
+updateHeaderLabel();
+updateRedPaddingLabel();
+drawPaper();
+</script>
 </body>
-
 </html>

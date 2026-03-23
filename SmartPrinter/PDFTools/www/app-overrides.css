@@ -1,0 +1,289 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Smart Printer – app-overrides.css
+   Deep dark theme to match native iOS app. Injected last in <head>.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 0. Force dark color-scheme on html ──────────────────────────── */
+html {
+  color-scheme: dark !important;
+}
+
+/* ── 1. Override CSS variables everywhere ────────────────────────────
+   Target BOTH :root (initial render) AND .dark (after JS hydration).
+   Using * ensures variables propagate to every element regardless of
+   whether the .dark class has been applied yet.
+   ─────────────────────────────────────────────────────────────────── */
+:root,
+.dark,
+html,
+html.dark {
+  /* Backgrounds – iOS app palette */
+  --color-background:       240 28%  8% !important;   /* #0f0f1c bg */
+  --color-card:             240 24% 12% !important;   /* #171728 card */
+  --color-muted:            240 20% 16% !important;   /* #1e1e30 muted */
+
+  /* Borders */
+  --color-border:           244 35% 24% !important;   /* #282851 */
+  --color-input:            244 35% 24% !important;
+
+  /* Text */
+  --color-foreground:       240  8% 96% !important;   /* #f2f2f8 */
+  --color-card-foreground:  240  8% 96% !important;
+  --color-muted-foreground: 240  8% 62% !important;   /* #9090a8 */
+
+  /* Primary/accent – iOS indigo purple #7875f0 */
+  --color-primary:             244 82% 70% !important;
+  --color-primary-foreground:  0   0% 100% !important;
+  --color-primary-hover:       244 82% 58% !important;
+  --color-accent:              244 82% 70% !important;
+  --color-accent-foreground:   0   0% 100% !important;
+  --color-secondary:           244 20% 18% !important;
+  --color-secondary-foreground:240  8% 96% !important;
+
+  /* Ring */
+  --color-ring: 244 82% 70% !important;
+
+  /* Radius – iOS rounded rect */
+  --radius-lg: 18px !important;
+  --radius-md: 14px !important;
+  --radius-sm: 10px !important;
+}
+
+/* ── 2. Hard-code page & card backgrounds (bypass variable cascade) ─ */
+html, body {
+  background-color: #0f0f1c !important;
+  color: #f2f2f8 !important;
+}
+
+/* ── 3. Kill frosted-glass cards – replace with solid dark navy ───── */
+/*
+   The app uses `.glass-card` with backdrop-blur + white gradient.
+   On a dark bg this creates grey frosted look. Replace with solid dark.
+*/
+.glass-card,
+[class*="glass"] {
+  background: #171728 !important;
+  background-image: none !important;
+  backdrop-filter: blur(0px) !important;
+  -webkit-backdrop-filter: blur(0px) !important;
+  border-color: rgba(120, 117, 240, 0.25) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset !important;
+}
+
+/* ── 4. Tool cards ───────────────────────────────────────────────── */
+/*
+   Cards use: rounded-[var(--radius-lg)] bg-[hsl(var(--color-card))]
+   border border-[hsl(var(--color-border))]
+   The CSS vars above handle color. Add a visible indigo border + radius.
+*/
+
+/* Any rounded bordered element (card, panel, input) */
+[class*="rounded"][class*="border"] {
+  border-color: hsl(244 35% 24%) !important;
+}
+
+/* Tool card root – add indigo left-border glow on hover */
+a[href*="/en/tools/"]:hover {
+  box-shadow: 0 0 0 1px rgba(120,117,240,0.35),
+              0 4px 20px rgba(120,117,240,0.12) !important;
+}
+
+/* Card icon area */
+[class*="rounded-xl"][class*="bg-"][class*="0.1"] {
+  background: rgba(120, 117, 240, 0.14) !important;
+}
+
+/* Category badge chips */
+[class*="rounded-full"][class*="border"],
+[class*="rounded-full"][class*="px-"][class*="py-"] {
+  background-color: hsl(244 30% 16%) !important;
+  border-color: hsl(244 35% 26%) !important;
+  color: hsl(244 70% 76%) !important;
+}
+
+/* Favourite star button */
+button[class*="absolute"][class*="rounded-full"] {
+  background: rgba(15, 15, 28, 0.85) !important;
+  border-color: hsl(244 35% 24%) !important;
+}
+button[class*="absolute"][class*="rounded-full"]:hover {
+  background: rgba(120, 117, 240, 0.2) !important;
+}
+
+/* ── 5. Category filter / sticky bar ─────────────────────────────── */
+[class*="sticky"][class*="glass-card"],
+[class*="sticky"][class*="rounded"] {
+  background: rgba(15, 15, 28, 0.92) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-color: rgba(120, 117, 240, 0.2) !important;
+}
+
+/* Category filter button – inactive */
+button[aria-pressed="false"],
+button[variant="outline"],
+[class*="rounded-full"][class*="border"][class*="px-3"] {
+  background: hsl(244 24% 15%) !important;
+  border-color: hsl(244 30% 24%) !important;
+  color: hsl(240 8% 72%) !important;
+}
+button[aria-pressed="false"]:hover {
+  background: hsl(244 24% 20%) !important;
+  border-color: rgba(120,117,240,0.4) !important;
+  color: #f2f2f8 !important;
+}
+
+/* Category filter button – active */
+button[aria-pressed="true"] {
+  background: linear-gradient(135deg, hsl(244 82% 64%), hsl(258 72% 54%)) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 2px 12px rgba(120,117,240,0.4) !important;
+}
+
+/* ── 6. Header ──────────────────────────────────────────────────── */
+header[role="banner"] {
+  background-color: #0f0f1c !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 1px solid hsl(244 35% 18%) !important;
+  box-shadow: none !important;
+}
+
+/* Compact 56px height */
+header[role="banner"] .flex.h-20 {
+  height: 56px !important;
+  min-height: 56px !important;
+}
+
+/* Logo gradient icon */
+header [class*="from-"][class*="to-"] {
+  background-image: linear-gradient(135deg, hsl(244 82% 64%), hsl(258 70% 50%)) !important;
+}
+
+/* Nav pill container */
+header nav[role="navigation"] {
+  background: rgba(23, 23, 40, 0.8) !important;
+  border-color: hsl(244 35% 20%) !important;
+}
+
+/* Search box */
+header input[type="search"],
+header input[type="text"] {
+  background: #171728 !important;
+  border-color: hsl(244 35% 24%) !important;
+  color: #f2f2f8 !important;
+}
+header input:focus {
+  border-color: hsl(244 82% 65%) !important;
+  box-shadow: 0 0 0 3px rgba(120,117,240,0.2) !important;
+}
+
+/* ── 7. Hide unwanted nav items ──────────────────────────────────── */
+a[href*="/workflow"],
+a[href*="/about"],
+a[href*="/faq"],
+a[href*="/contact"],
+li:has(> a[href*="/workflow"]),
+li:has(> a[href*="/about"]),
+li:has(> a[href*="/faq"]),
+li:has(> a[href*="/contact"]),
+a[href*="github.com"],
+a[href*="x.com/"],
+a[href*="twitter.com"],
+#language-selector-slot {
+  display: none !important;
+}
+
+/* ── 8. Hide footer ──────────────────────────────────────────────── */
+footer[role="contentinfo"] { display: none !important; }
+
+/* ── 9. Tool detail page ─────────────────────────────────────────── */
+/* Upload / drop zone */
+[class*="glass-card"][class*="border-dashed"],
+[class*="p-16"][class*="glass-card"],
+[class*="border-dashed"] {
+  background: #171728 !important;
+  border-color: rgba(120, 117, 240, 0.35) !important;
+  backdrop-filter: none !important;
+}
+
+/* "Add to Favorites" pill */
+button[class*="rounded-full"][class*="gap"] {
+  background: hsl(244 24% 16%) !important;
+  border-color: hsl(244 35% 24%) !important;
+  color: #f2f2f8 !important;
+}
+
+/* "About This Tool" section cards */
+[class*="p-6"][class*="rounded"],
+[class*="p-4"][class*="rounded"] {
+  background-color: #171728 !important;
+  border-color: hsl(244 35% 24%) !important;
+}
+
+/* Section headings */
+h2, h3, h4 {
+  color: #f2f2f8 !important;
+}
+
+/* Body / description text */
+p, [class*="text-"][class*="muted"] {
+  color: rgba(242, 242, 248, 0.68) !important;
+}
+
+/* Override muted-foreground back for strong text */
+h1, h2, h3, [class*="font-bold"], [class*="font-semibold"], [class*="font-medium"] {
+  color: #f2f2f8 !important;
+}
+
+/* ── 10. Primary buttons ─────────────────────────────────────────── */
+[class*="bg-"][class*="primary"]:not([class*="border"]),
+button[class*="primary"] {
+  background: linear-gradient(135deg, hsl(244 82% 64%), hsl(258 72% 54%)) !important;
+  box-shadow: 0 2px 16px rgba(120,117,240,0.35) !important;
+}
+
+/* ── 11. Hero / home page ────────────────────────────────────────── */
+section[aria-labelledby="hero-title"] .inline-flex:first-child { display: none !important; }
+section[aria-label="Features"] { display: none !important; }
+
+.text-gradient {
+  background: linear-gradient(135deg, #a78bfa, #818cf8, #7875f0) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* ── 12. Inputs (tool forms) ─────────────────────────────────────── */
+input:not([type="search"]):not([type="text"]),
+textarea, select {
+  background: #171728 !important;
+  border-color: hsl(244 35% 24%) !important;
+  color: #f2f2f8 !important;
+}
+
+/* ── 13. Breadcrumb ──────────────────────────────────────────────── */
+[aria-label="Breadcrumb"],
+[aria-label*="breadcrumb"] {
+  color: rgba(242,242,248,0.5) !important;
+}
+
+/* ── 14. Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(244 40% 30%); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(244 82% 60%); }
+
+/* ── 15. Mobile layout ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .container { padding-left: 12px !important; padding-right: 12px !important; }
+
+  /* 2-column tool grid */
+  .grid-cols-1.md\:grid-cols-2,
+  .grid-cols-1.sm\:grid-cols-2,
+  .grid-cols-1.md\:grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+}

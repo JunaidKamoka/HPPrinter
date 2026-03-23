@@ -25,6 +25,10 @@
 		AA000001000000000000002F /* DocumentPickerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000009 /* DocumentPickerService.swift */; };
 		AA0000010000000000000070 /* writing_paper.html in Resources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000071 /* writing_paper.html */; };
 		AA0000010000000000000072 /* WritingPaperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000073 /* WritingPaperView.swift */; };
+		AA0000010000000000000074 /* PDFToolsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000075 /* PDFToolsViewController.swift */; };
+		AA0000010000000000000076 /* PDFToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000077 /* PDFToolsView.swift */; };
+		AA0000010000000000000078 /* ios-bridge.js in Resources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000079 /* ios-bridge.js */; };
+		AA000001000000000000007A /* www in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000007B /* www */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +51,10 @@
 		AA000001000000000000001F /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
 		AA0000010000000000000071 /* writing_paper.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = writing_paper.html; sourceTree = "<group>"; };
 		AA0000010000000000000073 /* WritingPaperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritingPaperView.swift; sourceTree = "<group>"; };
+		AA0000010000000000000075 /* PDFToolsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsViewController.swift; sourceTree = "<group>"; };
+		AA0000010000000000000077 /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsView.swift; sourceTree = "<group>"; };
+		AA0000010000000000000079 /* ios-bridge.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "ios-bridge.js"; sourceTree = "<group>"; };
+		AA000001000000000000007B /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = PDFTools/www; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +96,8 @@
 				AA0000010000000000000034 /* Services */,
 				AA000001000000000000001C /* Assets.xcassets */,
 				AA0000010000000000000071 /* writing_paper.html */,
+				AA0000010000000000000079 /* ios-bridge.js */,
+				AA000001000000000000007B /* www */,
 			);
 			path = SmartPrinter;
 			sourceTree = "<group>";
@@ -118,6 +128,8 @@
 				AA0000010000000000000019 /* SettingsView.swift */,
 				AA000001000000000000001A /* HistoryView.swift */,
 				AA0000010000000000000073 /* WritingPaperView.swift */,
+				AA0000010000000000000075 /* PDFToolsViewController.swift */,
+				AA0000010000000000000077 /* PDFToolsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -193,6 +205,8 @@
 			files = (
 				AA000001000000000000002B /* Assets.xcassets in Resources */,
 				AA0000010000000000000070 /* writing_paper.html in Resources */,
+				AA0000010000000000000078 /* ios-bridge.js in Resources */,
+				AA000001000000000000007A /* www in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,6 +233,8 @@
 				AA000001000000000000002E /* PersistenceService.swift in Sources */,
 				AA000001000000000000002F /* DocumentPickerService.swift in Sources */,
 				AA0000010000000000000072 /* WritingPaperView.swift in Sources */,
+				AA0000010000000000000074 /* PDFToolsViewController.swift in Sources */,
+				AA0000010000000000000076 /* PDFToolsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -351,7 +367,10 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "HP Smart Printer App : AiPrint";
 				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Smart Printer needs local network access to discover printers on your Wi-Fi network.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "PrintMate uses the camera to scan documents to PDF.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Smart Printer needs photo access to print your photos.";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -385,7 +404,10 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "HP Smart Printer App : AiPrint";
 				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Smart Printer needs local network access to discover printers on your Wi-Fi network.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "PrintMate uses the camera to scan documents to PDF.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Smart Printer needs photo access to print your photos.";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

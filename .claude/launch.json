@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "writing-paper",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "7823", "--directory", "/Users/macbook/Documents/GitHub/iOS/HPPrinter/SmartPrinter"],
+      "port": 7823
+    }
+  ]
+}
