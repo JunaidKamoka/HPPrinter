@@ -155,6 +155,7 @@ class AppViewModel: ObservableObject {
 
     func handlePickedFile(url: URL) {
         selectedFileURL = url
+        RatingService.shared.recordAction()
     }
 
     // MARK: - Queue Management
@@ -229,6 +230,7 @@ class AppViewModel: ObservableObject {
                     self.persistence.saveHistory(self.history)
                 }
 
+                RatingService.shared.recordAction()
                 self.showToastMessage("Printed: \(url.lastPathComponent)")
             }
         }

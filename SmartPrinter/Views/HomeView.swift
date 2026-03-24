@@ -90,7 +90,7 @@ struct HomeView: View {
                     .padding(.top, 8)
                 }
             }
-            .navigationTitle("Smart Printer")
+            .navigationTitle("HP Smart Printer")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

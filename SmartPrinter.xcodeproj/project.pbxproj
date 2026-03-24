@@ -29,6 +29,10 @@
 		AA0000010000000000000076 /* PDFToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000077 /* PDFToolsView.swift */; };
 		AA0000010000000000000078 /* ios-bridge.js in Resources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000079 /* ios-bridge.js */; };
 		AA000001000000000000007A /* www in Resources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000007B /* www */; };
+		AA0000010000000000000080 /* RatingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000081 /* RatingService.swift */; };
+		AA0000010000000000000082 /* AppRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000083 /* AppRatingView.swift */; };
+		AA0000010000000000000084 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000085 /* OnboardingView.swift */; };
+		AA0000010000000000000086 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000087 /* SplashView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +59,10 @@
 		AA0000010000000000000077 /* PDFToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFToolsView.swift; sourceTree = "<group>"; };
 		AA0000010000000000000079 /* ios-bridge.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "ios-bridge.js"; sourceTree = "<group>"; };
 		AA000001000000000000007B /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = PDFTools/www; sourceTree = "<group>"; };
+		AA0000010000000000000081 /* RatingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingService.swift; sourceTree = "<group>"; };
+		AA0000010000000000000083 /* AppRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRatingView.swift; sourceTree = "<group>"; };
+		AA0000010000000000000085 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		AA0000010000000000000087 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +138,9 @@
 				AA0000010000000000000073 /* WritingPaperView.swift */,
 				AA0000010000000000000075 /* PDFToolsViewController.swift */,
 				AA0000010000000000000077 /* PDFToolsView.swift */,
+				AA0000010000000000000083 /* AppRatingView.swift */,
+				AA0000010000000000000085 /* OnboardingView.swift */,
+				AA0000010000000000000087 /* SplashView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -141,6 +152,7 @@
 				AA000001000000000000001E /* PrintService.swift */,
 				AA000001000000000000001F /* PersistenceService.swift */,
 				AA0000010000000000000009 /* DocumentPickerService.swift */,
+				AA0000010000000000000081 /* RatingService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -235,6 +247,10 @@
 				AA0000010000000000000072 /* WritingPaperView.swift in Sources */,
 				AA0000010000000000000074 /* PDFToolsViewController.swift in Sources */,
 				AA0000010000000000000076 /* PDFToolsView.swift in Sources */,
+				AA0000010000000000000080 /* RatingService.swift in Sources */,
+				AA0000010000000000000082 /* AppRatingView.swift in Sources */,
+				AA0000010000000000000084 /* OnboardingView.swift in Sources */,
+				AA0000010000000000000086 /* SplashView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,8 +384,8 @@
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
 				INFOPLIST_KEY_NSCameraUsageDescription = "PrintMate uses the camera to scan documents to PDF.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Smart Printer needs local network access to discover printers on your Wi-Fi network.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Smart Printer needs photo access to print your photos.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "HP Smart Printer needs local network access to discover printers on your Wi-Fi network.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "HP Smart Printer needs photo access to print your photos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIFileSharingEnabled = YES;
@@ -405,8 +421,8 @@
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
 				INFOPLIST_KEY_NSCameraUsageDescription = "PrintMate uses the camera to scan documents to PDF.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Smart Printer needs local network access to discover printers on your Wi-Fi network.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Smart Printer needs photo access to print your photos.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "HP Smart Printer needs local network access to discover printers on your Wi-Fi network.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "HP Smart Printer needs photo access to print your photos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIFileSharingEnabled = YES;
