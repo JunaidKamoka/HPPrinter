@@ -1,52 +1,60 @@
 // app-overrides.js
 // Injected as FIRST script in <head>.
-// Uses a <style> tag injection to apply dark theme so React hydration
-// never sees a mismatch on html.className or html.style.
+// Applies dark theme, redirects home → tools, hides all web chrome.
 
 (function () {
   "use strict";
 
-  // ── A. Dark theme via injected <style> (safe for React hydration) ──
-  // Do NOT touch html.classList or html.style — React owns those during
-  // hydration and any mutation causes error #418.
+  // ── A. Redirect home page → tools listing ───────────────────────
+  // Open directly on the PDF tools screen, not the landing/home page.
+  var p = window.location.pathname;
+  if (p === "/" || p === "" || p === "/en" || p === "/en/" ||
+      p === "/en/index.html" || p === "/index.html") {
+    // Replace history so back button doesn't loop
+    window.location.replace("/en/tools/");
+  }
+
+  // ── B. Dark theme via injected <style> (safe for React hydration) ─
   var darkCSS = [
     ":root,html,.dark,html.dark{",
-    "--color-background:240 28% 8%!important;",
-    "--color-card:240 24% 12%!important;",
-    "--color-muted:240 20% 16%!important;",
-    "--color-border:244 35% 24%!important;",
-    "--color-input:244 35% 24%!important;",
-    "--color-foreground:240 8% 96%!important;",
-    "--color-card-foreground:240 8% 96%!important;",
-    "--color-muted-foreground:240 8% 62%!important;",
-    "--color-primary:244 82% 70%!important;",
+    "--color-background:240 23% 5%!important;",       /* #0a0a0f */
+    "--color-card:240 20% 9%!important;",              /* #12121a */
+    "--color-muted:240 19% 13%!important;",            /* #1a1a26 */
+    "--color-border:244 30% 18%!important;",
+    "--color-input:244 30% 18%!important;",
+    "--color-foreground:240 33% 96%!important;",       /* #f0f0f8 */
+    "--color-card-foreground:240 33% 96%!important;",
+    "--color-muted-foreground:240 14% 63%!important;", /* #9090b0 */
+    "--color-primary:243 100% 69%!important;",         /* #6c63ff */
     "--color-primary-foreground:0 0% 100%!important;",
-    "--color-primary-hover:244 82% 58%!important;",
-    "--color-accent:244 82% 70%!important;",
+    "--color-primary-hover:243 100% 58%!important;",
+    "--color-accent:243 100% 69%!important;",
     "--color-accent-foreground:0 0% 100%!important;",
-    "--color-secondary:244 20% 18%!important;",
-    "--color-secondary-foreground:240 8% 96%!important;",
-    "--color-ring:244 82% 70%!important;",
+    "--color-secondary:243 20% 16%!important;",
+    "--color-secondary-foreground:240 33% 96%!important;",
+    "--color-ring:243 100% 69%!important;",
     "--radius-lg:18px!important;",
     "--radius-md:14px!important;",
     "--radius-sm:10px!important;",
     "}",
-    // Force dark bg/color on body (property, not variable – immediate)
-    "html,body{background:#0f0f1c!important;color:#f2f2f8!important;}",
-    // Kill frosted-glass white gradient
+    "html,body{background:#0a0a0f!important;color:#f0f0f8!important;padding-top:0!important;margin-top:0!important;}",
+    // Hide header + footer before React paints
+    "header,header[role='banner'],footer,footer[role='contentinfo']{display:none!important;}",
+    // Kill frosted glass
     ".glass-card,[class*='glass']{",
-    "background:#171728!important;",
+    "background:#12121a!important;",
     "background-image:none!important;",
     "backdrop-filter:none!important;",
     "-webkit-backdrop-filter:none!important;",
-    "border-color:rgba(120,117,240,.25)!important;",
+    "border-color:rgba(255,255,255,0.08)!important;",
     "}",
+    // Remove top padding reserved for fixed header
+    "main,[role='main'],.pt-20,.pt-16,.pt-14,.pt-12{padding-top:0!important;}",
   ].join("");
 
   var styleEl = document.createElement("style");
   styleEl.id = "sp-dark-override";
   styleEl.textContent = darkCSS;
-  // Insert at the very beginning of <head> so it applies before any other styles
   var head = document.head || document.getElementsByTagName("head")[0];
   if (head.firstChild) {
     head.insertBefore(styleEl, head.firstChild);
@@ -54,19 +62,20 @@
     head.appendChild(styleEl);
   }
 
-  // ── B. After React hydration: add .dark class + text cleanup ───────
-  // Wait until React has finished hydrating before touching the DOM.
+  // ── C. After React hydration: DOM cleanup ────────────────────────
   function afterHydration() {
-    // Now safe to add .dark class (React is done)
     var html = document.documentElement;
     html.classList.add("dark");
     html.classList.remove("light");
 
-    // Text brand replacements
+    // Brand text replacement
     replaceTextInNode(document.body);
 
     // Hide unwanted elements
     hideElements();
+
+    // Remove top padding added by layout for the nav bar
+    removeHeaderSpacing();
   }
 
   function replaceTextInNode(node) {
@@ -95,11 +104,22 @@
 
   function hideElements() {
     var sels = [
-      'a[href*="/workflow"]', 'a[href*="/about"]',
-      'a[href*="/faq"]',      'a[href*="/contact"]',
-      'a[href*="github.com"]','a[href*="x.com/"]',
-      '#language-selector-slot',
-      'footer[role="contentinfo"]',
+      "header",
+      "header[role='banner']",
+      "footer",
+      "footer[role='contentinfo']",
+      "a[href*='/workflow']",
+      "a[href*='/about']",
+      "a[href*='/faq']",
+      "a[href*='/contact']",
+      "a[href*='/privacy']",
+      "a[href*='github.com']",
+      "a[href*='x.com/']",
+      "a[href*='twitter.com']",
+      "a[href*='producthunt.com']",
+      "#language-selector-slot",
+      "[aria-label='Breadcrumb']",
+      "nav[aria-label='breadcrumb']",
     ];
     sels.forEach(function (sel) {
       document.querySelectorAll(sel).forEach(function (el) {
@@ -109,23 +129,39 @@
       });
     });
     if (document.title)
-      document.title = document.title.replace(/PDFCraft/g, "Smart PDF");
+      document.title = document.title.replace(/PDFCraft/gi, "Smart PDF");
   }
 
-  // Run after DOMContentLoaded (React hydration happens shortly after)
+  function removeHeaderSpacing() {
+    // Some layouts add top padding = header height; zero it out
+    var candidates = [
+      document.querySelector("main"),
+      document.querySelector("[role='main']"),
+      document.querySelector("#__next > div"),
+      document.querySelector("body > div"),
+    ];
+    candidates.forEach(function (el) {
+      if (!el) return;
+      var pt = parseInt(window.getComputedStyle(el).paddingTop, 10);
+      // If padding-top looks like a header offset (> 40px), remove it
+      if (pt > 40) el.style.paddingTop = "0";
+    });
+  }
+
+  // Run after React hydrates
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
-      // Small delay to let React finish hydration
       requestAnimationFrame(function () { requestAnimationFrame(afterHydration); });
     });
   } else {
     requestAnimationFrame(function () { requestAnimationFrame(afterHydration); });
   }
 
-  // Re-run hide on client-side navigation
+  // Re-run on client-side navigation (Next.js SPA transitions)
   var observer = new MutationObserver(function (mutations) {
     if (mutations.some(function (m) { return m.addedNodes.length > 0; })) {
       hideElements();
+      removeHeaderSpacing();
     }
   });
   document.addEventListener("DOMContentLoaded", function () {
