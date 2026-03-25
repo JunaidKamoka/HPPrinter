@@ -4,11 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Writing Paper Generator</title>
+<script>
+// Apply theme class before any CSS renders to prevent flash
+(function() {
+  var t = window._appTheme || 'system';
+  var dark = t === 'dark' || (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.classList.add(dark ? 'dark' : 'light');
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    if ((window._appTheme || 'system') === 'system') {
+      var h = document.documentElement;
+      h.classList.toggle('dark', e.matches);
+      h.classList.toggle('light', !e.matches);
+    }
+  });
+})();
+</script>
 <style>
 /* ── Reset & base ──────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
+/* ── Dark theme (default) ──────────────────────────────────────── */
+:root, html.dark {
   --bg:        #0f0f1c;
   --bg2:       #171728;
   --bg3:       #1e1e30;
@@ -20,6 +36,39 @@
   --text3:     rgba(242,242,248,.38);
   --radius:    16px;
   --radius-sm: 10px;
+  --shadow-canvas: 0 0 0 1px rgba(255,255,255,.07), 0 8px 32px rgba(0,0,0,.45);
+}
+
+/* ── Light theme ───────────────────────────────────────────────── */
+html.light {
+  --bg:        #ffffff;
+  --bg2:       #f3f3f8;
+  --bg3:       #e8e8f0;
+  --border:    rgba(91,82,232,.18);
+  --accent:    #5b52e8;
+  --accent2:   #4a43d0;
+  --text:      #0f0f1f;
+  --text2:     rgba(15,15,31,.6);
+  --text3:     rgba(15,15,31,.4);
+  --radius:    16px;
+  --radius-sm: 10px;
+  --shadow-canvas: 0 0 0 1px rgba(0,0,0,.06), 0 8px 32px rgba(0,0,0,.12);
+}
+
+/* ── System light fallback (before class is set) ───────────────── */
+@media (prefers-color-scheme: light) {
+  :root:not(.dark) {
+    --bg:        #ffffff;
+    --bg2:       #f3f3f8;
+    --bg3:       #e8e8f0;
+    --border:    rgba(91,82,232,.18);
+    --accent:    #5b52e8;
+    --accent2:   #4a43d0;
+    --text:      #0f0f1f;
+    --text2:     rgba(15,15,31,.6);
+    --text3:     rgba(15,15,31,.4);
+    --shadow-canvas: 0 0 0 1px rgba(0,0,0,.06), 0 8px 32px rgba(0,0,0,.12);
+  }
 }
 
 html, body {
@@ -55,9 +104,7 @@ html, body {
   max-width: 100%;
   height: auto;
   border-radius: 8px;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.07),
-    0 8px 32px rgba(0,0,0,.45);
+  box-shadow: var(--shadow-canvas);
   background: #fff;
   /* Cap preview height so controls stay visible */
   max-height: 38vh;
@@ -274,7 +321,7 @@ html, body {
   width: 100%;
   padding: 16px;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--accent), #5e5bc8);
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
   color: #fff;
   font-size: 16px;
   font-weight: 700;

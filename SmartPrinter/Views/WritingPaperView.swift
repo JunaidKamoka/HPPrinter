@@ -3,11 +3,12 @@ import WebKit
 
 struct WritingPaperView: View {
     @EnvironmentObject var vm: AppViewModel
+    @EnvironmentObject var themeManager: ThemeManager
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
         NavigationView {
-            WritingPaperWebViewRepresentable(vm: vm)
+            WritingPaperWebViewRepresentable(vm: vm, theme: themeManager.current)
                 .ignoresSafeArea(edges: .bottom)
                 .navigationTitle("Writing Paper")
                 .navigationBarTitleDisplayMode(.inline)
@@ -24,9 +25,18 @@ struct WritingPaperView: View {
 
 struct WritingPaperWebViewRepresentable: UIViewRepresentable {
     let vm: AppViewModel
+    let theme: AppTheme
 
     func makeUIView(context: Context) -> WKWebView {
         let contentController = WKUserContentController()
+
+        // Inject theme before page loads
+        let themeScript = WKUserScript(
+            source: "window._appTheme = '\(theme.jsValue)';",
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: true
+        )
+        contentController.addUserScript(themeScript)
         contentController.add(context.coordinator, name: "printPaper")
 
         let config = WKWebViewConfiguration()
@@ -34,16 +44,39 @@ struct WritingPaperWebViewRepresentable: UIViewRepresentable {
 
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.scrollView.bounces = false
+        webView.isOpaque = false
+        webView.backgroundColor = .appBackground
+        webView.overrideUserInterfaceStyle = theme.uiStyle
 
         if let htmlURL = Bundle.main.url(forResource: "writing_paper", withExtension: "html") {
-            // allowingReadAccessTo the same folder so the WebView can read the local file
             webView.loadFileURL(htmlURL, allowingReadAccessTo: htmlURL.deletingLastPathComponent())
         }
 
         return webView
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {}
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        uiView.overrideUserInterfaceStyle = theme.uiStyle
+        // Re-inject theme on live theme change
+        let isDark: Bool
+        switch theme {
+        case .dark:   isDark = true
+        case .light:  isDark = false
+        case .system: isDark = UITraitCollection.current.userInterfaceStyle == .dark
+        }
+        let js = """
+        (function(){
+          var h = document.documentElement;
+          if (\(isDark ? "true" : "false")) {
+            h.classList.add('dark'); h.classList.remove('light');
+          } else {
+            h.classList.add('light'); h.classList.remove('dark');
+          }
+          window._appTheme = '\(theme.jsValue)';
+        })();
+        """
+        uiView.evaluateJavaScript(js, completionHandler: nil)
+    }
 
     func makeCoordinator() -> Coordinator { Coordinator(vm: vm) }
 
@@ -53,7 +86,6 @@ struct WritingPaperWebViewRepresentable: UIViewRepresentable {
         let vm: AppViewModel
         init(vm: AppViewModel) { self.vm = vm }
 
-        /// Called when JS sends: window.webkit.messageHandlers.printPaper.postMessage(base64String)
         func userContentController(
             _ userContentController: WKUserContentController,
             didReceive message: WKScriptMessage

@@ -34,7 +34,7 @@ struct HistoryView: View {
                                         ForEach(Array(group.1.enumerated()), id: \.element.id) { idx, job in
                                             HistoryRow(job: job)
                                             if idx < group.1.count - 1 {
-                                                Divider().background(Color.white.opacity(0.08)).padding(.leading, 70)
+                                                Divider().background(Color.dividerColor).padding(.leading, 70)
                                             }
                                         }
                                     }
@@ -137,7 +137,7 @@ struct HistoryRow: View {
                     .padding(.horizontal, 8).padding(.vertical, 5)
                     .background(Color.bg3)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.cardBorder, lineWidth: 1))
             }
             .buttonStyle(.plain)
         }

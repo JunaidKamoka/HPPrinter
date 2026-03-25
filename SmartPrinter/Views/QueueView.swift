@@ -49,7 +49,7 @@ struct QueueView: View {
                             .frame(width: 36, height: 36)
                             .background(Color.bg3)
                             .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white.opacity(0.08), lineWidth: 1))
+                            .overlay(Circle().stroke(Color.cardBorder, lineWidth: 1))
                     }
                 }
             }
@@ -112,7 +112,7 @@ struct StatBox: View {
         .padding(.vertical, 12)
         .background(Color.bg2)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.cardBorder, lineWidth: 1))
     }
 }
 
@@ -127,7 +127,7 @@ struct QueueJobCard: View {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(Color.bg3)
                     .frame(width: 42, height: 52)
-                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.white.opacity(0.08), lineWidth: 1))
+                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.cardBorder, lineWidth: 1))
                 Text(job.fileIcon).font(.system(size: 20)).offset(x: -3, y: 14)
                 Path { p in
                     p.move(to: CGPoint(x: 30, y: 0))
@@ -170,13 +170,13 @@ struct QueueJobCard: View {
                     .padding(.horizontal, 10).padding(.vertical, 6)
                     .background(Color.bg3)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.14), lineWidth: 1))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.btnBorder, lineWidth: 1))
             }
         }
         .padding(16)
         .background(Color.bg2)
         .clipShape(RoundedRectangle(cornerRadius: 18))
-        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.cardBorder, lineWidth: 1))
     }
 }
 

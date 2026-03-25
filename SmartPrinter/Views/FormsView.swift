@@ -47,7 +47,7 @@ struct FormsView: View {
                     .padding(.horizontal, 14).padding(.vertical, 11)
                     .background(Color.bg2)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.08), lineWidth: 1))
+                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.cardBorder, lineWidth: 1))
                     .padding(.horizontal).padding(.top, 10).padding(.bottom, 8)
 
                     // Country filter
@@ -95,7 +95,7 @@ struct FormsView: View {
                         .background(isSelected ? Color.accent : Color.bg2)
                         .clipShape(Capsule())
                         .overlay(Capsule().stroke(
-                            isSelected ? Color.accent.opacity(0.5) : Color.white.opacity(0.1),
+                            isSelected ? Color.accent.opacity(0.5) : Color.cardBorder,
                             lineWidth: 1
                         ))
                         .shadow(color: isSelected ? Color.accent.opacity(0.3) : .clear, radius: 6, y: 3)
@@ -262,7 +262,7 @@ struct FormCard: View {
         .padding(13)
         .background(Color.bg2)
         .clipShape(RoundedRectangle(cornerRadius: 18))
-        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.cardBorder, lineWidth: 1))
     }
 
     func shortCountry(_ c: String) -> String {
@@ -295,7 +295,7 @@ struct FormThumbnail: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.09), lineWidth: 1)
+                .stroke(Color.cardBorder, lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
     }
@@ -398,9 +398,9 @@ struct FormDetailView: View {
                             // Details card
                             AppCard {
                                 detailRow(label: "Country", value: "\(form.countryFlag) \(form.country)")
-                                Divider().background(Color.white.opacity(0.08)).padding(.leading, 16)
+                                Divider().background(Color.dividerColor).padding(.leading, 16)
                                 detailRow(label: "Pages", value: "\(form.pageCount)")
-                                Divider().background(Color.white.opacity(0.08)).padding(.leading, 16)
+                                Divider().background(Color.dividerColor).padding(.leading, 16)
                                 detailRow(label: "Form ID", value: form.originalId)
                             }
                         }
@@ -522,7 +522,7 @@ struct FormDetailView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                    .stroke(Color.cardBorder, lineWidth: 1)
             )
             .padding(.horizontal)
 
@@ -664,7 +664,7 @@ struct TagFlow: View {
                             .padding(.horizontal, 10).padding(.vertical, 5)
                             .background(Color.bg3)
                             .clipShape(Capsule())
-                            .overlay(Capsule().stroke(Color.white.opacity(0.1), lineWidth: 1))
+                            .overlay(Capsule().stroke(Color.cardBorder, lineWidth: 1))
                     }
                 }
             }

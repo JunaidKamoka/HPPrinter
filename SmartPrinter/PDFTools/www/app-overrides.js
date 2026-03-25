@@ -14,18 +14,32 @@
     window.location.replace("/en/tools/");
   }
 
-  // ── B. Dark theme via injected <style> (safe for React hydration) ─
-  var darkCSS = [
-    ":root,html,.dark,html.dark{",
-    "--color-background:240 23% 5%!important;",       /* #0a0a0f */
-    "--color-card:240 20% 9%!important;",              /* #12121a */
-    "--color-muted:240 19% 13%!important;",            /* #1a1a26 */
+  // ── B. Determine theme and apply class to <html> immediately ──────
+  // Priority: native injection (window._appTheme) > prefers-color-scheme
+  var _forced    = window._appTheme || "system";
+  var _sysDark   = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var _isDark    = _forced === "dark" || (_forced === "system" && _sysDark);
+
+  // Set html class before any CSS loads — prevents flash of wrong theme
+  var _html = document.documentElement;
+  if (_isDark) {
+    _html.classList.add("dark");
+    _html.classList.remove("light");
+  } else {
+    _html.classList.add("light");
+    _html.classList.remove("dark");
+  }
+
+  var darkVars = [
+    "--color-background:240 23% 5%!important;",
+    "--color-card:240 20% 9%!important;",
+    "--color-muted:240 19% 13%!important;",
     "--color-border:244 30% 18%!important;",
     "--color-input:244 30% 18%!important;",
-    "--color-foreground:240 33% 96%!important;",       /* #f0f0f8 */
+    "--color-foreground:240 33% 96%!important;",
     "--color-card-foreground:240 33% 96%!important;",
-    "--color-muted-foreground:240 14% 63%!important;", /* #9090b0 */
-    "--color-primary:243 100% 69%!important;",         /* #6c63ff */
+    "--color-muted-foreground:240 14% 63%!important;",
+    "--color-primary:243 100% 69%!important;",
     "--color-primary-foreground:0 0% 100%!important;",
     "--color-primary-hover:243 100% 58%!important;",
     "--color-accent:243 100% 69%!important;",
@@ -33,24 +47,36 @@
     "--color-secondary:243 20% 16%!important;",
     "--color-secondary-foreground:240 33% 96%!important;",
     "--color-ring:243 100% 69%!important;",
-    "--radius-lg:18px!important;",
-    "--radius-md:14px!important;",
-    "--radius-sm:10px!important;",
-    "}",
-    "html,body{background:#0a0a0f!important;color:#f0f0f8!important;padding-top:0!important;margin-top:0!important;}",
-    // Hide header + footer before React paints
+  ].join("");
+
+  var lightVars = [
+    "--color-background:0 0% 100%!important;",
+    "--color-card:240 20% 97%!important;",
+    "--color-muted:240 19% 94%!important;",
+    "--color-border:240 14% 88%!important;",
+    "--color-input:240 14% 88%!important;",
+    "--color-foreground:240 20% 6%!important;",
+    "--color-card-foreground:240 20% 6%!important;",
+    "--color-muted-foreground:240 14% 40%!important;",
+    "--color-primary:243 80% 61%!important;",
+    "--color-primary-foreground:0 0% 100%!important;",
+    "--color-primary-hover:243 80% 52%!important;",
+    "--color-accent:243 80% 61%!important;",
+    "--color-accent-foreground:0 0% 100%!important;",
+    "--color-secondary:240 20% 94%!important;",
+    "--color-secondary-foreground:240 20% 6%!important;",
+    "--color-ring:243 80% 61%!important;",
+  ].join("");
+
+  var sharedVars = "--radius-lg:18px!important;--radius-md:14px!important;--radius-sm:10px!important;";
+  var baseBg  = _isDark ? "background:#0a0a0f!important;color:#f0f0f8!important;" : "background:#ffffff!important;color:#0f0f1f!important;";
+
+  var earlyCSS = [
+    ":root,html{", (_isDark ? darkVars : lightVars), sharedVars, "}",
+    "html,body{", baseBg, "padding-top:0!important;margin-top:0!important;}",
     "header,header[role='banner'],footer,footer[role='contentinfo']{display:none!important;}",
-    // Kill frosted glass
-    ".glass-card,[class*='glass']{",
-    "background:#12121a!important;",
-    "background-image:none!important;",
-    "backdrop-filter:none!important;",
-    "-webkit-backdrop-filter:none!important;",
-    "border-color:rgba(255,255,255,0.08)!important;",
-    "}",
-    // Remove top padding reserved for fixed header
+    ".glass-card,[class*='glass']{background:hsl(var(--color-card))!important;background-image:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}",
     "main,[role='main'],.pt-20,.pt-16,.pt-14,.pt-12{padding-top:0!important;}",
-    // Hide hero title and subtitle on tools page immediately
     "section[class*='pt-36'] h1,section[class*='pt-32'] h1{display:none!important;}",
     "section[class*='pt-36']>div>div>p,section[class*='pt-32']>div>div>p{display:none!important;}",
     "section[class*='pt-36'],section[class*='pt-32']{padding-top:8px!important;padding-bottom:0!important;}",
@@ -58,8 +84,8 @@
   ].join("");
 
   var styleEl = document.createElement("style");
-  styleEl.id = "sp-dark-override";
-  styleEl.textContent = darkCSS;
+  styleEl.id = "sp-theme-override";
+  styleEl.textContent = earlyCSS;
   var head = document.head || document.getElementsByTagName("head")[0];
   if (head.firstChild) {
     head.insertBefore(styleEl, head.firstChild);
@@ -67,11 +93,23 @@
     head.appendChild(styleEl);
   }
 
+  // Listen for system theme changes (applies when app theme = "system")
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function(e) {
+    if ((window._appTheme || "system") === "system") {
+      applyThemeClass(e.matches);
+    }
+  });
+
+  function applyThemeClass(isDark) {
+    var h = document.documentElement;
+    if (isDark) { h.classList.add("dark"); h.classList.remove("light"); }
+    else        { h.classList.add("light"); h.classList.remove("dark"); }
+  }
+
   // ── C. After React hydration: DOM cleanup ────────────────────────
   function afterHydration() {
-    var html = document.documentElement;
-    html.classList.add("dark");
-    html.classList.remove("light");
+    // Re-apply the correct theme class after React hydration
+    applyThemeClass(_isDark);
 
     // Brand text replacement
     replaceTextInNode(document.body);

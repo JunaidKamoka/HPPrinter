@@ -100,7 +100,7 @@ struct HomeView: View {
                             .frame(width: 36, height: 36)
                             .background(Color.bg3)
                             .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white.opacity(0.08), lineWidth: 1))
+                            .overlay(Circle().stroke(Color.cardBorder, lineWidth: 1))
                     }
                 }
             }
@@ -346,7 +346,7 @@ struct HomeView: View {
         .background(Color.bg2)
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .overlay(RoundedRectangle(cornerRadius: 18).stroke(
-            connected ? Color.appGreen.opacity(0.3) : Color.white.opacity(0.07),
+            connected ? Color.appGreen.opacity(0.3) : Color.cardBorder,
             lineWidth: 1
         ))
     }
@@ -443,7 +443,7 @@ struct HomeView: View {
             ForEach(Array(printers.enumerated()), id: \.element.id) { idx, printer in
                 PrinterStatusRow(printer: printer)
                 if idx < printers.count - 1 {
-                    Divider().background(Color.white.opacity(0.08)).padding(.leading, 64)
+                    Divider().background(Color.dividerColor).padding(.leading, 64)
                 }
             }
         }
@@ -457,7 +457,7 @@ struct HomeView: View {
             ForEach(Array(recent.enumerated()), id: \.element.id) { idx, job in
                 RecentActivityRow(job: job)
                 if idx < recent.count - 1 {
-                    Divider().background(Color.white.opacity(0.08)).padding(.leading, 64)
+                    Divider().background(Color.dividerColor).padding(.leading, 64)
                 }
             }
         }
@@ -517,7 +517,7 @@ private struct ToolCarouselCard: View {
         .overlay(
             RoundedRectangle(cornerRadius: 20)
                 .stroke(
-                    isHighlighted ? Color(hex: tool.colorA).opacity(0.45) : Color.white.opacity(0.07),
+                    isHighlighted ? Color(hex: tool.colorA).opacity(0.45) : Color.cardBorder,
                     lineWidth: isHighlighted ? 1.5 : 1
                 )
         )
@@ -560,7 +560,7 @@ struct QuickActionButton: View {
             .padding(16)
             .background(Color.bg2)
             .clipShape(RoundedRectangle(cornerRadius: 18))
-            .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.08), lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.cardBorder, lineWidth: 1))
         }
         .buttonStyle(.plain)
     }
@@ -661,7 +661,7 @@ struct TestPrintPickerSheet: View {
                                 .padding(14)
                                 .background(Color.bg2)
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
-                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.08), lineWidth: 1))
+                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.cardBorder, lineWidth: 1))
                             }
                             .buttonStyle(.plain)
                             .disabled(vm.isDownloadingTestPrint)

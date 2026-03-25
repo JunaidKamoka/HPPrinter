@@ -4,47 +4,89 @@
    Colors match Theme.swift precisely.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* ── 0. Force dark ───────────────────────────────────────────────── */
-html { color-scheme: dark !important; }
+/* ── 0. Color scheme — follow app theme class ────────────────────── */
+html.dark  { color-scheme: dark  !important; }
+html.light { color-scheme: light !important; }
 
-/* ── 1. CSS variables – exact native palette ─────────────────────
-   Native Theme.swift:
-     bg  #0a0a0f   bg2 #12121a   bg3 #1a1a26   bg4 #22222f
-     accent #6c63ff  accent2 #8b85ff
-     textPrimary #f0f0f8   textSecondary #9090b0
-   ─────────────────────────────────────────────────────────────── */
-:root, .dark, html, html.dark {
+/* ── 1a. DARK CSS variables (html.dark or system dark) ───────────── */
+:root, html.dark, .dark {
   --color-background:       240 23%  5% !important;   /* #0a0a0f */
   --color-card:             240 20%  9% !important;   /* #12121a */
   --color-muted:            240 19% 13% !important;   /* #1a1a26 */
-
-  --color-border:           244 30% 18% !important;   /* ~#1e1e33 */
+  --color-border:           244 30% 18% !important;
   --color-input:            244 30% 18% !important;
-
   --color-foreground:       240 33% 96% !important;   /* #f0f0f8 */
   --color-card-foreground:  240 33% 96% !important;
   --color-muted-foreground: 240 14% 63% !important;   /* #9090b0 */
-
-  /* accent: #6c63ff → hsl(243 100% 69%) */
-  --color-primary:             243 100% 69% !important;
+  --color-primary:             243 100% 69% !important;  /* #6c63ff */
   --color-primary-foreground:  0     0% 100% !important;
   --color-primary-hover:       243 100% 58% !important;
   --color-accent:              243 100% 69% !important;
   --color-accent-foreground:   0     0% 100% !important;
   --color-secondary:           243  20% 16% !important;
   --color-secondary-foreground:240  33% 96% !important;
-
   --color-ring: 243 100% 69% !important;
-
   --radius-lg: 18px !important;
   --radius-md: 14px !important;
   --radius-sm: 10px !important;
 }
 
+/* ── 1b. LIGHT CSS variables (html.light or system light) ────────── */
+html.light,
+html:not(.dark) {
+  --color-background:       0   0% 100% !important;   /* #ffffff */
+  --color-card:             240 20% 97% !important;   /* #f3f3f8 */
+  --color-muted:            240 19% 94% !important;   /* #e8e8f0 */
+  --color-border:           240 14% 88% !important;   /* #dadae8 */
+  --color-input:            240 14% 88% !important;
+  --color-foreground:       240 20%  6% !important;   /* #0f0f1f */
+  --color-card-foreground:  240 20%  6% !important;
+  --color-muted-foreground: 240 14% 40% !important;   /* #50507a */
+  --color-primary:             243  80% 61% !important;  /* #5b52e8 */
+  --color-primary-foreground:  0     0% 100% !important;
+  --color-primary-hover:       243  80% 52% !important;
+  --color-accent:              243  80% 61% !important;
+  --color-accent-foreground:   0     0% 100% !important;
+  --color-secondary:           240  20% 94% !important;
+  --color-secondary-foreground:240  20%  6% !important;
+  --color-ring: 243 80% 61% !important;
+  --radius-lg: 18px !important;
+  --radius-md: 14px !important;
+  --radius-sm: 10px !important;
+}
+
+/* ── 1c. Media query fallback (when no class set yet) ─────────────── */
+@media (prefers-color-scheme: light) {
+  :root:not(.dark) {
+    --color-background:       0   0% 100% !important;
+    --color-card:             240 20% 97% !important;
+    --color-muted:            240 19% 94% !important;
+    --color-border:           240 14% 88% !important;
+    --color-input:            240 14% 88% !important;
+    --color-foreground:       240 20%  6% !important;
+    --color-card-foreground:  240 20%  6% !important;
+    --color-muted-foreground: 240 14% 40% !important;
+    --color-primary:          243  80% 61% !important;
+    --color-primary-foreground:  0  0% 100% !important;
+    --color-accent:           243  80% 61% !important;
+    --color-accent-foreground:   0  0% 100% !important;
+    --color-secondary:        240  20% 94% !important;
+    --color-secondary-foreground: 240 20% 6% !important;
+    --color-ring: 243 80% 61% !important;
+  }
+}
+
 /* ── 2. Base page ────────────────────────────────────────────────── */
-html, body {
+html.dark body, html.dark html {
   background-color: #0a0a0f !important;
   color: #f0f0f8 !important;
+}
+html.light body, html.light html,
+html:not(.dark) body {
+  background-color: #ffffff !important;
+  color: #0f0f1f !important;
+}
+html, body {
   padding-top: 0 !important;
   margin-top: 0 !important;
 }
@@ -86,19 +128,29 @@ section[class*="pt-24"] {
 }
 
 /* ── 4. Kill frosted-glass ───────────────────────────────────────── */
-.glass-card,
-[class*="glass"] {
-  background: #12121a !important;
+html.dark .glass-card, html.dark [class*="glass"],
+.glass-card, [class*="glass"] {
+  background: hsl(var(--color-card)) !important;
   background-image: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   border-color: rgba(108, 99, 255, 0.2) !important;
 }
+html.light .glass-card, html.light [class*="glass"],
+html:not(.dark) .glass-card, html:not(.dark) [class*="glass"] {
+  background: hsl(var(--color-card)) !important;
+  border-color: rgba(91, 82, 232, 0.15) !important;
+}
 
 /* ── 5. Tool cards ───────────────────────────────────────────────── */
-/* Card containers */
+/* Card containers – adaptive border */
+html.dark [class*="rounded"][class*="border"],
 [class*="rounded"][class*="border"] {
   border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html.light [class*="rounded"][class*="border"],
+html:not(.dark) [class*="rounded"][class*="border"] {
+  border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Tool card hover glow – matches native accentGlow */
@@ -113,9 +165,19 @@ a[href*="/tools/"]:hover {
   background-image: none !important;
 }
 
-/* Icon SVG color inside tool cards – white on purple bg, matches native app */
+/* Icon SVG color inside tool cards */
+html.dark [data-testid="tool-card-icon"] svg,
 [data-testid="tool-card-icon"] svg {
   color: #f0f0f8 !important;
+  stroke: currentColor;
+}
+html.light [data-testid="tool-card-icon"],
+html:not(.dark) [data-testid="tool-card-icon"] {
+  background: rgba(91, 82, 232, 0.14) !important;
+}
+html.light [data-testid="tool-card-icon"] svg,
+html:not(.dark) [data-testid="tool-card-icon"] svg {
+  color: #5b52e8 !important;
   stroke: currentColor;
 }
 
@@ -136,14 +198,14 @@ a[href*="/tools/"]:hover {
 button[aria-pressed="false"],
 [class*="rounded-full"][class*="border"][class*="px-3"],
 [class*="rounded-full"][class*="border"][class*="px-4"] {
-  background: #1a1a26 !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: #9090b0 !important;
+  background: hsl(var(--color-muted)) !important;
+  border-color: hsl(var(--color-border)) !important;
+  color: hsl(var(--color-muted-foreground)) !important;
 }
 button[aria-pressed="false"]:hover {
-  background: #22222f !important;
-  border-color: rgba(108, 99, 255, 0.35) !important;
-  color: #f0f0f8 !important;
+  background: hsl(var(--color-secondary)) !important;
+  border-color: hsl(var(--color-primary) / 0.35) !important;
+  color: hsl(var(--color-foreground)) !important;
 }
 
 /* Active */
@@ -158,26 +220,26 @@ button[aria-pressed="true"] {
 [class*="sticky"][class*="glass-card"],
 [class*="sticky"][class*="rounded"],
 [class*="sticky"][class*="top-"] {
-  background: rgba(10, 10, 15, 0.96) !important;
+  background: hsl(var(--color-background) / 0.96) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  border-color: rgba(255, 255, 255, 0.07) !important;
+  border-color: hsl(var(--color-border)) !important;
 }
 
 /* ── 8. Cards (p-4/p-6 containers) ──────────────────────────────── */
 [class*="p-6"][class*="rounded"],
 [class*="p-4"][class*="rounded"],
 [class*="p-8"][class*="rounded"] {
-  background-color: #12121a !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: hsl(var(--color-card)) !important;
+  border-color: hsl(var(--color-border)) !important;
 }
 
 /* ── 9. Upload / drop zone ───────────────────────────────────────── */
 [class*="glass-card"][class*="border-dashed"],
 [class*="border-dashed"],
 [class*="p-16"][class*="glass-card"] {
-  background: #12121a !important;
-  border-color: rgba(108, 99, 255, 0.3) !important;
+  background: hsl(var(--color-card)) !important;
+  border-color: hsl(var(--color-primary) / 0.3) !important;
   backdrop-filter: none !important;
 }
 
@@ -192,17 +254,35 @@ button[class*="primary"],
 }
 
 /* ── 11. Favourite / pill buttons ───────────────────────────────── */
+html.dark button[class*="absolute"][class*="rounded-full"],
 button[class*="absolute"][class*="rounded-full"] {
   background: rgba(10, 10, 15, 0.85) !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
+html.light button[class*="absolute"][class*="rounded-full"],
+html:not(.dark) button[class*="absolute"][class*="rounded-full"] {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+html.dark button[class*="absolute"][class*="rounded-full"]:hover,
 button[class*="absolute"][class*="rounded-full"]:hover {
   background: rgba(108, 99, 255, 0.2) !important;
 }
+html.light button[class*="absolute"][class*="rounded-full"]:hover,
+html:not(.dark) button[class*="absolute"][class*="rounded-full"]:hover {
+  background: rgba(91, 82, 232, 0.12) !important;
+}
+html.dark button[class*="rounded-full"][class*="gap"],
 button[class*="rounded-full"][class*="gap"] {
   background: #1a1a26 !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #f0f0f8 !important;
+}
+html.light button[class*="rounded-full"][class*="gap"],
+html:not(.dark) button[class*="rounded-full"][class*="gap"] {
+  background: #e8e8f0 !important;
+  border-color: rgba(0, 0, 0, 0.09) !important;
+  color: #0f0f1f !important;
 }
 
 /* ── 12. Typography ──────────────────────────────────────────────── */
@@ -210,11 +290,11 @@ h1, h2, h3, h4,
 [class*="font-bold"],
 [class*="font-semibold"],
 [class*="font-medium"] {
-  color: #f0f0f8 !important;
+  color: hsl(var(--color-foreground)) !important;
 }
 
 p, [class*="text-"][class*="muted"] {
-  color: rgba(240, 240, 248, 0.65) !important;
+  color: hsl(var(--color-muted-foreground)) !important;
 }
 
 .text-gradient {
@@ -226,16 +306,16 @@ p, [class*="text-"][class*="muted"] {
 
 /* ── 13. Inputs ──────────────────────────────────────────────────── */
 input, textarea, select {
-  background: #12121a !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: #f0f0f8 !important;
+  background: hsl(var(--color-card)) !important;
+  border-color: hsl(var(--color-border)) !important;
+  color: hsl(var(--color-foreground)) !important;
 }
 input:focus, textarea:focus, select:focus {
-  border-color: #6c63ff !important;
-  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2) !important;
+  border-color: hsl(var(--color-primary)) !important;
+  box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.2) !important;
   outline: none !important;
 }
-::placeholder { color: #9090b0 !important; }
+::placeholder { color: hsl(var(--color-muted-foreground)) !important; }
 
 /* ── 14. Hide web-only & branding elements ───────────────────────── */
 /* Nav links to web pages */

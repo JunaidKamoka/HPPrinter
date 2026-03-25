@@ -75,7 +75,7 @@ struct DiscoverView: View {
                             .frame(width: 36, height: 36)
                             .background(Color.bg3)
                             .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white.opacity(0.08), lineWidth: 1))
+                            .overlay(Circle().stroke(Color.cardBorder, lineWidth: 1))
                     }
                 }
             }
@@ -121,7 +121,7 @@ struct DiscoverView: View {
         }
         .frame(height: 180)
         .clipShape(RoundedRectangle(cornerRadius: 18))
-        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.cardBorder, lineWidth: 1))
     }
 }
 
@@ -193,7 +193,7 @@ struct PrinterDiscoverRow: View {
             .clipShape(RoundedRectangle(cornerRadius: 18))
             .overlay(
                 RoundedRectangle(cornerRadius: 18)
-                    .stroke(printer.isPrimary ? Color.accent.opacity(0.4) : Color.white.opacity(0.08), lineWidth: 1)
+                    .stroke(printer.isPrimary ? Color.accent.opacity(0.4) : Color.cardBorder, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)

@@ -80,7 +80,7 @@ struct PrintablesView: View {
             .padding(.horizontal, 14).padding(.vertical, 11)
             .background(Color.bg2)
             .clipShape(RoundedRectangle(cornerRadius: 14))
-            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.08), lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.cardBorder, lineWidth: 1))
             .padding(.horizontal).padding(.top, 10).padding(.bottom, 12)
 
             // Stats bar
@@ -204,7 +204,7 @@ struct PrintablesView: View {
         .padding(.horizontal, 14).padding(.vertical, 12)
         .background(Color.bg2)
         .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.cardBorder, lineWidth: 1))
     }
 }
 
@@ -254,7 +254,7 @@ struct CategoryTile: View {
                 .background(Color.bg2)
             }
             .clipShape(RoundedRectangle(cornerRadius: 18))
-            .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.08), lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.cardBorder, lineWidth: 1))
             .shadow(color: Color(hex: category.gradientColors[0]).opacity(0.25), radius: 8, y: 4)
         }
         .buttonStyle(.plain)
@@ -284,7 +284,7 @@ struct PrintableItemCard: View {
                 }
                 .frame(width: size, height: size)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.08), lineWidth: 1))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.cardBorder, lineWidth: 1))
 
                 // PDF badge
                 if item.hasPdf {
@@ -367,9 +367,9 @@ struct PrintableDetailView: View {
                             // Details card
                             AppCard {
                                 detailRow(label: "Category", value: item.categoryName)
-                                Divider().background(Color.white.opacity(0.08)).padding(.leading, 16)
+                                Divider().background(Color.dividerColor).padding(.leading, 16)
                                 detailRow(label: "Pages", value: "\(item.images.count)")
-                                Divider().background(Color.white.opacity(0.08)).padding(.leading, 16)
+                                Divider().background(Color.dividerColor).padding(.leading, 16)
                                 detailRow(label: "Format", value: item.hasPdf ? "PDF + Image" : "Image only")
                             }
                         }
@@ -499,7 +499,7 @@ struct PrintableDetailView: View {
             .frame(height: 340)
             .background(Color.bg2)
             .clipShape(RoundedRectangle(cornerRadius: 16))
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.06), lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.cardBorder, lineWidth: 1))
             .padding(.horizontal)
 
             if item.images.count > 1 {

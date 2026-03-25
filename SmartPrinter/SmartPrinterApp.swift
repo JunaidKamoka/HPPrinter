@@ -2,10 +2,11 @@ import SwiftUI
 
 @main
 struct SmartPrinterApp: App {
-    @StateObject private var viewModel = AppViewModel()
+    @StateObject private var viewModel    = AppViewModel()
+    @StateObject private var themeManager = ThemeManager()
     @Environment(\.scenePhase) private var scenePhase
-    @State private var showRating = false
-    @State private var showSplash = true
+    @State private var showRating     = false
+    @State private var showSplash     = true
     @State private var showOnboarding = !UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
 
     var body: some Scene {
@@ -13,7 +14,7 @@ struct SmartPrinterApp: App {
             ZStack {
                 ContentView()
                     .environmentObject(viewModel)
-                    .preferredColorScheme(.dark)
+                    .environmentObject(themeManager)
 
                 if showRating {
                     AppRatingView(isPresented: $showRating)
@@ -33,6 +34,7 @@ struct SmartPrinterApp: App {
                         .zIndex(300)
                 }
             }
+            .preferredColorScheme(themeManager.colorScheme)
             .onChange(of: scenePhase) { newPhase in
                 guard !showOnboarding && !showSplash else { return }
                 switch newPhase {

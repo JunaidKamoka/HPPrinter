@@ -131,6 +131,9 @@ class PDFToolsViewController: UIViewController,
 
     var webView: WKWebView!
 
+    /// Theme set by the SwiftUI wrapper before viewDidLoad.
+    var appTheme: AppTheme = .system
+
     /// Called when the user finishes with the tool and wants to dismiss.
     var onDismiss: (() -> Void)?
 
@@ -141,21 +144,36 @@ class PDFToolsViewController: UIViewController,
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(red: 0.04, green: 0.04, blue: 0.06, alpha: 1)
+        overrideUserInterfaceStyle = appTheme.uiStyle
+        view.backgroundColor = .appBackground
         setupNavigationBar()
         setupWebView()
         loadSmartPDF()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        guard traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) else { return }
+        view.backgroundColor = .appBackground
+        webView?.backgroundColor = .appBackground
+        injectThemeIntoWebView()
+    }
+
+    /// Called from PDFToolsView.updateUIViewController when the user changes theme in Settings.
+    func applyTheme(_ theme: AppTheme) {
+        appTheme = theme
+        overrideUserInterfaceStyle = theme.uiStyle
+        view.backgroundColor = .appBackground
+        webView?.backgroundColor = .appBackground
+        injectThemeIntoWebView()
     }
 
     // MARK: - Navigation Bar
 
     private func setupNavigationBar() {
         title = "PDF Tools"
-        navigationController?.navigationBar.tintColor = UIColor(red: 0.42, green: 0.39, blue: 1.0, alpha: 1)
-        navigationController?.navigationBar.barStyle = .black
-        navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor(red: 0.94, green: 0.94, blue: 0.97, alpha: 1)
-        ]
+        navigationController?.navigationBar.tintColor = .appAccent
+        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.appLabel]
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Done", style: .done, target: self, action: #selector(didTapDone)
         )
@@ -183,6 +201,14 @@ class PDFToolsViewController: UIViewController,
          "_jsLog", "_jsError", "_jsWarn", "_jsInfo"].forEach {
             cc.add(self, name: $0)
         }
+
+        // Inject app theme before any JS runs so app-overrides.js can read it
+        let themeScript = WKUserScript(
+            source: "window._appTheme = '\(appTheme.jsValue)';",
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: false
+        )
+        cc.addUserScript(themeScript)
 
         // Inject console bridge — forwards all JS console output to Swift print()
         let consoleBridge = WKUserScript(source: """
@@ -228,10 +254,34 @@ class PDFToolsViewController: UIViewController,
         webView = WKWebView(frame: view.bounds, configuration: config)
         webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         webView.scrollView.bounces = false
-        webView.isOpaque = true
-        webView.backgroundColor = UIColor(red: 0.04, green: 0.04, blue: 0.06, alpha: 1)
+        webView.isOpaque = false
+        webView.backgroundColor = .appBackground
         webView.navigationDelegate = self
         view.addSubview(webView)
+    }
+
+    // MARK: - Theme Bridge
+
+    func injectThemeIntoWebView() {
+        guard let webView else { return }
+        let isDark: Bool
+        switch appTheme {
+        case .dark:   isDark = true
+        case .light:  isDark = false
+        case .system: isDark = traitCollection.userInterfaceStyle == .dark
+        }
+        let js = """
+        (function(){
+          var h = document.documentElement;
+          if (\(isDark ? "true" : "false")) {
+            h.classList.add('dark'); h.classList.remove('light');
+          } else {
+            h.classList.add('light'); h.classList.remove('dark');
+          }
+          window._appTheme = '\(appTheme.jsValue)';
+        })();
+        """
+        webView.evaluateJavaScript(js, completionHandler: nil)
     }
 
     // MARK: - Load Smart PDF
@@ -495,6 +545,7 @@ extension PDFToolsViewController: WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         NSLog("[NAV] didFinish → \(webView.url?.absoluteString ?? "?")")
+        injectThemeIntoWebView()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
