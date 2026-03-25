@@ -1,0 +1,22 @@
+# Firebase — keep credentials out of source control
+GoogleService-Info.plist
+
+# Xcode
+*.xcuserstate
+*.xcuserdata/
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# CocoaPods (if used later)
+Pods/
+Podfile.lock
+
+# macOS
+.DS_Store

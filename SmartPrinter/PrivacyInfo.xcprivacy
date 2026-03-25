@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+
+	<!-- ─────────────────────────────────────────────
+	     NSPrivacyTracking
+	     We do NOT track users across apps/websites.
+	     ───────────────────────────────────────────── -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+
+	<!-- ─────────────────────────────────────────────
+	     NSPrivacyTrackingDomains
+	     No tracking domains.
+	     ───────────────────────────────────────────── -->
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<!-- ─────────────────────────────────────────────
+	     NSPrivacyCollectedDataTypes
+	     Declare what data is collected and why.
+	     ───────────────────────────────────────────── -->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array>
+
+		<!-- Device ID — for crash-free rate & unique user analytics (local only) -->
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeDeviceID</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+
+		<!-- Product Interaction — print counts, feature usage (on-device only) -->
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeProductInteraction</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+				<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+			</array>
+		</dict>
+
+	</array>
+
+	<!-- ─────────────────────────────────────────────
+	     NSPrivacyAccessedAPITypes
+	     Required: declare every privacy-sensitive API used.
+	     ───────────────────────────────────────────── -->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+
+		<!-- UserDefaults — settings, rating state, print history flags -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- CA92.1: Access user defaults to read/write info only from/to app or
+				     extension with the same bundle ID. -->
+				<string>CA92.1</string>
+			</array>
+		</dict>
+
+		<!-- File Timestamp — reading modification dates of printed documents -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- C617.1: Access the file timestamp to provide app functionality
+				     displayed to user. -->
+				<string>C617.1</string>
+			</array>
+		</dict>
+
+		<!-- Disk Space — checking available disk space before saving large PDFs -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- E174.1: Access the disk space to check whether there is sufficient
+				     space to perform a requested task. -->
+				<string>E174.1</string>
+			</array>
+		</dict>
+
+		<!-- System Boot Time — for relative time calculations in print history -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- 35F9.1: Access the system boot time to measure the time on-device
+				     for non-tracking purposes. -->
+				<string>35F9.1</string>
+			</array>
+		</dict>
+
+	</array>
+
+</dict>
+</plist>

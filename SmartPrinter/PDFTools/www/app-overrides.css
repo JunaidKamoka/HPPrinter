@@ -107,7 +107,25 @@ a[href*="/tools/"]:hover {
               0 4px 20px rgba(108, 99, 255, 0.1) !important;
 }
 
-/* Tool icon area – native bg2 + accent opacity like app cards */
+/* Tool icon area – target by data-testid for reliable matching */
+[data-testid="tool-card-icon"] {
+  background: rgba(108, 99, 255, 0.18) !important;
+  background-image: none !important;
+}
+
+/* Icon SVG color inside tool cards – white on purple bg, matches native app */
+[data-testid="tool-card-icon"] svg {
+  color: #f0f0f8 !important;
+  stroke: currentColor;
+}
+
+/* Fallback: rounded-2xl icon containers with gradient bg */
+[class*="rounded-2xl"][class*="bg-gradient"] {
+  background: rgba(108, 99, 255, 0.15) !important;
+  background-image: none !important;
+}
+
+/* Legacy selectors kept for other elements */
 [class*="rounded-xl"][class*="bg-"][class*="0.1"],
 [class*="rounded-lg"][class*="bg-"][class*="opacity"] {
   background: rgba(108, 99, 255, 0.12) !important;
@@ -164,7 +182,8 @@ button[aria-pressed="true"] {
 }
 
 /* ── 10. Primary buttons ─────────────────────────────────────────── */
-[class*="bg-"][class*="primary"]:not([class*="border"]),
+/* Exclude tool-card-icon and gradient containers to avoid false match */
+[class*="bg-"][class*="primary"]:not([class*="border"]):not([data-testid="tool-card-icon"]):not([class*="bg-gradient"]),
 button[class*="primary"],
 [class*="btn-primary"] {
   background: linear-gradient(135deg, #6c63ff, #8b5cf6) !important;
@@ -255,7 +274,57 @@ section[aria-label="Hero"],
 ::-webkit-scrollbar-thumb { background: rgba(108, 99, 255, 0.4); border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: #6c63ff; }
 
-/* ── 16. Mobile layout ───────────────────────────────────────────── */
+/* ── 16. Tools page – compact header (title/subtitle hidden) ─────── */
+/* Hide hero title and subtitle on tools listing page */
+section[class*="pt-36"] h1,
+section[class*="pt-32"] h1 {
+  display: none !important;
+}
+section[class*="pt-36"] > div > div > p,
+section[class*="pt-32"] > div > div > p {
+  display: none !important;
+}
+/* Collapse hero section */
+section[class*="pt-36"],
+section[class*="pt-32"] {
+  padding-top: 8px !important;
+  padding-bottom: 0 !important;
+}
+/* Remove decorative background blobs */
+section[class*="pt-36"] div[class*="absolute"][class*="-z-10"],
+section[class*="pt-32"] div[class*="absolute"][class*="-z-10"] {
+  display: none !important;
+}
+/* Full-width search inside hero */
+section[class*="pt-36"] [class*="max-w-2xl"],
+section[class*="pt-32"] [class*="max-w-2xl"] {
+  max-width: none !important;
+}
+section[class*="pt-36"] [class*="max-w-3xl"],
+section[class*="pt-32"] [class*="max-w-3xl"] {
+  max-width: none !important;
+  text-align: left !important;
+}
+/* Compact filter section */
+section[class*="py-8"][class*="min-h"] {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  background: transparent !important;
+  min-height: 0 !important;
+}
+/* Filter bar: sticky at top-0, compact */
+[class*="sticky"][class*="top-20"] {
+  top: 0 !important;
+  padding: 6px 12px !important;
+  margin-bottom: 6px !important;
+  gap: 8px !important;
+}
+/* Result count row: compact */
+[class*="mb-6"][class*="px-2"] {
+  margin-bottom: 6px !important;
+}
+
+/* ── 17. Mobile layout ───────────────────────────────────────────── */
 @media (max-width: 768px) {
   .container {
     padding-left: 12px !important;

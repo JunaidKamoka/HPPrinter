@@ -50,6 +50,11 @@
     "}",
     // Remove top padding reserved for fixed header
     "main,[role='main'],.pt-20,.pt-16,.pt-14,.pt-12{padding-top:0!important;}",
+    // Hide hero title and subtitle on tools page immediately
+    "section[class*='pt-36'] h1,section[class*='pt-32'] h1{display:none!important;}",
+    "section[class*='pt-36']>div>div>p,section[class*='pt-32']>div>div>p{display:none!important;}",
+    "section[class*='pt-36'],section[class*='pt-32']{padding-top:8px!important;padding-bottom:0!important;}",
+    "section[class*='py-8'][class*='min-h']{padding-top:0!important;background:transparent!important;min-height:0!important;}",
   ].join("");
 
   var styleEl = document.createElement("style");
@@ -76,6 +81,103 @@
 
     // Remove top padding added by layout for the nav bar
     removeHeaderSpacing();
+
+    // Compact tools listing page: merge search + filter onto one row
+    compactToolsPage();
+  }
+
+  // ── D. Compact tools listing page ────────────────────────────────
+  // Hides title/subtitle, merges search input into the filter bar row.
+  var _toolsCompacted = false;
+  function compactToolsPage() {
+    var path = window.location.pathname;
+    if (!/\/tools\/?(\?|#|$)/.test(path)) { _toolsCompacted = false; return; }
+    if (_toolsCompacted) return;
+
+    // Find hero section (has pt-36 or pt-32 class)
+    var hero = document.querySelector("section[class*='pt-36']") ||
+               document.querySelector("section[class*='pt-32']");
+    if (!hero) return;
+
+    // Find filter bar (sticky row with category chips)
+    var filterBar = document.querySelector("[class*='sticky'][class*='top-20']");
+    if (!filterBar) return;
+
+    // 1. Hide decorative blobs, h1, subtitle
+    var deco = hero.querySelector("div[class*='absolute'][class*='-z-10']");
+    if (deco) deco.style.display = "none";
+    var h1 = hero.querySelector("h1");
+    if (h1) h1.style.display = "none";
+    var subtitle = hero.querySelector("p");
+    if (subtitle) subtitle.style.display = "none";
+    hero.style.padding = "8px 0 0";
+
+    // 2. Find search wrapper inside hero
+    var searchWrap = hero.querySelector("[class*='max-w-2xl']");
+    if (!searchWrap) return;
+
+    // 3. Compact the input: smaller padding
+    var searchInput = searchWrap.querySelector("input");
+    if (searchInput) {
+      searchInput.style.paddingTop = "10px";
+      searchInput.style.paddingBottom = "10px";
+      searchInput.style.fontSize = "15px";
+    }
+
+    // 4. Style search wrapper for inline layout
+    searchWrap.style.flex = "1";
+    searchWrap.style.maxWidth = "none";
+    searchWrap.style.minWidth = "0";
+
+    // 5. Hide the mobile-only "Filters" toggle button
+    filterBar.querySelectorAll("button").forEach(function (btn) {
+      if (!btn.getAttribute("aria-pressed") && /ilter/.test(btn.textContent)) {
+        btn.style.display = "none";
+      }
+    });
+
+    // 6. Show category chips on mobile (override hidden md:flex)
+    var chipGroup = filterBar.querySelector("[role='group']");
+    if (chipGroup) {
+      chipGroup.style.display = "flex";
+      chipGroup.style.flexWrap = "nowrap";
+      chipGroup.style.overflowX = "auto";
+      chipGroup.style.webkitOverflowScrolling = "touch";
+      chipGroup.style.flex = "1";
+      chipGroup.style.gap = "4px";
+      chipGroup.style.scrollbarWidth = "none";
+    }
+
+    // 7. Move search wrapper into filter bar as first child
+    filterBar.insertBefore(searchWrap, filterBar.firstChild);
+
+    // 8. Make filter bar a compact flex row
+    filterBar.style.flexDirection = "row";
+    filterBar.style.alignItems = "center";
+    filterBar.style.flexWrap = "nowrap";
+    filterBar.style.gap = "8px";
+    filterBar.style.padding = "6px 12px";
+    filterBar.style.marginBottom = "6px";
+    filterBar.style.position = "sticky";
+    filterBar.style.top = "0";
+
+    // 9. Collapse filter section background/padding
+    var filterSection = filterBar.closest("section");
+    if (filterSection) {
+      filterSection.style.paddingTop = "0";
+      filterSection.style.paddingBottom = "0";
+      filterSection.style.background = "transparent";
+      filterSection.style.minHeight = "0";
+    }
+
+    // 10. Compact result count bar
+    var countBar = filterBar.nextElementSibling;
+    if (countBar) {
+      countBar.style.marginBottom = "6px";
+      countBar.style.padding = "0 4px";
+    }
+
+    _toolsCompacted = true;
   }
 
   function replaceTextInNode(node) {
@@ -162,6 +264,7 @@
     if (mutations.some(function (m) { return m.addedNodes.length > 0; })) {
       hideElements();
       removeHeaderSpacing();
+      compactToolsPage();
     }
   });
   document.addEventListener("DOMContentLoaded", function () {

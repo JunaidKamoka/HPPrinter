@@ -15,28 +15,27 @@ struct ContentView: View {
                     }
                     .tag(0)
 
-                DiscoverView()
+                FormsView()
                     .tabItem {
-                        Label("Discover", systemImage: "wifi")
+                        Label("Forms", systemImage: "doc.text.fill")
                     }
                     .tag(1)
 
-                QueueView()
+                PrintablesView()
                     .tabItem {
-                        Label("Queue", systemImage: "tray.full.fill")
+                        Label("Printables", systemImage: "rectangle.grid.2x2.fill")
                     }
-                    .badge(vm.queue.count)
                     .tag(2)
-
-                SettingsView()
-                    .tabItem {
-                        Label("Settings", systemImage: "gearshape.fill")
-                    }
-                    .tag(3)
 
                 HistoryView()
                     .tabItem {
                         Label("History", systemImage: "clock.fill")
+                    }
+                    .tag(3)
+
+                SettingsView()
+                    .tabItem {
+                        Label("Settings", systemImage: "gearshape.fill")
                     }
                     .tag(4)
             }

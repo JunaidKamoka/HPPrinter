@@ -33,6 +33,13 @@
 		AA0000010000000000000082 /* AppRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000083 /* AppRatingView.swift */; };
 		AA0000010000000000000084 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000085 /* OnboardingView.swift */; };
 		AA0000010000000000000086 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000087 /* SplashView.swift */; };
+		AA0000010000000000000089 /* FormsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000088 /* FormsView.swift */; };
+		AA000001000000000000008B /* PrintablesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000008A /* PrintablesView.swift */; };
+		AA000001000000000000008D /* WebImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000008C /* WebImage.swift */; };
+		AA000001000000000000008F /* TemplateModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000008E /* TemplateModels.swift */; };
+		AA0000010000000000000091 /* TemplateDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000090 /* TemplateDataService.swift */; };
+		AA0000010000000000000093 /* FirebaseStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000092 /* FirebaseStorageService.swift */; };
+		AA0000010000000000000095 /* SpotlightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000094 /* SpotlightService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +70,13 @@
 		AA0000010000000000000083 /* AppRatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRatingView.swift; sourceTree = "<group>"; };
 		AA0000010000000000000085 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		AA0000010000000000000087 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		AA0000010000000000000088 /* FormsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormsView.swift; sourceTree = "<group>"; };
+		AA000001000000000000008A /* PrintablesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintablesView.swift; sourceTree = "<group>"; };
+		AA000001000000000000008C /* WebImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebImage.swift; sourceTree = "<group>"; };
+		AA000001000000000000008E /* TemplateModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateModels.swift; sourceTree = "<group>"; };
+		AA0000010000000000000090 /* TemplateDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateDataService.swift; sourceTree = "<group>"; };
+		AA0000010000000000000092 /* FirebaseStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStorageService.swift; sourceTree = "<group>"; };
+		AA0000010000000000000094 /* SpotlightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +129,7 @@
 			children = (
 				AA0000010000000000000013 /* Printer.swift */,
 				AA0000010000000000000014 /* PrintJob.swift */,
+				AA000001000000000000008E /* TemplateModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -141,6 +156,9 @@
 				AA0000010000000000000083 /* AppRatingView.swift */,
 				AA0000010000000000000085 /* OnboardingView.swift */,
 				AA0000010000000000000087 /* SplashView.swift */,
+				AA0000010000000000000088 /* FormsView.swift */,
+				AA000001000000000000008A /* PrintablesView.swift */,
+				AA000001000000000000008C /* WebImage.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -153,6 +171,9 @@
 				AA000001000000000000001F /* PersistenceService.swift */,
 				AA0000010000000000000009 /* DocumentPickerService.swift */,
 				AA0000010000000000000081 /* RatingService.swift */,
+				AA0000010000000000000090 /* TemplateDataService.swift */,
+				AA0000010000000000000092 /* FirebaseStorageService.swift */,
+				AA0000010000000000000094 /* SpotlightService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -251,6 +272,13 @@
 				AA0000010000000000000082 /* AppRatingView.swift in Sources */,
 				AA0000010000000000000084 /* OnboardingView.swift in Sources */,
 				AA0000010000000000000086 /* SplashView.swift in Sources */,
+				AA0000010000000000000089 /* FormsView.swift in Sources */,
+				AA000001000000000000008B /* PrintablesView.swift in Sources */,
+				AA000001000000000000008D /* WebImage.swift in Sources */,
+				AA000001000000000000008F /* TemplateModels.swift in Sources */,
+				AA0000010000000000000091 /* TemplateDataService.swift in Sources */,
+				AA0000010000000000000093 /* FirebaseStorageService.swift in Sources */,
+				AA0000010000000000000095 /* SpotlightService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

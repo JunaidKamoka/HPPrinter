@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+
+	<!-- ═══════════════════════════════════════════════
+	     BUNDLE IDENTITY
+	     ═══════════════════════════════════════════════ -->
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundleDisplayName</key>
+	<string>HP Smart Printer App : AiPrint</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>MinimumOSVersion</key>
+	<string>15.0</string>
+
+	<!-- ═══════════════════════════════════════════════
+	     UI CONFIGURATION
+	     ═══════════════════════════════════════════════ -->
+	<key>UIRequiresFullScreen</key>
+	<false/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+
+	<!-- Launch Screen -->
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+	</dict>
+
+	<!-- Scene Manifest (SwiftUI @main app) -->
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+	</dict>
+
+	<!-- Device Family: iPhone (1) + iPad (2) -->
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+
+	<!-- Supported Orientations — iPhone -->
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+
+	<!-- Supported Orientations — iPad -->
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+
+	<!-- ═══════════════════════════════════════════════
+	     PRIVACY USAGE DESCRIPTIONS
+	     ═══════════════════════════════════════════════ -->
+	<key>NSCameraUsageDescription</key>
+	<string>HP Smart Printer uses the camera to scan documents and photos to PDF for wireless printing.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>HP Smart Printer needs access to your photo library to print photos and use images in PDF documents.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>HP Smart Printer needs local network access to discover and connect to AirPrint-compatible printers on your Wi-Fi network — including HP, Canon, Epson, Brother, Lexmark and more.</string>
+
+	<!-- ═══════════════════════════════════════════════
+	     NETWORK — BONJOUR SERVICES
+	     Expanded for broader printer discovery (ASO signal)
+	     ═══════════════════════════════════════════════ -->
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_ipp._tcp.</string>
+		<string>_ipps._tcp.</string>
+		<string>_pdl-datastream._tcp.</string>
+		<string>_printer._tcp.</string>
+		<string>_print._sub._ipp._tcp.</string>
+		<string>_universal._sub._ipp._tcp.</string>
+		<string>_http._tcp.</string>
+	</array>
+
+	<!-- App Transport Security -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<!-- Firebase Storage requires HTTPS — covered by default -->
+	</dict>
+
+	<!-- ═══════════════════════════════════════════════
+	     NSUserActivityTypes
+	     Enables Handoff, Siri Suggestions & Spotlight
+	     ═══════════════════════════════════════════════ -->
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>com.hp.smartprinter.print</string>
+		<string>com.hp.smartprinter.scan</string>
+		<string>com.hp.smartprinter.convert.pdf</string>
+		<string>com.hp.smartprinter.merge.pdf</string>
+		<string>com.hp.smartprinter.split.pdf</string>
+		<string>com.hp.smartprinter.sign.pdf</string>
+		<string>com.hp.smartprinter.compress.pdf</string>
+		<string>com.hp.smartprinter.ocr</string>
+		<string>com.hp.smartprinter.forms</string>
+		<string>com.hp.smartprinter.printables</string>
+	</array>
+
+	<!-- ═══════════════════════════════════════════════
+	     CFBundleDocumentTypes
+	     Makes app appear in Files "Open With" sheet —
+	     one of the highest-impact ASO signals on iOS.
+	     ═══════════════════════════════════════════════ -->
+	<key>CFBundleDocumentTypes</key>
+	<array>
+
+		<!-- PDF — Owner (primary type) -->
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PDF Document</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.adobe.pdf</string>
+			</array>
+		</dict>
+
+		<!-- Microsoft Word -->
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Microsoft Word Document</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.microsoft.word.doc</string>
+				<string>org.openxmlformats.wordprocessingml.document</string>
+			</array>
+		</dict>
+
+		<!-- Microsoft Excel -->
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Microsoft Excel Spreadsheet</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.microsoft.excel.xls</string>
+				<string>org.openxmlformats.spreadsheetml.sheet</string>
+			</array>
+		</dict>
+
+		<!-- Microsoft PowerPoint -->
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Microsoft PowerPoint Presentation</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.microsoft.powerpoint.ppt</string>
+				<string>org.openxmlformats.presentationml.presentation</string>
+			</array>
+		</dict>
+
+		<!-- Images (JPEG, PNG, HEIC, TIFF, BMP, WebP) -->
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Image File</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.jpeg</string>
+				<string>public.png</string>
+				<string>public.tiff</string>
+				<string>public.heic</string>
+				<string>com.compuserve.gif</string>
+				<string>com.microsoft.bmp</string>
+				<string>org.webmproject.webp</string>
+			</array>
+		</dict>
+
+		<!-- Plain Text / RTF / HTML -->
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Text Document</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.plain-text</string>
+				<string>public.rtf</string>
+				<string>public.html</string>
+				<string>public.xml</string>
+			</array>
+		</dict>
+
+		<!-- eBook (EPUB) -->
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>eBook</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.idpf.epub-container</string>
+			</array>
+		</dict>
+
+	</array>
+
+	<!-- ═══════════════════════════════════════════════
+	     CFBundleURLTypes — Deep Linking / Universal Links
+	     ═══════════════════════════════════════════════ -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>hp.smart.printer.app.ac</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>hpsmartprinter</string>
+				<string>hp-smart-printer</string>
+				<string>printdoc</string>
+			</array>
+		</dict>
+	</array>
+
+	<!-- ═══════════════════════════════════════════════
+	     UTExportedTypeDeclarations
+	     Declares custom type ownership — boosts indexing
+	     ═══════════════════════════════════════════════ -->
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeDescription</key>
+			<string>HP Smart Printer Document</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.hp.smartprinter.document</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.content</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>hpsp</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/x-hp-smart-printer</string>
+			</dict>
+		</dict>
+	</array>
+
+	<!-- ═══════════════════════════════════════════════
+	     UTImportedTypeDeclarations
+	     Declares understanding of third-party types
+	     ═══════════════════════════════════════════════ -->
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeDescription</key>
+			<string>Adobe PDF Document</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.adobe.pdf</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.composite-content</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>pdf</string>
+				</array>
+				<key>public.mime-type</key>
+				<string>application/pdf</string>
+			</dict>
+		</dict>
+	</array>
+
+	<!-- ═══════════════════════════════════════════════
+	     ASO: SUPPORTED PRINTER BRANDS (Apple-indexed)
+	     Comprehensive list for search ranking
+	     ═══════════════════════════════════════════════ -->
+	<key>SupportedPrinterBrands</key>
+	<string>HP DeskJet HP OfficeJet HP LaserJet HP ENVY HP Tango HP OfficeJet Pro HP Color LaserJet HP PageWide HP DesignJet HP ScanJet HP LaserJet Pro HP LaserJet Enterprise Canon PIXMA Canon MAXIFY Canon imageCLASS Canon SELPHY Canon imageRUNNER Canon imageGRAF Canon TR Canon TS Canon MG Canon MX Epson EcoTank Epson WorkForce Epson Expression Epson SureColor Epson PictureMate Epson ET Epson WF Epson XP Epson SC Brother HL Brother MFC Brother DCP Brother QL Brother ADS Brother LC Lexmark MB Lexmark CS Lexmark MS Lexmark CX Lexmark MX Lexmark B Lexmark C Samsung Xpress Samsung ProXpress Samsung MultiXpress Dell Color Dell Laser Dell B Xerox VersaLink Xerox WorkCentre Xerox Phaser Xerox AltaLink Xerox B Xerox ColorQube Ricoh SP Ricoh MP Ricoh IM Ricoh P Ricoh SG Kyocera ECOSYS Kyocera TASKalfa Kyocera FS Pantum P Pantum M Pantum BP Pantum CM Kodak Hero Kodak Verite Kodak ESP Sharp MX Sharp BP Sharp MX-M OKI ES OKI C OKI MB OKI MC Konica Minolta bizhub Konica Minolta PagePro Toshiba e-STUDIO Develop ineo Triumph-Adler Olivetti d-Color Utax CDC Fuji Xerox DocuPrint Fuji Xerox DocuCentre Xerox DocuColor Gestetner Nashuatec Lanier Savin Infotec NRG Sindoh D Sindoh A Pantum Series Canon Series HP Series Epson Series Brother Series wireless printer AirPrint printer wifi printer bluetooth printer photo printer label printer laser printer inkjet printer color printer black white printer mobile printer portable printer all-in-one printer scanner copier multifunction printer</string>
+
+	<!-- ═══════════════════════════════════════════════
+	     APP STORE OPTIMIZATION KEYWORDS
+	     Embedded metadata read by Apple crawlers
+	     ═══════════════════════════════════════════════ -->
+	<key>ASOKeywords</key>
+	<string>print pdf airprint wireless printer hp printer canon printer epson printer brother printer scan document pdf editor pdf converter merge pdf split pdf compress pdf sign pdf ocr pdf protect pdf word to pdf excel to pdf photo print mobile print cloud print google drive print dropbox print writing paper forms printables</string>
+
+</dict>
+</plist>
