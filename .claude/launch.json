@@ -6,6 +6,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "7823", "--directory", "/Users/macbook/Documents/GitHub/iOS/HPPrinter/SmartPrinter"],
       "port": 7823
+    },
+    {
+      "name": "pdf-tools",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "7824", "--directory", "/Users/macbook/Documents/GitHub/iOS/HPPrinter/.claude/worktrees/optimistic-austin/SmartPrinter/PDFTools/www"],
+      "port": 7824
     }
   ]
 }
