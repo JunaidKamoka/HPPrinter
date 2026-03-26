@@ -401,7 +401,7 @@ struct FormDetailView: View {
                                 Divider().background(Color.dividerColor).padding(.leading, 16)
                                 detailRow(label: "Pages", value: "\(form.pageCount)")
                                 Divider().background(Color.dividerColor).padding(.leading, 16)
-                                detailRow(label: "Form ID", value: form.originalId)
+                                detailRow(label: "Form ID", value: form.id)
                             }
                         }
                         .padding(.horizontal)
@@ -435,126 +435,166 @@ struct FormDetailView: View {
         .navigationViewStyle(.stack)
     }
 
-    // MARK: - Print form (downloads current page image → AirPrint directly from memory)
+    // MARK: - Print form — downloads ALL page images → composes a PDF → AirPrint in one job
     private func printForm() {
         guard !isPrinting else { return }
         printError = nil
         isPrinting = true
 
-        let pageIndex = min(currentPage, form.images.count - 1)
-        guard let remoteURL = FirebaseStorageService.imageURL(for: form, at: pageIndex) else {
+        let pageCount = form.images.count
+        guard pageCount > 0 else {
+            printError = "No pages available to print."
+            isPrinting = false
+            return
+        }
+
+        // Build remote URLs for every page
+        let urls: [URL] = (0..<pageCount).compactMap {
+            FirebaseStorageService.imageURL(for: form, at: $0)
+        }
+        guard urls.count == pageCount else {
             printError = "Image URL unavailable."
             isPrinting = false
             return
         }
 
-        var request = URLRequest(url: remoteURL, cachePolicy: .returnCacheDataElseLoad,
-                                 timeoutInterval: 20)
-        request.setValue("image/*", forHTTPHeaderField: "Accept")
+        // Download all pages in parallel
+        let group   = DispatchGroup()
+        var images  = [Int: UIImage]()
+        var dlError: String?
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        for (index, url) in urls.enumerated() {
+            group.enter()
+            var req = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad,
+                                 timeoutInterval: 20)
+            req.setValue("image/*", forHTTPHeaderField: "Accept")
+            URLSession.shared.dataTask(with: req) { data, response, error in
+                defer { group.leave() }
+                if let http = response as? HTTPURLResponse, http.statusCode != 200 {
+                    dlError = "Server error (\(http.statusCode)) on page \(index + 1)."
+                    return
+                }
+                guard let data, !data.isEmpty, error == nil,
+                      let img = UIImage(data: data) else {
+                    if dlError == nil { dlError = "Download failed on page \(index + 1)." }
+                    return
+                }
+                images[index] = img
+            }.resume()
+        }
+
+        group.notify(queue: .global(qos: .userInitiated)) {
             DispatchQueue.main.async {
                 isPrinting = false
 
-                guard let data, !data.isEmpty, error == nil else {
-                    printError = "Download failed. Check your connection."
+                if let err = dlError {
+                    printError = err
                     return
                 }
-                if let http = response as? HTTPURLResponse, http.statusCode != 200 {
-                    printError = "Server error (\(http.statusCode))."
+                guard images.count == pageCount else {
+                    printError = "Could not load all pages. Check your connection."
                     return
                 }
 
-                guard UIPrintInteractionController.canPrint(data) else {
+                // Compose all pages into one in-memory PDF (US Letter)
+                let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792) // 8.5 × 11 pt @ 72 dpi
+                let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
+                let pdfData  = renderer.pdfData { ctx in
+                    for i in 0..<pageCount {
+                        guard let img = images[i] else { continue }
+                        ctx.beginPage()
+                        // Scale image to fill the page while keeping aspect ratio
+                        let imgRatio  = img.size.width / img.size.height
+                        let pageRatio = pageRect.width / pageRect.height
+                        let drawRect: CGRect
+                        if imgRatio > pageRatio {
+                            let h = pageRect.width / imgRatio
+                            drawRect = CGRect(x: 0, y: (pageRect.height - h) / 2,
+                                             width: pageRect.width, height: h)
+                        } else {
+                            let w = pageRect.height * imgRatio
+                            drawRect = CGRect(x: (pageRect.width - w) / 2, y: 0,
+                                             width: w, height: pageRect.height)
+                        }
+                        img.draw(in: drawRect)
+                    }
+                }
+
+                guard UIPrintInteractionController.canPrint(pdfData) else {
                     printError = "This file cannot be printed."
                     return
                 }
 
-                let controller  = UIPrintInteractionController.shared
-                let info        = UIPrintInfo.printInfo()
-                info.jobName    = form.displayTitle
-                info.outputType = .photo
-                controller.printInfo   = info
-                controller.printingItem = data
-                controller.showsNumberOfCopies = true
+                // Save to temp file so PrintJobService can track it
+                let tempURL = FileManager.default.temporaryDirectory
+                    .appendingPathComponent("form_\(form.id)_all.pdf")
+                try? pdfData.write(to: tempURL, options: .atomic)
+
+                let controller = UIPrintInteractionController.shared
+                let info       = UIPrintInfo.printInfo()
+                info.jobName   = form.displayTitle
+                info.outputType = .general
+                controller.printInfo                        = info
+                controller.printingItem                     = pdfData
+                controller.showsNumberOfCopies              = true
                 controller.showsPaperSelectionForLoadedPapers = true
                 controller.present(animated: true) { _, completed, _ in
                     if completed {
-                        let tempURL = FileManager.default.temporaryDirectory
-                            .appendingPathComponent("form_\(form.originalId)_p\(pageIndex).png")
-                        try? data.write(to: tempURL, options: .atomic)
-                        vm.printFile(url: tempURL)
+                        vm.logHistory(
+                            fileName: form.displayTitle,
+                            fileType: "pdf",
+                            pageCount: pageCount,
+                            source: "Forms",
+                            fileURL: tempURL
+                        )
+                        vm.showToastMessage("Printed: \(form.displayTitle)")
                     }
                 }
             }
-        }.resume()
+        }
     }
 
     // MARK: - Image Gallery
 
     var imageGallery: some View {
-        VStack(spacing: 12) {
-            TabView(selection: $currentPage) {
-                ForEach(Array(form.images.enumerated()), id: \.offset) { i, _ in
-                    let url = FirebaseStorageService.imageURL(for: form, at: i)
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 0)
-                            .fill(Color.bg2)
-                        if let url = url {
-                            WebImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                            } placeholder: {
-                                galleryFailedPlaceholder
-                            }
-                            .padding(12)
-                        } else {
-                            galleryFailedPlaceholder
-                        }
-                    }
-                    .tag(i)
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 320)
-            .background(Color.bg2)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.cardBorder, lineWidth: 1)
-            )
-            .padding(.horizontal)
+        let imageURLs = (0..<form.images.count).map {
+            FirebaseStorageService.imageURL(for: form, at: $0)
+        }
 
-            // Page indicators
-            if form.images.count > 1 {
-                HStack(spacing: 6) {
-                    ForEach(0..<form.images.count, id: \.self) { i in
-                        Capsule()
-                            .fill(i == currentPage ? Color.accent : Color.bg4)
-                            .frame(width: i == currentPage ? 18 : 6, height: 6)
-                            .animation(.spring(response: 0.3), value: currentPage)
+        return Group {
+            if !imageURLs.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    DocumentReaderView(mode: .images(imageURLs))
+                        .padding(.horizontal)
+
+                    if form.images.count > 1 {
+                        Text("\(form.images.count) pages — pinch to zoom, double-tap to fit")
+                            .font(.system(size: 11))
+                            .foregroundColor(.textTertiary)
+                            .padding(.horizontal)
                     }
                 }
-                Text("Page \(currentPage + 1) of \(form.images.count)")
-                    .font(.system(size: 11)).foregroundColor(.textTertiary)
+            } else {
+                // No images decoded yet (unlikely after CodingKeys fix, but safe fallback)
+                galleryEmptyPlaceholder
+                    .padding(.horizontal)
             }
         }
     }
 
-    /// Shown only when image URL is nil or the download actually failed.
-    var galleryFailedPlaceholder: some View {
-        VStack(spacing: 10) {
-            Image(systemName: "doc.text.fill")
+    var galleryEmptyPlaceholder: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "doc.text")
                 .font(.system(size: 40))
-                .foregroundColor(.textTertiary.opacity(0.4))
-            Text("Preview unavailable")
-                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.textTertiary.opacity(0.35))
+            Text("No preview available")
+                .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.textTertiary)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .frame(height: 240)
         .background(Color.bg3)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     func detailRow(label: String, value: String) -> some View {

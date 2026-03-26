@@ -111,10 +111,27 @@ struct HistoryRow: View {
                 vm.reprintFromHistory(job)
             } label: {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(job.fileName).font(.system(size: 13, weight: .medium)).foregroundColor(.textPrimary).lineLimit(1)
-                    Text("\(job.pageCount) pages · \(job.copies) cop\(job.copies > 1 ? "ies" : "y") · \(job.colorMode) · \(job.printerName)")
+                    HStack(spacing: 5) {
+                        Text(job.fileName)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(.textPrimary)
+                            .lineLimit(1)
+                        Spacer(minLength: 0)
+                        // Source badge
+                        HStack(spacing: 3) {
+                            Image(systemName: job.sourceIcon)
+                                .font(.system(size: 8, weight: .semibold))
+                            Text(job.source)
+                                .font(.system(size: 9, weight: .semibold))
+                        }
+                        .foregroundColor(.accent)
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Color.accent.opacity(0.12))
+                        .clipShape(Capsule())
+                    }
+                    Text("\(job.pageCount) pg · \(job.copies) cop\(job.copies > 1 ? "ies" : "y") · \(job.colorMode) · \(job.printerName)")
                         .font(.system(size: 11)).foregroundColor(.textSecondary).lineLimit(1)
-                    Text("\(job.formattedDate)\(job.duration != nil ? " · \(job.duration!)" : "")")
+                    Text(job.formattedDate)
                         .font(.system(size: 11)).foregroundColor(.textTertiary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

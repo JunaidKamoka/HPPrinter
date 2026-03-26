@@ -26,9 +26,9 @@ final class TemplateDataService: ObservableObject {
     private static let cacheDir: URL = {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     }()
-    private static var formsCachePath:      URL { cacheDir.appendingPathComponent("hp_forms_v2.json") }
-    private static var printablesCachePath: URL { cacheDir.appendingPathComponent("hp_printables_v2.json") }
-    private static let kLastSync = "hp_templates_last_sync_v2"
+    private static var formsCachePath:      URL { cacheDir.appendingPathComponent("hp_forms_v3.json") }
+    private static var printablesCachePath: URL { cacheDir.appendingPathComponent("hp_printables_v3.json") }
+    private static let kLastSync = "hp_templates_last_sync_v3"
 
     // MARK: - Firebase download URLs
     private var formsDownloadURL: URL? {
@@ -36,7 +36,7 @@ final class TemplateDataService: ObservableObject {
         guard !bucket.isEmpty else { return nil }
         return URL(string:
             "https://firebasestorage.googleapis.com/v0/b/\(bucket)/o/" +
-            "templates%2FprinterTemplates%2Ffirebase_forms.json?alt=media"
+            "templates%2Ffirebase_forms.json?alt=media"
         )
     }
     private var printablesDownloadURL: URL? {
@@ -44,7 +44,7 @@ final class TemplateDataService: ObservableObject {
         guard !bucket.isEmpty else { return nil }
         return URL(string:
             "https://firebasestorage.googleapis.com/v0/b/\(bucket)/o/" +
-            "templates%2FprinterTemplates%2Ffirebase_printables.json?alt=media"
+            "templates%2Ffirebase_printables.json?alt=media"
         )
     }
 

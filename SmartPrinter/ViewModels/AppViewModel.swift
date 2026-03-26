@@ -176,7 +176,8 @@ class AppViewModel: ObservableObject {
             status: .queued,
             progress: 0,
             date: Date(),
-            fileBookmark: try? url.bookmarkData()
+            fileBookmark: try? url.bookmarkData(),
+            source: "Queue"
         )
         queue.append(job)
         persistence.saveQueue(queue)
@@ -197,43 +198,57 @@ class AppViewModel: ObservableObject {
 
     // MARK: - Printing (native sheet handles everything)
 
-    /// Opens the native iOS print sheet for any file URL.
-    /// The sheet lets the user pick printer, copies, pages, duplex, paper size, etc.
-    func printFile(url: URL) {
+    /// Opens the native iOS print sheet for any file URL and logs to history on completion.
+    func printFile(url: URL, source: String = "Documents") {
         PrintService.presentPrintSheet(url: url) { [weak self] completed, pageCount in
-            guard let self = self else { return }
+            guard let self else { return }
             DispatchQueue.main.async {
-                // Only record to history when user tapped Print (not cancelled)
                 guard completed else {
                     self.showToastMessage("Print cancelled")
                     return
                 }
-
-                let job = PrintJob(
+                self.logHistory(
                     fileName: url.lastPathComponent,
                     fileType: url.pathExtension.lowercased(),
                     pageCount: max(pageCount, 1),
-                    printerName: "AirPrint",
-                    colorMode: "Color",
-                    duplex: false,
-                    paperSize: "Auto",
-                    copies: 1,
-                    status: .done,
-                    progress: 1.0,
-                    date: Date(),
-                    duration: "Completed",
-                    fileBookmark: try? url.bookmarkData()
+                    source: source,
+                    fileURL: url
                 )
-
-                if self.saveHistory {
-                    self.history.insert(job, at: 0)
-                    self.persistence.saveHistory(self.history)
-                }
-
-                RatingService.shared.recordAction()
                 self.showToastMessage("Printed: \(url.lastPathComponent)")
             }
         }
+    }
+
+    /// Log a completed print job to history directly — call this when the print sheet
+    /// was already presented by the caller (Forms, Printables) so we don't open a second sheet.
+    func logHistory(
+        fileName: String,
+        fileType: String,
+        pageCount: Int,
+        source: String,
+        status: JobStatus = .done,
+        fileURL: URL? = nil
+    ) {
+        guard saveHistory else { return }
+        let job = PrintJob(
+            fileName: fileName,
+            fileType: fileType,
+            pageCount: pageCount,
+            printerName: primaryPrinter?.name ?? "AirPrint",
+            colorMode: colorMode,
+            duplex: duplexEnabled,
+            paperSize: paperSize,
+            copies: copies,
+            status: status,
+            progress: status == .done ? 1.0 : 0,
+            date: Date(),
+            duration: status == .done ? "Completed" : nil,
+            fileBookmark: fileURL.flatMap { try? $0.bookmarkData() },
+            source: source
+        )
+        history.insert(job, at: 0)
+        persistence.saveHistory(history)
+        RatingService.shared.recordAction()
     }
 
     func printFromQueue(_ job: PrintJob) {
@@ -371,7 +386,7 @@ class AppViewModel: ObservableObject {
 
         // Use cached file if available
         if FileManager.default.fileExists(atPath: localURL.path) {
-            printFile(url: localURL)
+            printFile(url: localURL, source: "Test Print")
             return
         }
 
@@ -397,11 +412,19 @@ class AppViewModel: ObservableObject {
 
                 do {
                     try data.write(to: localURL, options: .atomic)
-                    self?.printFile(url: localURL)
+                    self?.printFile(url: localURL, source: "Test Print")
                 } catch {
                     // Fallback: print directly from data if file write fails
                     PrintService.presentPrintSheet(data: data, jobName: testPrint.name) { completed in
                         DispatchQueue.main.async {
+                            if completed {
+                                self?.logHistory(
+                                    fileName: testPrint.name,
+                                    fileType: "pdf",
+                                    pageCount: 1,
+                                    source: "Test Print"
+                                )
+                            }
                             self?.showToastMessage(completed ? "\(testPrint.name) sent" : "Print cancelled")
                         }
                     }

@@ -5,6 +5,7 @@ struct OnboardingView: View {
     @Binding var isPresented: Bool
     @State private var currentPage = 0
     @State private var animateContent = false
+    @Environment(\.colorScheme) private var colorScheme
 
     private let totalPages = 5
 
@@ -32,7 +33,7 @@ struct OnboardingView: View {
                                 .foregroundColor(.textSecondary)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 8)
-                                .background(Color.white.opacity(0.08))
+                                .background(Color.bg3)
                                 .clipShape(Capsule())
                         }
                     }
@@ -68,7 +69,7 @@ struct OnboardingView: View {
                     HStack(spacing: 8) {
                         ForEach(0..<totalPages, id: \.self) { i in
                             Capsule()
-                                .fill(i == currentPage ? Color.accent : Color.white.opacity(0.2))
+                                .fill(i == currentPage ? Color.accent : Color.bg4)
                                 .frame(width: i == currentPage ? 24 : 8, height: 8)
                                 .animation(.spring(response: 0.35, dampingFraction: 0.7), value: currentPage)
                         }
@@ -138,14 +139,31 @@ struct OnboardingView: View {
     // MARK: - Background
 
     private var backgroundGradient: some View {
+        let isDark = colorScheme == .dark
         let colors: [Color] = {
             switch currentPage {
-            case 0: return [Color(hex: "#0a0a1a"), Color(hex: "#0f0f2a"), Color(hex: "#0a0a0f")]
-            case 1: return [Color(hex: "#0a0f1a"), Color(hex: "#0a1a2a"), Color(hex: "#0a0a0f")]
-            case 2: return [Color(hex: "#0a1a0f"), Color(hex: "#0a2a1a"), Color(hex: "#0a0a0f")]
-            case 3: return [Color(hex: "#1a0f0a"), Color(hex: "#2a1a0a"), Color(hex: "#0a0a0f")]
-            case 4: return [Color(hex: "#1a0a1a"), Color(hex: "#2a0a2a"), Color(hex: "#0a0a0f")]
-            default: return [Color.bg, Color.bg2, Color.bg]
+            case 0: // Purple/printer
+                return isDark
+                    ? [Color(hex: "#0a0a1a"), Color(hex: "#0f0f2a"), Color(hex: "#0a0a0f")]
+                    : [Color(hex: "#f8f7ff"), Color(hex: "#ede9ff"), Color(hex: "#ffffff")]
+            case 1: // Blue/PDF tools
+                return isDark
+                    ? [Color(hex: "#0a0f1a"), Color(hex: "#0a1a2a"), Color(hex: "#0a0a0f")]
+                    : [Color(hex: "#f5f8ff"), Color(hex: "#e8f0ff"), Color(hex: "#ffffff")]
+            case 2: // Green/discovery
+                return isDark
+                    ? [Color(hex: "#0a1a0f"), Color(hex: "#0a2a1a"), Color(hex: "#0a0a0f")]
+                    : [Color(hex: "#f5fff7"), Color(hex: "#e8f5ec"), Color(hex: "#ffffff")]
+            case 3: // Amber/queue
+                return isDark
+                    ? [Color(hex: "#1a0f0a"), Color(hex: "#2a1a0a"), Color(hex: "#0a0a0f")]
+                    : [Color(hex: "#fffcf5"), Color(hex: "#fff3e0"), Color(hex: "#ffffff")]
+            case 4: // Pink/review
+                return isDark
+                    ? [Color(hex: "#1a0a1a"), Color(hex: "#2a0a2a"), Color(hex: "#0a0a0f")]
+                    : [Color(hex: "#fff7ff"), Color(hex: "#f5e8ff"), Color(hex: "#ffffff")]
+            default:
+                return [Color.bg, Color.bg2, Color.bg]
             }
         }()
         return LinearGradient(colors: colors, startPoint: .top, endPoint: .bottom)
@@ -485,7 +503,7 @@ struct OnboardingView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14))
                     .overlay(
                         RoundedRectangle(cornerRadius: 14)
-                            .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                            .stroke(Color.cardBorder, lineWidth: 1)
                     )
                     .frame(width: 260)
                     .offset(y: yBase)
@@ -691,7 +709,7 @@ struct OnboardingView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                    .stroke(Color.cardBorder, lineWidth: 1)
             )
     }
 

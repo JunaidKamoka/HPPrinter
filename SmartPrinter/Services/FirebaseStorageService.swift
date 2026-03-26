@@ -59,9 +59,9 @@ struct FirebaseStorageService {
         "https://firebasestorage.googleapis.com/v0/b/\(FirebaseConfig.storageBucket)/o"
     }
 
-    // JSON storagePaths are relative (e.g. "forms/Canada/20220906T184712613").
-    // The actual Firebase Storage root is "templates/printerTemplates/", so we prepend it.
-    private static let pathPrefix = "templates/printerTemplates"
+    // JSON storagePaths are relative (e.g. "forms/Canada/cra_t1_income_tax_return").
+    // The actual Firebase Storage root is "templates/", so we prepend it.
+    private static let pathPrefix = "templates"
 
     /// Builds a public download URL for a file stored in Firebase Storage.
     /// - Parameters:
@@ -104,7 +104,12 @@ struct FirebaseStorageService {
         return imageURL(storagePath: form.storagePath, filename: form.images[index])
     }
 
-    /// Full-resolution page image URL (by index) for a `PrintableItem`
+    /// Preview image URL for a `PrintableItem` (single preview PNG)
+    static func previewURL(for item: PrintableItem) -> URL? {
+        imageURL(storagePath: item.storagePath, filename: item.preview)
+    }
+
+    /// Page image URL for a `PrintableItem` by index (maps to `item.images`)
     static func imageURL(for item: PrintableItem, at index: Int) -> URL? {
         guard index < item.images.count else { return nil }
         return imageURL(storagePath: item.storagePath, filename: item.images[index])

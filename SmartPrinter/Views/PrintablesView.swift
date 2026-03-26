@@ -415,8 +415,8 @@ struct PrintableDetailView: View {
            let url = FirebaseStorageService.pdfURL(storagePath: item.storagePath, filename: pdfName) {
             downloadAndPrint(remoteURL: url, jobName: jobName)
         } else {
-            let idx = min(currentPage, item.images.count - 1)
-            guard let url = FirebaseStorageService.imageURL(for: item, at: idx) else {
+            // Print first page (all pages visible in the reader above)
+            guard let url = FirebaseStorageService.imageURL(for: item, at: 0) else {
                 printError = "Image URL unavailable."
                 isPrinting = false
                 return
@@ -461,74 +461,88 @@ struct PrintableDetailView: View {
                 controller.showsPaperSelectionForLoadedPapers = true
                 controller.present(animated: true) { _, completed, _ in
                     if completed {
-                        // Record in history via vm
+                        let ext     = data.isPDF ? "pdf" : "png"
                         let tempURL = FileManager.default.temporaryDirectory
-                            .appendingPathComponent("\(jobName).pdf")
+                            .appendingPathComponent("\(jobName).\(ext)")
                         try? data.write(to: tempURL, options: .atomic)
-                        vm.printFile(url: tempURL)
+                        let pages: Int = {
+                            guard data.isPDF else { return 1 }
+                            return CGPDFDocument(tempURL as CFURL)?.numberOfPages ?? 1
+                        }()
+                        vm.logHistory(
+                            fileName: jobName,
+                            fileType: ext,
+                            pageCount: pages,
+                            source: "Printables",
+                            fileURL: tempURL
+                        )
+                        vm.showToastMessage("Printed: \(jobName)")
                     }
                 }
             }
         }.resume()
     }
 
-    // MARK: - Image Gallery
+    // MARK: - Document Gallery
 
     var printableGallery: some View {
-        VStack(spacing: 12) {
-            TabView(selection: $currentPage) {
-                ForEach(Array(item.images.enumerated()), id: \.offset) { i, _ in
-                    let url = FirebaseStorageService.imageURL(for: item, at: i)
-                    ZStack {
-                        Color.bg2
-                        if let url = url {
-                            WebImage(url: url) { image in
-                                image.resizable().scaledToFit()
-                            } placeholder: {
-                                galleryFailedPlaceholder
-                            }
-                            .padding(12)
-                        } else {
-                            galleryFailedPlaceholder
-                        }
-                    }
-                    .tag(i)
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 340)
-            .background(Color.bg2)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.cardBorder, lineWidth: 1))
-            .padding(.horizontal)
+        Group {
+            if item.hasPdf, let pdfName = item.pdfs.first,
+               let pdfURL = FirebaseStorageService.pdfURL(storagePath: item.storagePath, filename: pdfName) {
+                // PDF printable → show with PDFKit continuous reader
+                VStack(alignment: .leading, spacing: 8) {
+                    DocumentReaderView(mode: .pdf(pdfURL))
+                        .frame(minHeight: 420)
+                        .padding(.horizontal)
 
-            if item.images.count > 1 {
-                HStack(spacing: 6) {
-                    ForEach(0..<item.images.count, id: \.self) { i in
-                        Capsule()
-                            .fill(i == currentPage ? Color.accent : Color.bg4)
-                            .frame(width: i == currentPage ? 18 : 6, height: 6)
-                            .animation(.spring(response: 0.3), value: currentPage)
+                    HStack(spacing: 6) {
+                        Image(systemName: "doc.fill")
+                            .font(.system(size: 10))
+                            .foregroundColor(Color.accent)
+                        Text("PDF · scroll to browse all pages · pinch to zoom")
+                            .font(.system(size: 11))
+                            .foregroundColor(.textTertiary)
+                    }
+                    .padding(.horizontal)
+                }
+
+            } else if !item.images.isEmpty {
+                // Image-based printable → zoomable stacked pages
+                let imageURLs = (0..<item.images.count).map {
+                    FirebaseStorageService.imageURL(for: item, at: $0)
+                }
+                VStack(alignment: .leading, spacing: 8) {
+                    DocumentReaderView(mode: .images(imageURLs))
+                        .padding(.horizontal)
+
+                    if item.images.count > 1 {
+                        Text("\(item.images.count) pages — pinch to zoom, double-tap to fit")
+                            .font(.system(size: 11))
+                            .foregroundColor(.textTertiary)
+                            .padding(.horizontal)
                     }
                 }
-                Text("Page \(currentPage + 1) of \(item.images.count)")
-                    .font(.system(size: 11)).foregroundColor(.textTertiary)
+
+            } else {
+                galleryEmptyPlaceholder
+                    .padding(.horizontal)
             }
         }
     }
 
-    var galleryFailedPlaceholder: some View {
-        VStack(spacing: 10) {
-            Image(systemName: "photo.fill")
+    var galleryEmptyPlaceholder: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "photo")
                 .font(.system(size: 40))
-                .foregroundColor(.textTertiary.opacity(0.4))
-            Text("Preview unavailable")
-                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.textTertiary.opacity(0.35))
+            Text("No preview available")
+                .font(.system(size: 13, weight: .medium))
                 .foregroundColor(.textTertiary)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .frame(height: 240)
         .background(Color.bg3)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     func detailRow(label: String, value: String) -> some View {

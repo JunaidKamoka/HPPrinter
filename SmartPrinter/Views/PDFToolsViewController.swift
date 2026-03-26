@@ -446,7 +446,9 @@ class PDFToolsViewController: UIViewController,
                     let ctrl = UIPrintInteractionController.shared
                     ctrl.printInfo = info
                     ctrl.printingItem = tmp
-                    ctrl.present(animated: true, completionHandler: nil)
+                    ctrl.present(animated: true) { [weak self] _, completed, _ in
+                        if completed { self?.onPrintFile?(tmp) }
+                    }
                 }
             })
 
@@ -506,7 +508,11 @@ class PDFToolsViewController: UIViewController,
                 let ctrl = UIPrintInteractionController.shared
                 ctrl.printInfo = info
                 ctrl.printingItem = data
-                ctrl.present(animated: true, completionHandler: nil)
+                ctrl.present(animated: true) { [weak self] _, completed, _ in
+                    if completed, (try? data.write(to: tmp)) != nil {
+                        self?.onPrintFile?(tmp)
+                    }
+                }
             }
         }
     }

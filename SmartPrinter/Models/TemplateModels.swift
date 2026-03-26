@@ -4,7 +4,6 @@ import Foundation
 
 struct FormItem: Identifiable, Codable {
     let id: String
-    let originalId: String
     let title: String
     let subtitle: String
     let description: String
@@ -16,22 +15,29 @@ struct FormItem: Identifiable, Codable {
     let storagePath: String
     let tags: [String]
 
+    // JSON uses "pages" for page images and "sourceFiles" for PDFs
+    enum CodingKeys: String, CodingKey {
+        case id, title, subtitle, description, country
+        case pageCount, thumbnail, storagePath, tags
+        case images = "pages"
+        case pdfs   = "sourceFiles"
+    }
+
     var countryFlag: String {
         switch country {
-        case "Canada":                    return "🇨🇦"
-        case "France":                    return "🇫🇷"
-        case "Germany":                   return "🇩🇪"
-        case "Italy":                     return "🇮🇹"
-        case "US", "United States of America": return "🇺🇸"
-        case "United Kingdom":            return "🇬🇧"
-        case "india":                     return "🇮🇳"
-        default:                          return "🌐"
+        case "Canada":                              return "🇨🇦"
+        case "France":                              return "🇫🇷"
+        case "Germany":                             return "🇩🇪"
+        case "Italy":                               return "🇮🇹"
+        case "United States", "US",
+             "United States of America":            return "🇺🇸"
+        case "United Kingdom":                      return "🇬🇧"
+        case "india", "India":                      return "🇮🇳"
+        default:                                    return "🌐"
         }
     }
 
-    var displayTitle: String {
-        title.isEmpty ? "Form \(originalId)" : title
-    }
+    var displayTitle: String { title.isEmpty ? id : title }
 }
 
 // MARK: - Printable Models
@@ -41,10 +47,20 @@ struct PrintableItem: Identifiable, Codable {
     let category: String
     let categoryName: String
     let thumbnail: String
-    let images: [String]
+    /// Single preview image filename (e.g. "qp_0_20220507T131630669.png")
+    let preview: String
     let pdfs: [String]
     let storagePath: String
     let hasPdf: Bool
+
+    // JSON uses "preview" for the preview image and "sourceFiles" for PDFs
+    enum CodingKeys: String, CodingKey {
+        case id, category, categoryName, thumbnail, preview, storagePath, hasPdf
+        case pdfs = "sourceFiles"
+    }
+
+    /// Single-element array wrapping `preview` so views can treat printables like multi-page forms.
+    var images: [String] { [preview] }
 }
 
 struct PrintableCategory: Identifiable, Codable {

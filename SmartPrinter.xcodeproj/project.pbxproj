@@ -40,6 +40,7 @@
 		AA0000010000000000000091 /* TemplateDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000090 /* TemplateDataService.swift */; };
 		AA0000010000000000000093 /* FirebaseStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000092 /* FirebaseStorageService.swift */; };
 		AA0000010000000000000095 /* SpotlightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000094 /* SpotlightService.swift */; };
+		AA0000010000000000000097 /* DocumentReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000096 /* DocumentReaderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -77,6 +78,7 @@
 		AA0000010000000000000090 /* TemplateDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateDataService.swift; sourceTree = "<group>"; };
 		AA0000010000000000000092 /* FirebaseStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStorageService.swift; sourceTree = "<group>"; };
 		AA0000010000000000000094 /* SpotlightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightService.swift; sourceTree = "<group>"; };
+		AA0000010000000000000096 /* DocumentReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentReaderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,6 +161,7 @@
 				AA0000010000000000000088 /* FormsView.swift */,
 				AA000001000000000000008A /* PrintablesView.swift */,
 				AA000001000000000000008C /* WebImage.swift */,
+				AA0000010000000000000096 /* DocumentReaderView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				AA0000010000000000000089 /* FormsView.swift in Sources */,
 				AA000001000000000000008B /* PrintablesView.swift in Sources */,
 				AA000001000000000000008D /* WebImage.swift in Sources */,
+				AA0000010000000000000097 /* DocumentReaderView.swift in Sources */,
 				AA000001000000000000008F /* TemplateModels.swift in Sources */,
 				AA0000010000000000000091 /* TemplateDataService.swift in Sources */,
 				AA0000010000000000000093 /* FirebaseStorageService.swift in Sources */,
@@ -426,7 +430,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = hp.smart.printer.app.ac;
 				PRODUCT_NAME = "HP Smart Printer App : AiPrint";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -463,7 +467,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = hp.smart.printer.app.ac;
 				PRODUCT_NAME = "HP Smart Printer App : AiPrint";
 				SWIFT_EMIT_LOC_STRINGS = YES;

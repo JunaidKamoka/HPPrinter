@@ -12,7 +12,7 @@ struct PDFToolsView: View {
         PDFToolsRepresentable(
             theme: themeManager.current,
             onDismiss: { dismiss() },
-            onPrintFile: { url in vm.printFile(url: url) }
+            onPrintFile: { url in vm.printFile(url: url, source: "PDF Tools") }
         )
         .ignoresSafeArea()
     }
