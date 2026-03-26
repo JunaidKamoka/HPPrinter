@@ -31,6 +31,7 @@ private let featuredTools: [PDFToolItem] = [
 
 struct HomeView: View {
     @EnvironmentObject var vm: AppViewModel
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showDocPicker       = false
     @State private var showPhotoPicker     = false
     @State private var showTestPrintPicker = false
@@ -133,43 +134,37 @@ struct HomeView: View {
     // MARK: - Hero Section
 
     var heroSection: some View {
-        ZStack(alignment: .topLeading) {
-            // Base gradient
+        let isLight = colorScheme == .light
+        return ZStack(alignment: .topLeading) {
+            // Base gradient — dark: deep navy; light: soft lavender
             RoundedRectangle(cornerRadius: 26)
                 .fill(LinearGradient(
-                    colors: [Color(hex: "#0d0b30"), Color(hex: "#180e40"), Color(hex: "#0a1435")],
+                    colors: isLight
+                        ? [Color(hex: "#f0eeff"), Color(hex: "#e6e0ff"), Color(hex: "#f3f0ff")]
+                        : [Color(hex: "#0d0b30"), Color(hex: "#180e40"), Color(hex: "#0a1435")],
                     startPoint: .topLeading, endPoint: .bottomTrailing
                 ))
 
             // Floating orb 1 — purple
             Circle()
-                .fill(Color(hex: "#7875f0").opacity(0.38))
+                .fill(Color(hex: "#7875f0").opacity(isLight ? 0.18 : 0.38))
                 .frame(width: 220, height: 220)
                 .blur(radius: 60)
                 .offset(x: orbAnimate ? 120 : 60, y: orbAnimate ? -55 : -95)
 
             // Floating orb 2 — pink
             Circle()
-                .fill(Color(hex: "#f472b6").opacity(0.22))
+                .fill(Color(hex: "#f472b6").opacity(isLight ? 0.10 : 0.22))
                 .frame(width: 150, height: 150)
                 .blur(radius: 44)
                 .offset(x: orbAnimate ? -10 : 30, y: orbAnimate ? 100 : 60)
 
             // Floating orb 3 — cyan
             Circle()
-                .fill(Color(hex: "#38bdf8").opacity(0.16))
+                .fill(Color(hex: "#38bdf8").opacity(isLight ? 0.08 : 0.16))
                 .frame(width: 120, height: 120)
                 .blur(radius: 36)
                 .offset(x: orbAnimate ? 270 : 230, y: orbAnimate ? 55 : 95)
-
-            // Subtle grid overlay
-            Rectangle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.white.opacity(0.03), Color.clear],
-                        startPoint: .topLeading, endPoint: .bottomTrailing
-                    )
-                )
 
             // Content
             VStack(alignment: .leading, spacing: 10) {
@@ -181,11 +176,11 @@ struct HomeView: View {
                         .font(.system(size: 10, weight: .bold))
                         .kerning(0.8)
                 }
-                .foregroundColor(Color(hex: "#c4b5fd"))
+                .foregroundColor(isLight ? Color(hex: "#5b52e8") : Color(hex: "#c4b5fd"))
                 .padding(.horizontal, 10).padding(.vertical, 5)
-                .background(Color(hex: "#7875f0").opacity(0.15))
+                .background(Color(hex: "#7875f0").opacity(isLight ? 0.10 : 0.15))
                 .clipShape(Capsule())
-                .overlay(Capsule().stroke(Color(hex: "#7875f0").opacity(0.35), lineWidth: 1))
+                .overlay(Capsule().stroke(Color(hex: "#7875f0").opacity(isLight ? 0.30 : 0.35), lineWidth: 1))
 
                 // Giant animated "99+ PDF Tools"
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
@@ -198,19 +193,16 @@ struct HomeView: View {
                                 startPoint: .topLeading, endPoint: .bottomTrailing
                             ))
                             .blur(radius: numberPulse ? 18 : 10)
-                            .opacity(numberPulse ? 0.65 : 0.35)
+                            .opacity(numberPulse ? (isLight ? 0.35 : 0.65) : (isLight ? 0.18 : 0.35))
                             .scaleEffect(numberPulse ? 1.12 : 1.0)
 
-                        // Main crisp text
+                        // Main crisp text — white gradient in dark, deep purple in light
                         Text("99+")
                             .font(.system(size: 96, weight: .black, design: .rounded))
                             .foregroundStyle(LinearGradient(
-                                colors: [
-                                    Color(hex: "#ffffff"),
-                                    Color(hex: "#e0d7ff"),
-                                    Color(hex: "#c4b5fd"),
-                                    Color(hex: "#818cf8"),
-                                ],
+                                colors: isLight
+                                    ? [Color(hex: "#4f46e5"), Color(hex: "#6c63ff"), Color(hex: "#7875f0"), Color(hex: "#5b52e8")]
+                                    : [Color(hex: "#ffffff"), Color(hex: "#e0d7ff"), Color(hex: "#c4b5fd"), Color(hex: "#818cf8")],
                                 startPoint: .top, endPoint: .bottom
                             ))
                     }
@@ -220,10 +212,10 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: -2) {
                         Text("PDF")
                             .font(.system(size: 30, weight: .black))
-                            .foregroundColor(.white)
+                            .foregroundColor(isLight ? Color(hex: "#1e1b4b") : .white)
                         Text("Tools")
                             .font(.system(size: 26, weight: .bold))
-                            .foregroundColor(.white.opacity(0.5))
+                            .foregroundColor(isLight ? Color(hex: "#5b52e8").opacity(0.6) : .white.opacity(0.5))
                     }
                     .padding(.bottom, 8)
                 }
@@ -234,9 +226,9 @@ struct HomeView: View {
                         ForEach(["Merge", "Split", "OCR", "Sign", "Convert", "Compress", "Annotate"], id: \.self) { chip in
                             Text(chip)
                                 .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(.white.opacity(0.65))
+                                .foregroundColor(isLight ? Color(hex: "#5b52e8") : .white.opacity(0.65))
                                 .padding(.horizontal, 9).padding(.vertical, 4)
-                                .background(Color.white.opacity(0.07))
+                                .background(Color(hex: "#6c63ff").opacity(isLight ? 0.10 : 0.07))
                                 .clipShape(Capsule())
                         }
                     }
@@ -257,7 +249,7 @@ struct HomeView: View {
                         startPoint: .leading, endPoint: .trailing
                     ))
                     .clipShape(Capsule())
-                    .shadow(color: Color(hex: "#7875f0").opacity(glowAnimate ? 0.65 : 0.35),
+                    .shadow(color: Color(hex: "#7875f0").opacity(glowAnimate ? (isLight ? 0.35 : 0.65) : (isLight ? 0.18 : 0.35)),
                             radius: glowAnimate ? 18 : 10, x: 0, y: 4)
                 }
                 .buttonStyle(.plain)
@@ -270,7 +262,9 @@ struct HomeView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 26)
                 .stroke(LinearGradient(
-                    colors: [Color(hex: "#7875f0").opacity(0.45), Color(hex: "#f472b6").opacity(0.2), Color.clear],
+                    colors: isLight
+                        ? [Color(hex: "#7875f0").opacity(0.30), Color(hex: "#f472b6").opacity(0.12), Color.clear]
+                        : [Color(hex: "#7875f0").opacity(0.45), Color(hex: "#f472b6").opacity(0.2), Color.clear],
                     startPoint: .topLeading, endPoint: .bottomTrailing
                 ), lineWidth: 1)
         )

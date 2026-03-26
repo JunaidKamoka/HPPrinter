@@ -122,14 +122,53 @@
 
     // Compact tools listing page: merge search + filter onto one row
     compactToolsPage();
+
+    // Inject back button on tool detail pages
+    injectBackButton();
+  }
+
+  // ── D-0. Tool detail page — back button ──────────────────────────
+  function injectBackButton() {
+    var path = window.location.pathname;
+    // Tool detail: /en/tools/some-tool/ — NOT the listing /en/tools/
+    var isToolDetail = /\/tools\/[^/]+\/?$/.test(path) && !/\/tools\/?$/.test(path);
+
+    // Remove stale bar on non-tool pages
+    var existing = document.getElementById("sp-back-bar");
+    if (!isToolDetail) { if (existing) existing.remove(); return; }
+    if (existing) return; // already injected
+
+    // Build bar
+    var bar = document.createElement("div");
+    bar.id = "sp-back-bar";
+
+    var btn = document.createElement("button");
+    btn.id = "sp-back-btn";
+    btn.type = "button";
+    btn.innerHTML =
+      '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>' +
+      '<span>All Tools</span>';
+    btn.addEventListener("click", function () {
+      window.location.href = "/en/tools/";
+    });
+
+    bar.appendChild(btn);
+
+    // Insert as very first element inside body
+    document.body.insertBefore(bar, document.body.firstChild);
   }
 
   // ── D. Compact tools listing page ────────────────────────────────
-  // Hides title/subtitle, merges search input into the filter bar row.
+  // Hides title/subtitle, merges search + funnel-filter button into one row.
   var _toolsCompacted = false;
+  var _filterUIInjected = false;
   function compactToolsPage() {
     var path = window.location.pathname;
-    if (!/\/tools\/?(\?|#|$)/.test(path)) { _toolsCompacted = false; return; }
+    if (!/\/tools\/?(\?|#|$)/.test(path)) {
+      _toolsCompacted = false;
+      _filterUIInjected = false;
+      return;
+    }
     if (_toolsCompacted) return;
 
     // Find hero section (has pt-36 or pt-32 class)
@@ -174,16 +213,10 @@
       }
     });
 
-    // 6. Show category chips on mobile (override hidden md:flex)
+    // 6. Hide chip group; inject professional funnel filter button instead
     var chipGroup = filterBar.querySelector("[role='group']");
     if (chipGroup) {
-      chipGroup.style.display = "flex";
-      chipGroup.style.flexWrap = "nowrap";
-      chipGroup.style.overflowX = "auto";
-      chipGroup.style.webkitOverflowScrolling = "touch";
-      chipGroup.style.flex = "1";
-      chipGroup.style.gap = "4px";
-      chipGroup.style.scrollbarWidth = "none";
+      chipGroup.style.display = "none";
     }
 
     // 7. Move search wrapper into filter bar as first child
@@ -215,7 +248,150 @@
       countBar.style.padding = "0 4px";
     }
 
+    // 11. Inject funnel filter button + dropdown
+    injectFilterUI(filterBar, chipGroup);
+
     _toolsCompacted = true;
+  }
+
+  // ── E. Funnel filter button + dropdown ───────────────────────────
+  function injectFilterUI(filterBar, chipGroup) {
+    if (_filterUIInjected || !chipGroup) return;
+    var chips = Array.from(chipGroup.querySelectorAll("button[aria-pressed][class*='px-']"));
+    if (chips.length === 0) return;
+
+    // Wrapper (shrink, positioned)
+    var wrap = document.createElement("div");
+    wrap.id = "sp-filter-wrap";
+
+    // Trigger button
+    var btn = document.createElement("button");
+    btn.id = "sp-filter-btn";
+    btn.type = "button";
+    btn.setAttribute("aria-haspopup", "listbox");
+    btn.setAttribute("aria-expanded", "false");
+    _updateFilterBtn(btn, chips);
+
+    // Dropdown panel
+    var dd = document.createElement("div");
+    dd.id = "sp-filter-dropdown";
+    dd.setAttribute("role", "listbox");
+    dd.setAttribute("aria-hidden", "true");
+
+    chips.forEach(function (chip, idx) {
+      var raw   = chip.textContent.trim();
+      var match = raw.match(/^(.*?)\((\d+)\)$/) || [raw, raw, ""];
+      var label = match[1].trim();
+      var count = match[2] || "";
+      var isFav = label === "Favorite Tools";
+
+      // Divider after Favorite Tools row
+      if (idx > 0 && isFav) {
+        var div = document.createElement("div");
+        div.className = "sp-fi-divider";
+        dd.appendChild(div);
+      }
+
+      var item = document.createElement("button");
+      item.type = "button";
+      item.className = "sp-filter-item" + (chip.getAttribute("aria-pressed") === "true" ? " sp-fi-active" : "");
+      item.setAttribute("role", "option");
+      item.dataset.label = label;
+
+      item.innerHTML =
+        '<span class="sp-fi-icon">' + (isFav ? _spStarSVG() : _spCatIcon(label)) + '</span>' +
+        '<span class="sp-fi-label">' + label + '</span>' +
+        (count ? '<span class="sp-fi-count">' + count + '</span>' : '') +
+        '<span class="sp-fi-check">' + _spCheckSVG() + '</span>';
+
+      item.addEventListener("click", function (e) {
+        e.stopPropagation();
+        chip.click();
+        setTimeout(function () {
+          _updateFilterBtn(btn, chips);
+          dd.querySelectorAll(".sp-filter-item").forEach(function (it) {
+            var c = chips.find(function (ch) {
+              return ch.textContent.trim().replace(/\(\d+\)$/, "").trim() === it.dataset.label;
+            });
+            it.classList.toggle("sp-fi-active", !!(c && c.getAttribute("aria-pressed") === "true"));
+          });
+        }, 80);
+        _closeDD(btn, dd);
+      });
+
+      dd.appendChild(item);
+    });
+
+    wrap.appendChild(btn);
+    wrap.appendChild(dd);
+
+    // Toggle dropdown on button click
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var isOpen = dd.classList.toggle("sp-filter-open");
+      btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      dd.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    });
+
+    // Close on outside tap
+    document.addEventListener("click", function () { _closeDD(btn, dd); });
+
+    // Insert after search wrap
+    var searchWrap = filterBar.querySelector("[class*='max-w-2xl']");
+    if (searchWrap && searchWrap.nextSibling) {
+      filterBar.insertBefore(wrap, searchWrap.nextSibling);
+    } else {
+      filterBar.appendChild(wrap);
+    }
+
+    _filterUIInjected = true;
+  }
+
+  function _closeDD(btn, dd) {
+    dd.classList.remove("sp-filter-open");
+    btn.setAttribute("aria-expanded", "false");
+    dd.setAttribute("aria-hidden", "true");
+  }
+
+  function _updateFilterBtn(btn, chips) {
+    var active = chips.find(function (c) { return c.getAttribute("aria-pressed") === "true"; });
+    var raw    = active ? active.textContent.trim() : "All Tools";
+    var match  = raw.match(/^(.*?)\((\d+)\)$/) || [raw, raw, ""];
+    var label  = match[1].trim();
+    var count  = match[2] || "";
+    var filtered = label !== "All Tools";
+    btn.className = filtered ? "sp-filtered" : "";
+    btn.innerHTML =
+      '<span class="sp-fb-icon">' + _spFunnelSVG(filtered) + '</span>' +
+      '<span class="sp-fb-label">' + label + '</span>' +
+      (filtered && count ? '<span class="sp-fb-badge">' + count + '</span>' : '') +
+      '<span class="sp-fb-chevron">' + _spChevronSVG() + '</span>';
+  }
+
+  function _spFunnelSVG(active) {
+    var c = active ? "#fff" : "currentColor";
+    return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="' + c + '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>';
+  }
+  function _spChevronSVG() {
+    return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  }
+  function _spCheckSVG() {
+    return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  }
+  function _spStarSVG() {
+    return '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+  }
+  function _spCatIcon(label) {
+    var map = {
+      "All Tools":         '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>',
+      "Edit & Annotate":   '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+      "Convert to PDF":    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>',
+      "Convert from PDF":  '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><polyline points="9 15 12 18 15 15"/></svg>',
+      "Organize & Manage": '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
+      "Optimize & Repair": '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>',
+      "Secure PDF":        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>'
+    };
+    return map[label] || map["All Tools"];
   }
 
   function replaceTextInNode(node) {
@@ -303,6 +479,7 @@
       hideElements();
       removeHeaderSpacing();
       compactToolsPage();
+      injectBackButton();
     }
   });
   document.addEventListener("DOMContentLoaded", function () {

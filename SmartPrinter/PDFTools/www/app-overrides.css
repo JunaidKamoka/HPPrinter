@@ -159,61 +159,81 @@ a[href*="/tools/"]:hover {
               0 4px 20px rgba(108, 99, 255, 0.1) !important;
 }
 
-/* Tool icon area – target by data-testid for reliable matching */
+/* ── Tool card icon circles ──────────────────────────────────────── */
+/* Always solid purple + white icon — same in light and dark mode    */
 [data-testid="tool-card-icon"] {
-  background: rgba(108, 99, 255, 0.18) !important;
-  background-image: none !important;
+  background: linear-gradient(135deg, #6c63ff 0%, #8b5cf6 100%) !important;
+  background-image: linear-gradient(135deg, #6c63ff 0%, #8b5cf6 100%) !important;
+  border-radius: 18px !important;
+}
+[data-testid="tool-card-icon"] svg,
+[data-testid="tool-card-icon"] svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
 }
 
-/* Icon SVG color inside tool cards */
-html.dark [data-testid="tool-card-icon"] svg,
-[data-testid="tool-card-icon"] svg {
-  color: #f0f0f8 !important;
-  stroke: currentColor;
-}
-html.light [data-testid="tool-card-icon"],
-html:not(.dark) [data-testid="tool-card-icon"] {
-  background: rgba(91, 82, 232, 0.14) !important;
-}
-html.light [data-testid="tool-card-icon"] svg,
-html:not(.dark) [data-testid="tool-card-icon"] svg {
-  color: #5b52e8 !important;
-  stroke: currentColor;
-}
-
-/* Fallback: rounded-2xl icon containers with gradient bg */
+/* Fallback: rounded-2xl gradient containers (other pages) */
 [class*="rounded-2xl"][class*="bg-gradient"] {
-  background: rgba(108, 99, 255, 0.15) !important;
-  background-image: none !important;
+  background: linear-gradient(135deg, #6c63ff 0%, #8b5cf6 100%) !important;
+  background-image: linear-gradient(135deg, #6c63ff 0%, #8b5cf6 100%) !important;
+}
+[class*="rounded-2xl"][class*="bg-gradient"] svg,
+[class*="rounded-2xl"][class*="bg-gradient"] svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
-/* Legacy selectors kept for other elements */
-[class*="rounded-xl"][class*="bg-"][class*="0.1"],
-[class*="rounded-lg"][class*="bg-"][class*="opacity"] {
-  background: rgba(108, 99, 255, 0.12) !important;
+/* Upload zone icon circle (rounded-full with p-4 inside a dropzone) */
+[class*="border-dashed"] [class*="rounded-full"],
+[class*="min-h-\[250px\]"] [class*="rounded-full"],
+[class*="min-h-\[300px\]"] [class*="rounded-full"] {
+  background: linear-gradient(135deg, #6c63ff 0%, #8b5cf6 100%) !important;
+  background-color: #6c63ff !important;
+  background-image: linear-gradient(135deg, #6c63ff 0%, #8b5cf6 100%) !important;
+}
+[class*="border-dashed"] [class*="rounded-full"] svg,
+[class*="border-dashed"] [class*="rounded-full"] svg *,
+[class*="min-h-\[250px\]"] [class*="rounded-full"] svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
 }
 
 /* ── 6. Category filter chips ────────────────────────────────────── */
-/* Inactive */
-button[aria-pressed="false"],
+/* Chips have px- padding; favorite/icon buttons do NOT — use [class*="px-"] to exclude them */
+
+/* Inactive chips */
+button[aria-pressed="false"][class*="px-"],
 [class*="rounded-full"][class*="border"][class*="px-3"],
 [class*="rounded-full"][class*="border"][class*="px-4"] {
   background: hsl(var(--color-muted)) !important;
   border-color: hsl(var(--color-border)) !important;
   color: hsl(var(--color-muted-foreground)) !important;
 }
-button[aria-pressed="false"]:hover {
+button[aria-pressed="false"][class*="px-"]:hover {
   background: hsl(var(--color-secondary)) !important;
   border-color: hsl(var(--color-primary) / 0.35) !important;
   color: hsl(var(--color-foreground)) !important;
 }
 
-/* Active */
-button[aria-pressed="true"] {
+/* Active chips */
+button[aria-pressed="true"][class*="px-"] {
   background: linear-gradient(135deg, #6c63ff, #8b5cf6) !important;
   border-color: transparent !important;
   color: #fff !important;
   box-shadow: 0 2px 12px rgba(108, 99, 255, 0.4) !important;
+}
+
+/* Favorite / icon-only buttons — restore their native transparent background */
+button[aria-pressed][class*="rounded-full"]:not([class*="px-"]) {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+button[aria-pressed="true"][class*="rounded-full"]:not([class*="px-"]) {
+  background: transparent !important;
+  color: inherit !important;
 }
 
 /* ── 7. Sticky category bar ──────────────────────────────────────── */
@@ -227,9 +247,10 @@ button[aria-pressed="true"] {
 }
 
 /* ── 8. Cards (p-4/p-6 containers) ──────────────────────────────── */
-[class*="p-6"][class*="rounded"],
-[class*="p-4"][class*="rounded"],
-[class*="p-8"][class*="rounded"] {
+/* Exclude rounded-full (icon circles) and data-testid icon containers */
+[class*="p-6"][class*="rounded"]:not([class*="rounded-full"]):not([data-testid]),
+[class*="p-4"][class*="rounded"]:not([class*="rounded-full"]):not([data-testid]),
+[class*="p-8"][class*="rounded"]:not([class*="rounded-full"]):not([data-testid]) {
   background-color: hsl(var(--color-card)) !important;
   border-color: hsl(var(--color-border)) !important;
 }
@@ -253,33 +274,16 @@ button[class*="primary"],
   border-color: transparent !important;
 }
 
-/* ── 11. Favourite / pill buttons ───────────────────────────────── */
-html.dark button[class*="absolute"][class*="rounded-full"],
-button[class*="absolute"][class*="rounded-full"] {
-  background: rgba(10, 10, 15, 0.85) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-html.light button[class*="absolute"][class*="rounded-full"],
-html:not(.dark) button[class*="absolute"][class*="rounded-full"] {
-  background: rgba(255, 255, 255, 0.92) !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
-}
-html.dark button[class*="absolute"][class*="rounded-full"]:hover,
-button[class*="absolute"][class*="rounded-full"]:hover {
-  background: rgba(108, 99, 255, 0.2) !important;
-}
-html.light button[class*="absolute"][class*="rounded-full"]:hover,
-html:not(.dark) button[class*="absolute"][class*="rounded-full"]:hover {
-  background: rgba(91, 82, 232, 0.12) !important;
-}
-html.dark button[class*="rounded-full"][class*="gap"],
-button[class*="rounded-full"][class*="gap"] {
+/* ── 11. Pill buttons with text (must have px- to exclude icon-only buttons) ── */
+/* "Share", "Download" type pill buttons with text+icon and gap */
+html.dark button[class*="rounded-full"][class*="gap"][class*="px-"],
+button[class*="rounded-full"][class*="gap"][class*="px-"]:not([aria-pressed]) {
   background: #1a1a26 !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #f0f0f8 !important;
 }
-html.light button[class*="rounded-full"][class*="gap"],
-html:not(.dark) button[class*="rounded-full"][class*="gap"] {
+html.light button[class*="rounded-full"][class*="gap"][class*="px-"],
+html:not(.dark) button[class*="rounded-full"][class*="gap"][class*="px-"]:not([aria-pressed]) {
   background: #e8e8f0 !important;
   border-color: rgba(0, 0, 0, 0.09) !important;
   color: #0f0f1f !important;
@@ -419,4 +423,244 @@ section[class*="py-8"][class*="min-h"] {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 10px !important;
   }
+}
+
+/* ── 18. Funnel filter button + dropdown ─────────────────────────── */
+#sp-filter-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Trigger button */
+#sp-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px 8px 10px;
+  border-radius: 50px;
+  border: 1.5px solid hsl(var(--color-border));
+  background: hsl(var(--color-muted));
+  color: hsl(var(--color-muted-foreground));
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 175px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, color 0.15s, background 0.15s;
+}
+#sp-filter-btn:hover {
+  border-color: hsl(var(--color-primary) / 0.5);
+  color: hsl(var(--color-foreground));
+}
+#sp-filter-btn[aria-expanded="true"] {
+  border-color: hsl(var(--color-primary));
+  color: hsl(var(--color-foreground));
+  box-shadow: 0 0 0 3px hsl(var(--color-primary) / 0.18);
+}
+/* Active filter — gradient pill */
+#sp-filter-btn.sp-filtered {
+  background: linear-gradient(135deg, #6c63ff, #8b5cf6) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 2px 14px rgba(108, 99, 255, 0.45) !important;
+}
+#sp-filter-btn.sp-filtered:hover {
+  filter: brightness(1.08);
+}
+
+.sp-fb-icon { display: flex; align-items: center; }
+.sp-fb-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 105px;
+}
+.sp-fb-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+.sp-fb-chevron {
+  display: flex;
+  align-items: center;
+  opacity: 0.65;
+  transition: transform 0.2s ease;
+}
+#sp-filter-btn[aria-expanded="true"] .sp-fb-chevron {
+  transform: rotate(180deg);
+}
+
+/* Dropdown panel */
+#sp-filter-dropdown {
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  z-index: 99999;
+  min-width: 228px;
+  width: max-content;
+  max-width: 290px;
+  background: hsl(var(--color-card));
+  border: 1.5px solid hsl(var(--color-border));
+  border-radius: 18px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.22),
+    0 2px 8px rgba(0, 0, 0, 0.10);
+  padding: 7px;
+  /* Hidden */
+  opacity: 0;
+  transform: translateY(-10px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#sp-filter-dropdown.sp-filter-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Items */
+.sp-filter-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  margin: 1px 0;
+  border: none;
+  border-radius: 11px;
+  background: transparent;
+  color: hsl(var(--color-muted-foreground));
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.sp-filter-item:active {
+  transform: scale(0.98);
+}
+.sp-filter-item:hover {
+  background: hsl(var(--color-muted));
+  color: hsl(var(--color-foreground));
+}
+.sp-filter-item.sp-fi-active {
+  background: hsl(var(--color-primary) / 0.12);
+  color: hsl(var(--color-primary));
+  font-weight: 600;
+}
+
+/* Icon bubble */
+.sp-fi-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: hsl(var(--color-muted));
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.sp-filter-item.sp-fi-active .sp-fi-icon {
+  background: hsl(var(--color-primary) / 0.16);
+}
+.sp-filter-item:hover .sp-fi-icon {
+  background: hsl(var(--color-border));
+}
+
+.sp-fi-label { flex: 1; }
+
+/* Count badge */
+.sp-fi-count {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 50px;
+  background: hsl(var(--color-muted));
+  color: hsl(var(--color-muted-foreground));
+  flex-shrink: 0;
+}
+.sp-filter-item.sp-fi-active .sp-fi-count {
+  background: hsl(var(--color-primary) / 0.15);
+  color: hsl(var(--color-primary));
+}
+
+/* Check mark — only visible on active */
+.sp-fi-check {
+  display: flex;
+  align-items: center;
+  color: hsl(var(--color-primary));
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.sp-filter-item.sp-fi-active .sp-fi-check {
+  opacity: 1;
+}
+
+/* Thin divider between Favorite Tools and the rest */
+.sp-fi-divider {
+  height: 1px;
+  margin: 4px 8px;
+  background: hsl(var(--color-border));
+}
+
+/* Light mode overrides */
+html.light #sp-filter-dropdown {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ── 19. Tool detail page — back button ──────────────────────────── */
+#sp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 10px 0 4px 0;
+  padding: 8px 14px 8px 9px;
+  border: 1.5px solid hsl(var(--color-border));
+  border-radius: 50px;
+  background: hsl(var(--color-card));
+  color: hsl(var(--color-foreground));
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#sp-back-btn:hover {
+  background: hsl(var(--color-muted));
+  border-color: hsl(var(--color-primary) / 0.4);
+}
+#sp-back-btn:active {
+  transform: scale(0.95);
+}
+#sp-back-btn svg {
+  color: hsl(var(--color-primary)) !important;
+  stroke: currentColor !important;
+  flex-shrink: 0;
+}
+
+/* Wrapper bar containing the back button */
+#sp-back-bar {
+  padding: 4px 14px 2px;
+  background: hsl(var(--color-background));
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid hsl(var(--color-border));
 }
