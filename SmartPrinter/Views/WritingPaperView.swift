@@ -99,7 +99,7 @@ struct WritingPaperWebViewRepresentable: UIViewRepresentable {
                 let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
                 do {
                     try data.write(to: tempURL)
-                    self.vm.printDirectly(url: tempURL)
+                    self.vm.printDirectly(url: tempURL, source: "Writing Paper")
                 } catch {
                     self.vm.showToastMessage("Failed to prepare PDF for printing")
                 }

@@ -30,6 +30,299 @@
 	<string>15.0</string>
 
 	<!-- ═══════════════════════════════════════════════
+	     ASO — APP STORE CONNECT KEYWORD REFERENCE
+	     Max 100 characters, comma-separated, no spaces.
+	     Paste this string verbatim into App Store Connect
+	     → App Information → Keywords.
+	     ═══════════════════════════════════════════════ -->
+	<key>AppStoreKeywords</key>
+	<string>hp,airprint,printer,pdf,scan,canon,epson,brother,wifi,laser,inkjet,print,document,wireless,photo,ocr</string>
+
+	<!-- ═══════════════════════════════════════════════
+	     ASO — EXTENDED KEYWORD BANK
+	     Used for Spotlight, on-device search, and as
+	     reference when localising App Store metadata.
+	     ═══════════════════════════════════════════════ -->
+	<key>ASOKeywords</key>
+	<array>
+		<!-- Core value props -->
+		<string>hp smart printer app</string>
+		<string>hp printer</string>
+		<string>airprint</string>
+		<string>wireless printer</string>
+		<string>wifi printer</string>
+		<string>mobile print</string>
+		<string>print from iphone</string>
+		<string>print from ipad</string>
+		<string>print documents</string>
+		<string>print photos</string>
+		<string>scan to pdf</string>
+		<string>document scanner</string>
+		<string>pdf printer</string>
+		<string>pdf editor</string>
+		<string>pdf tools</string>
+		<string>merge pdf</string>
+		<string>split pdf</string>
+		<string>compress pdf</string>
+		<string>sign pdf</string>
+		<string>ocr pdf</string>
+		<string>protect pdf</string>
+		<string>word to pdf</string>
+		<string>excel to pdf</string>
+		<string>photo to pdf</string>
+		<string>forms</string>
+		<string>printables</string>
+		<string>writing paper</string>
+		<!-- Printer brands -->
+		<string>hp deskjet</string>
+		<string>hp officejet</string>
+		<string>hp laserjet</string>
+		<string>hp envy</string>
+		<string>hp tango</string>
+		<string>hp officejet pro</string>
+		<string>hp smart tank</string>
+		<string>hp color laserjet</string>
+		<string>hp pagewide</string>
+		<string>hp designjet</string>
+		<string>canon printer</string>
+		<string>canon pixma</string>
+		<string>canon maxify</string>
+		<string>canon imageclass</string>
+		<string>canon selphy</string>
+		<string>canon imagerunner</string>
+		<string>canon tr series</string>
+		<string>canon ts series</string>
+		<string>canon mg series</string>
+		<string>epson printer</string>
+		<string>epson ecotank</string>
+		<string>epson workforce</string>
+		<string>epson expression</string>
+		<string>epson surecolor</string>
+		<string>epson picturemate</string>
+		<string>epson et series</string>
+		<string>epson wf series</string>
+		<string>epson xp series</string>
+		<string>brother printer</string>
+		<string>brother hl series</string>
+		<string>brother mfc series</string>
+		<string>brother dcp series</string>
+		<string>brother ql label</string>
+		<string>lexmark printer</string>
+		<string>lexmark mb series</string>
+		<string>lexmark cs series</string>
+		<string>lexmark ms series</string>
+		<string>samsung printer</string>
+		<string>samsung xpress</string>
+		<string>samsung proxpress</string>
+		<string>dell printer</string>
+		<string>xerox printer</string>
+		<string>xerox versalink</string>
+		<string>xerox workcentre</string>
+		<string>xerox phaser</string>
+		<string>xerox altalink</string>
+		<string>ricoh printer</string>
+		<string>ricoh sp series</string>
+		<string>ricoh mp series</string>
+		<string>ricoh im series</string>
+		<string>kyocera printer</string>
+		<string>kyocera ecosys</string>
+		<string>kyocera taskalfa</string>
+		<string>pantum printer</string>
+		<string>kodak printer</string>
+		<string>sharp printer</string>
+		<string>oki printer</string>
+		<string>konica minolta</string>
+		<string>konica minolta bizhub</string>
+		<string>toshiba e-studio</string>
+		<string>fuji xerox</string>
+		<string>sindoh printer</string>
+		<!-- Printer types -->
+		<string>laser printer</string>
+		<string>inkjet printer</string>
+		<string>color printer</string>
+		<string>black white printer</string>
+		<string>photo printer</string>
+		<string>label printer</string>
+		<string>all in one printer</string>
+		<string>multifunction printer</string>
+		<string>portable printer</string>
+		<string>bluetooth printer</string>
+	</array>
+
+	<!-- ═══════════════════════════════════════════════
+	     SUPPORTED PRINTER BRANDS
+	     Comprehensive brand + model list for Spotlight
+	     indexing and on-device search signals.
+	     ═══════════════════════════════════════════════ -->
+	<key>SupportedPrinterBrands</key>
+	<array>
+		<!-- HP -->
+		<string>HP DeskJet</string>
+		<string>HP OfficeJet</string>
+		<string>HP OfficeJet Pro</string>
+		<string>HP LaserJet</string>
+		<string>HP LaserJet Pro</string>
+		<string>HP LaserJet Enterprise</string>
+		<string>HP Color LaserJet</string>
+		<string>HP ENVY</string>
+		<string>HP ENVY Pro</string>
+		<string>HP Tango</string>
+		<string>HP Smart Tank</string>
+		<string>HP PageWide</string>
+		<string>HP PageWide Pro</string>
+		<string>HP DesignJet</string>
+		<string>HP ScanJet</string>
+		<string>HP Neverstop</string>
+		<string>HP Sprocket</string>
+		<!-- Canon -->
+		<string>Canon PIXMA</string>
+		<string>Canon PIXMA TR</string>
+		<string>Canon PIXMA TS</string>
+		<string>Canon PIXMA MG</string>
+		<string>Canon PIXMA MX</string>
+		<string>Canon PIXMA G</string>
+		<string>Canon MAXIFY</string>
+		<string>Canon MAXIFY GX</string>
+		<string>Canon imageCLASS</string>
+		<string>Canon imageCLASS MF</string>
+		<string>Canon imageCLASS LBP</string>
+		<string>Canon SELPHY</string>
+		<string>Canon imageRUNNER</string>
+		<string>Canon imageRUNNER ADVANCE</string>
+		<string>Canon imagePROGRAF</string>
+		<string>Canon PIXMA iP</string>
+		<string>Canon PIXMA iX</string>
+		<string>Canon PIXMA Pro</string>
+		<!-- Epson -->
+		<string>Epson EcoTank</string>
+		<string>Epson WorkForce</string>
+		<string>Epson WorkForce Pro</string>
+		<string>Epson Expression</string>
+		<string>Epson Expression Premium</string>
+		<string>Epson Expression Home</string>
+		<string>Epson SureColor</string>
+		<string>Epson PictureMate</string>
+		<string>Epson ET Series</string>
+		<string>Epson WF Series</string>
+		<string>Epson XP Series</string>
+		<string>Epson SC Series</string>
+		<string>Epson L Series</string>
+		<string>Epson Stylus</string>
+		<!-- Brother -->
+		<string>Brother HL</string>
+		<string>Brother HL-L</string>
+		<string>Brother MFC</string>
+		<string>Brother MFC-L</string>
+		<string>Brother DCP</string>
+		<string>Brother DCP-L</string>
+		<string>Brother QL</string>
+		<string>Brother PT</string>
+		<string>Brother ADS</string>
+		<string>Brother INKvestment</string>
+		<!-- Lexmark -->
+		<string>Lexmark MB</string>
+		<string>Lexmark CS</string>
+		<string>Lexmark MS</string>
+		<string>Lexmark CX</string>
+		<string>Lexmark MX</string>
+		<string>Lexmark B</string>
+		<string>Lexmark C</string>
+		<string>Lexmark Go Line</string>
+		<!-- Samsung -->
+		<string>Samsung Xpress</string>
+		<string>Samsung ProXpress</string>
+		<string>Samsung MultiXpress</string>
+		<string>Samsung SL</string>
+		<!-- Dell -->
+		<string>Dell Color</string>
+		<string>Dell Laser</string>
+		<string>Dell B Series</string>
+		<string>Dell E Series</string>
+		<!-- Xerox -->
+		<string>Xerox VersaLink</string>
+		<string>Xerox WorkCentre</string>
+		<string>Xerox Phaser</string>
+		<string>Xerox AltaLink</string>
+		<string>Xerox B Series</string>
+		<string>Xerox ColorQube</string>
+		<string>Xerox DocuPrint</string>
+		<string>Xerox DocuCentre</string>
+		<string>Fuji Xerox DocuPrint</string>
+		<string>Fuji Xerox DocuCentre</string>
+		<!-- Ricoh -->
+		<string>Ricoh SP</string>
+		<string>Ricoh MP</string>
+		<string>Ricoh IM</string>
+		<string>Ricoh P</string>
+		<string>Ricoh SG</string>
+		<string>Ricoh Aficio</string>
+		<!-- Kyocera -->
+		<string>Kyocera ECOSYS</string>
+		<string>Kyocera TASKalfa</string>
+		<string>Kyocera FS</string>
+		<string>Kyocera M Series</string>
+		<string>Kyocera P Series</string>
+		<!-- Pantum -->
+		<string>Pantum P Series</string>
+		<string>Pantum M Series</string>
+		<string>Pantum BP Series</string>
+		<string>Pantum CM Series</string>
+		<string>Pantum CP Series</string>
+		<!-- Kodak -->
+		<string>Kodak Hero</string>
+		<string>Kodak Verite</string>
+		<string>Kodak ESP</string>
+		<string>Kodak Mini</string>
+		<!-- Sharp -->
+		<string>Sharp MX</string>
+		<string>Sharp BP</string>
+		<string>Sharp MX-M</string>
+		<string>Sharp AR</string>
+		<!-- OKI -->
+		<string>OKI ES</string>
+		<string>OKI C Series</string>
+		<string>OKI MB Series</string>
+		<string>OKI MC Series</string>
+		<string>OKI B Series</string>
+		<!-- Konica Minolta -->
+		<string>Konica Minolta bizhub</string>
+		<string>Konica Minolta PagePro</string>
+		<string>Konica Minolta AccurioPress</string>
+		<!-- Toshiba -->
+		<string>Toshiba e-STUDIO</string>
+		<!-- Develop / Triumph-Adler / Utax -->
+		<string>Develop ineo</string>
+		<string>Triumph-Adler</string>
+		<string>Utax CDC</string>
+		<!-- Sindoh -->
+		<string>Sindoh D Series</string>
+		<string>Sindoh A Series</string>
+		<string>Sindoh N Series</string>
+		<!-- Lanier / Savin / Gestetner / NRG / Nashuatec / Infotec -->
+		<string>Lanier</string>
+		<string>Savin</string>
+		<string>Gestetner</string>
+		<string>NRG</string>
+		<string>Nashuatec</string>
+		<string>Infotec</string>
+		<!-- Generic types -->
+		<string>AirPrint Printer</string>
+		<string>Wireless Printer</string>
+		<string>Laser Printer</string>
+		<string>Inkjet Printer</string>
+		<string>Photo Printer</string>
+		<string>Label Printer</string>
+		<string>All-in-One Printer</string>
+		<string>Multifunction Printer</string>
+		<string>Portable Printer</string>
+		<string>Bluetooth Printer</string>
+		<string>Color Printer</string>
+		<string>Black and White Printer</string>
+		<string>Network Printer</string>
+		<string>Cloud Printer</string>
+	</array>
+
+	<!-- ═══════════════════════════════════════════════
 	     UI CONFIGURATION
 	     ═══════════════════════════════════════════════ -->
 	<key>UIRequiresFullScreen</key>
@@ -83,17 +376,18 @@
 
 	<!-- ═══════════════════════════════════════════════
 	     PRIVACY USAGE DESCRIPTIONS
+	     Brand mentions increase contextual relevance.
 	     ═══════════════════════════════════════════════ -->
 	<key>NSCameraUsageDescription</key>
-	<string>HP Smart Printer uses the camera to scan documents and photos to PDF for wireless printing.</string>
+	<string>HP Smart Printer uses your camera to scan documents and photos directly to PDF for wireless printing to HP, Canon, Epson, Brother, Lexmark, Xerox and all AirPrint printers.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>HP Smart Printer needs access to your photo library to print photos and use images in PDF documents.</string>
+	<string>HP Smart Printer needs access to your photo library to print photos and use images in PDF documents on any AirPrint-compatible printer.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>HP Smart Printer needs local network access to discover and connect to AirPrint-compatible printers on your Wi-Fi network — including HP, Canon, Epson, Brother, Lexmark and more.</string>
+	<string>HP Smart Printer needs local network access to discover and connect to AirPrint-compatible printers on your Wi-Fi — HP, Canon, Epson, Brother, Xerox, Ricoh, Kyocera, Lexmark, Samsung, Sharp, OKI, Konica Minolta, Pantum and more.</string>
 
 	<!-- ═══════════════════════════════════════════════
 	     NETWORK — BONJOUR SERVICES
-	     Expanded for broader printer discovery (ASO signal)
+	     Expanded for maximum printer discovery coverage.
 	     ═══════════════════════════════════════════════ -->
 	<key>NSBonjourServices</key>
 	<array>
@@ -113,7 +407,6 @@
 		<true/>
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
-		<!-- Firebase Storage requires HTTPS — covered by default -->
 	</dict>
 
 	<!-- ═══════════════════════════════════════════════
@@ -137,7 +430,7 @@
 	<!-- ═══════════════════════════════════════════════
 	     CFBundleDocumentTypes
 	     Makes app appear in Files "Open With" sheet —
-	     one of the highest-impact ASO signals on iOS.
+	     highest-impact on-device ASO signal.
 	     ═══════════════════════════════════════════════ -->
 	<key>CFBundleDocumentTypes</key>
 	<array>
@@ -145,7 +438,7 @@
 		<!-- PDF — Owner (primary type) -->
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>PDF Document</string>
+			<string>PDF Document — Print, Edit, Sign, Merge</string>
 			<key>LSHandlerRank</key>
 			<string>Owner</string>
 			<key>CFBundleTypeRole</key>
@@ -159,7 +452,7 @@
 		<!-- Microsoft Word -->
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Microsoft Word Document</string>
+			<string>Microsoft Word Document — Print &amp; Convert to PDF</string>
 			<key>LSHandlerRank</key>
 			<string>Alternate</string>
 			<key>CFBundleTypeRole</key>
@@ -174,7 +467,7 @@
 		<!-- Microsoft Excel -->
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Microsoft Excel Spreadsheet</string>
+			<string>Microsoft Excel Spreadsheet — Print &amp; Convert to PDF</string>
 			<key>LSHandlerRank</key>
 			<string>Alternate</string>
 			<key>CFBundleTypeRole</key>
@@ -189,7 +482,7 @@
 		<!-- Microsoft PowerPoint -->
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Microsoft PowerPoint Presentation</string>
+			<string>Microsoft PowerPoint Presentation — Print &amp; Convert to PDF</string>
 			<key>LSHandlerRank</key>
 			<string>Alternate</string>
 			<key>CFBundleTypeRole</key>
@@ -201,10 +494,10 @@
 			</array>
 		</dict>
 
-		<!-- Images (JPEG, PNG, HEIC, TIFF, BMP, WebP) -->
+		<!-- Images -->
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Image File</string>
+			<string>Image — Print or Convert to PDF</string>
 			<key>LSHandlerRank</key>
 			<string>Alternate</string>
 			<key>CFBundleTypeRole</key>
@@ -224,7 +517,7 @@
 		<!-- Plain Text / RTF / HTML -->
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Text Document</string>
+			<string>Text Document — Print or Convert to PDF</string>
 			<key>LSHandlerRank</key>
 			<string>Alternate</string>
 			<key>CFBundleTypeRole</key>
@@ -241,7 +534,7 @@
 		<!-- eBook (EPUB) -->
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>eBook</string>
+			<string>eBook — Print or Convert to PDF</string>
 			<key>LSHandlerRank</key>
 			<string>Alternate</string>
 			<key>CFBundleTypeRole</key>
@@ -255,7 +548,7 @@
 	</array>
 
 	<!-- ═══════════════════════════════════════════════
-	     CFBundleURLTypes — Deep Linking / Universal Links
+	     CFBundleURLTypes — Deep Linking
 	     ═══════════════════════════════════════════════ -->
 	<key>CFBundleURLTypes</key>
 	<array>
@@ -273,7 +566,6 @@
 
 	<!-- ═══════════════════════════════════════════════
 	     UTExportedTypeDeclarations
-	     Declares custom type ownership — boosts indexing
 	     ═══════════════════════════════════════════════ -->
 	<key>UTExportedTypeDeclarations</key>
 	<array>
@@ -301,7 +593,6 @@
 
 	<!-- ═══════════════════════════════════════════════
 	     UTImportedTypeDeclarations
-	     Declares understanding of third-party types
 	     ═══════════════════════════════════════════════ -->
 	<key>UTImportedTypeDeclarations</key>
 	<array>
@@ -326,20 +617,6 @@
 			</dict>
 		</dict>
 	</array>
-
-	<!-- ═══════════════════════════════════════════════
-	     ASO: SUPPORTED PRINTER BRANDS (Apple-indexed)
-	     Comprehensive list for search ranking
-	     ═══════════════════════════════════════════════ -->
-	<key>SupportedPrinterBrands</key>
-	<string>HP DeskJet HP OfficeJet HP LaserJet HP ENVY HP Tango HP OfficeJet Pro HP Color LaserJet HP PageWide HP DesignJet HP ScanJet HP LaserJet Pro HP LaserJet Enterprise Canon PIXMA Canon MAXIFY Canon imageCLASS Canon SELPHY Canon imageRUNNER Canon imageGRAF Canon TR Canon TS Canon MG Canon MX Epson EcoTank Epson WorkForce Epson Expression Epson SureColor Epson PictureMate Epson ET Epson WF Epson XP Epson SC Brother HL Brother MFC Brother DCP Brother QL Brother ADS Brother LC Lexmark MB Lexmark CS Lexmark MS Lexmark CX Lexmark MX Lexmark B Lexmark C Samsung Xpress Samsung ProXpress Samsung MultiXpress Dell Color Dell Laser Dell B Xerox VersaLink Xerox WorkCentre Xerox Phaser Xerox AltaLink Xerox B Xerox ColorQube Ricoh SP Ricoh MP Ricoh IM Ricoh P Ricoh SG Kyocera ECOSYS Kyocera TASKalfa Kyocera FS Pantum P Pantum M Pantum BP Pantum CM Kodak Hero Kodak Verite Kodak ESP Sharp MX Sharp BP Sharp MX-M OKI ES OKI C OKI MB OKI MC Konica Minolta bizhub Konica Minolta PagePro Toshiba e-STUDIO Develop ineo Triumph-Adler Olivetti d-Color Utax CDC Fuji Xerox DocuPrint Fuji Xerox DocuCentre Xerox DocuColor Gestetner Nashuatec Lanier Savin Infotec NRG Sindoh D Sindoh A Pantum Series Canon Series HP Series Epson Series Brother Series wireless printer AirPrint printer wifi printer bluetooth printer photo printer label printer laser printer inkjet printer color printer black white printer mobile printer portable printer all-in-one printer scanner copier multifunction printer</string>
-
-	<!-- ═══════════════════════════════════════════════
-	     APP STORE OPTIMIZATION KEYWORDS
-	     Embedded metadata read by Apple crawlers
-	     ═══════════════════════════════════════════════ -->
-	<key>ASOKeywords</key>
-	<string>print pdf airprint wireless printer hp printer canon printer epson printer brother printer scan document pdf editor pdf converter merge pdf split pdf compress pdf sign pdf ocr pdf protect pdf word to pdf excel to pdf photo print mobile print cloud print google drive print dropbox print writing paper forms printables</string>
 
 </dict>
 </plist>

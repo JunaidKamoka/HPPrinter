@@ -12,6 +12,13 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "7824", "--directory", "/Users/macbook/Documents/GitHub/iOS/HPPrinter/SmartPrinter/PDFTools/www"],
       "port": 7824
+    },
+    {
+      "name": "screenshots",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "/Users/macbook/Documents/GitHub/iOS/HPPrinter/screenshots", "dev"],
+      "port": 3000,
+      "autoPort": true
     }
   ]
 }

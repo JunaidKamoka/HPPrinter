@@ -438,6 +438,7 @@ struct FormDetailView: View {
     // MARK: - Print form — downloads ALL page images → composes a PDF → AirPrint in one job
     private func printForm() {
         guard !isPrinting else { return }
+        guard vm.checkAccess() else { return }
         printError = nil
         isPrinting = true
 

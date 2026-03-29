@@ -11,6 +11,74 @@ class AppViewModel: ObservableObject {
     @Published var discoveryService = PrinterDiscoveryService()
     private var discoveryCancellable: AnyCancellable?
 
+    // MARK: - Subscription / Paywall
+    @Published var showPaywall: Bool = false
+
+    var paywallShowCount: Int {
+        get { UserDefaults.standard.integer(forKey: "hp_paywall_show_count") }
+        set { UserDefaults.standard.set(newValue, forKey: "hp_paywall_show_count") }
+    }
+
+    /// Pure read — no side effects. Call nextPaywallVariant() to advance.
+    var paywallVariant: Int { paywallShowCount % 3 }
+
+    func nextPaywallVariant() { paywallShowCount += 1 }
+
+    private let freeTriesKey = "hp_free_tries_used"
+    static let freeTriesLimit = 3
+
+    var freePrintsUsed: Int {
+        get { UserDefaults.standard.integer(forKey: freeTriesKey) }
+        set { UserDefaults.standard.set(newValue, forKey: freeTriesKey); objectWillChange.send() }
+    }
+
+    var freePrintsRemaining: Int { max(0, Self.freeTriesLimit - freePrintsUsed) }
+
+    @MainActor var isPremium: Bool { SubscriptionService.shared.isPremium }
+
+    /// Returns true if the action is allowed (premium or has free tries left).
+    /// Increments the try counter and shows the paywall when tries are exhausted.
+    /// In DEBUG builds all actions are always allowed.
+    @MainActor @discardableResult
+    func checkAccess() -> Bool {
+        #if DEBUG
+        return true
+        #else
+        if SubscriptionService.shared.isPremium { return true }
+        if freePrintsUsed < Self.freeTriesLimit {
+            freePrintsUsed += 1
+            return true
+        }
+        showPaywall = true
+        return false
+        #endif
+    }
+
+    // MARK: - Template Access (first template is free; rest require premium)
+
+    private let freeTemplateKey = "hp_free_template_used"
+
+    var freeTemplateUsed: Bool {
+        get { UserDefaults.standard.bool(forKey: freeTemplateKey) }
+        set { UserDefaults.standard.set(newValue, forKey: freeTemplateKey); objectWillChange.send() }
+    }
+
+    /// First template print is always free. Subsequent prints require premium.
+    @MainActor @discardableResult
+    func checkTemplateAccess() -> Bool {
+        #if DEBUG
+        return true
+        #else
+        if SubscriptionService.shared.isPremium { return true }
+        if !freeTemplateUsed {
+            freeTemplateUsed = true
+            return true
+        }
+        showPaywall = true
+        return false
+        #endif
+    }
+
     // MARK: - UI State
     @Published var toastMessage: String = ""
     @Published var showToast: Bool = false
@@ -29,6 +97,12 @@ class AppViewModel: ObservableObject {
     @Published var notificationsEnabled: Bool = true
     @Published var autoReconnect: Bool = true
     @Published var saveHistory: Bool = true
+
+    // Haptics (backed by HapticService so buttons read it directly)
+    var hapticsEnabled: Bool {
+        get { HapticService.shared.isEnabled }
+        set { HapticService.shared.isEnabled = newValue; objectWillChange.send() }
+    }
 
     private let persistence = PersistenceService.shared
 
@@ -100,6 +174,7 @@ class AppViewModel: ObservableObject {
         notificationsEnabled = settings.notificationsEnabled
         autoReconnect = settings.autoReconnect
         saveHistory = settings.saveHistory
+        HapticService.shared.isEnabled = settings.hapticsEnabled
     }
 
     // MARK: - Toast
@@ -131,9 +206,11 @@ class AppViewModel: ObservableObject {
         savedPrinters.append(p)
         persistence.savePrinters(savedPrinters)
         showToastMessage("Printer added: \(p.name)")
+        logPrinterEvent(event: "Added: \(p.name)", printerName: p.name)
     }
 
     func removePrinter(_ printer: Printer) {
+        logPrinterEvent(event: "Removed: \(printer.name)", printerName: printer.name)
         savedPrinters.removeAll { $0.id == printer.id }
         if printer.isPrimary, let first = savedPrinters.first {
             if let idx = savedPrinters.firstIndex(where: { $0.id == first.id }) {
@@ -149,6 +226,27 @@ class AppViewModel: ObservableObject {
         }
         persistence.savePrinters(savedPrinters)
         showToastMessage("\(printer.name) set as primary")
+        logPrinterEvent(event: "Set Primary: \(printer.name)", printerName: printer.name)
+    }
+
+    private func logPrinterEvent(event: String, printerName: String) {
+        guard saveHistory else { return }
+        let job = PrintJob(
+            fileName: event,
+            fileType: "printer",
+            pageCount: 0,
+            printerName: printerName,
+            colorMode: "-",
+            duplex: false,
+            paperSize: "-",
+            copies: 0,
+            status: .done,
+            progress: 1.0,
+            date: Date(),
+            source: "Printer"
+        )
+        history.insert(job, at: 0)
+        persistence.saveHistory(history)
     }
 
     // MARK: - File Handling
@@ -261,13 +359,13 @@ class AppViewModel: ObservableObject {
             return
         }
 
-        printFile(url: url)
+        printFile(url: url, source: "Queue")
         queue.removeAll { $0.id == job.id }
         persistence.saveQueue(queue)
     }
 
-    func printDirectly(url: URL) {
-        printFile(url: url)
+    func printDirectly(url: URL, source: String = "Documents") {
+        printFile(url: url, source: source)
     }
 
     // MARK: - History
@@ -303,7 +401,8 @@ class AppViewModel: ObservableObject {
             pagesPerSheet: pagesPerSheet, colorMode: colorMode, printQuality: printQuality,
             duplexEnabled: duplexEnabled, collateEnabled: collateEnabled,
             printInBackground: printInBackground, notificationsEnabled: notificationsEnabled,
-            autoReconnect: autoReconnect, saveHistory: saveHistory
+            autoReconnect: autoReconnect, saveHistory: saveHistory,
+            hapticsEnabled: HapticService.shared.isEnabled
         )
         persistence.saveSettings(settings)
         showToastMessage("Settings saved")
@@ -323,6 +422,7 @@ class AppViewModel: ObservableObject {
         notificationsEnabled = defaults.notificationsEnabled
         autoReconnect = defaults.autoReconnect
         saveHistory = defaults.saveHistory
+        HapticService.shared.isEnabled = defaults.hapticsEnabled
         persistence.saveSettings(defaults)
         showToastMessage("Settings reset to defaults")
     }

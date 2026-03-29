@@ -5,6 +5,50 @@
 (function () {
   "use strict";
 
+  // ── 0. Favorites localStorage bridge for WKWebView custom scheme ──
+  // WKWebView with smartpdf:// may not persist localStorage across sessions.
+  // Proxy the favorites key through Swift UserDefaults via message handler.
+  (function patchFavStorage() {
+    var FAVKEY = "smartpdf-favorite-tools";
+    var _mem = {};
+    // Seed from Swift-injected window._spFavData (set before page load)
+    try {
+      if (window._spFavData && window._spFavData !== "null") {
+        _mem[FAVKEY] = window._spFavData;
+      }
+    } catch (e) {}
+
+    var _proto = Storage.prototype;
+    var _origSet = _proto.setItem;
+    var _origGet = _proto.getItem;
+    var _origDel = _proto.removeItem;
+
+    _proto.setItem = function (k, v) {
+      try { _origSet.call(this, k, v); } catch (e) {}
+      if (k === FAVKEY) {
+        _mem[k] = String(v);
+        try { window.webkit.messageHandlers.saveFavorites.postMessage(String(v)); } catch (e) {}
+      }
+    };
+
+    _proto.getItem = function (k) {
+      if (k === FAVKEY) {
+        var real;
+        try { real = _origGet.call(this, k); } catch (e) {}
+        return (real !== null && real !== undefined) ? real : (_mem[k] || null);
+      }
+      try { return _origGet.call(this, k); } catch (e) { return null; }
+    };
+
+    _proto.removeItem = function (k) {
+      try { _origDel.call(this, k); } catch (e) {}
+      if (k === FAVKEY) {
+        delete _mem[k];
+        try { window.webkit.messageHandlers.saveFavorites.postMessage(""); } catch (e) {}
+      }
+    };
+  })();
+
   // ── A. Redirect home page → tools listing ───────────────────────
   // Open directly on the PDF tools screen, not the landing/home page.
   var p = window.location.pathname;
@@ -31,45 +75,45 @@
   }
 
   var darkVars = [
-    "--color-background:240 23% 5%!important;",
-    "--color-card:240 20% 9%!important;",
-    "--color-muted:240 19% 13%!important;",
-    "--color-border:244 30% 18%!important;",
-    "--color-input:244 30% 18%!important;",
-    "--color-foreground:240 33% 96%!important;",
-    "--color-card-foreground:240 33% 96%!important;",
-    "--color-muted-foreground:240 14% 63%!important;",
-    "--color-primary:243 100% 69%!important;",
+    "--color-background:222 63% 7%!important;",
+    "--color-card:224 63% 12%!important;",
+    "--color-muted:224 58% 16%!important;",
+    "--color-border:224 50% 22%!important;",
+    "--color-input:224 50% 22%!important;",
+    "--color-foreground:220 40% 96%!important;",
+    "--color-card-foreground:220 40% 96%!important;",
+    "--color-muted-foreground:220 20% 63%!important;",
+    "--color-primary:218 100% 62%!important;",
     "--color-primary-foreground:0 0% 100%!important;",
-    "--color-primary-hover:243 100% 58%!important;",
-    "--color-accent:243 100% 69%!important;",
+    "--color-primary-hover:218 100% 52%!important;",
+    "--color-accent:218 100% 62%!important;",
     "--color-accent-foreground:0 0% 100%!important;",
-    "--color-secondary:243 20% 16%!important;",
-    "--color-secondary-foreground:240 33% 96%!important;",
-    "--color-ring:243 100% 69%!important;",
+    "--color-secondary:222 50% 18%!important;",
+    "--color-secondary-foreground:220 40% 96%!important;",
+    "--color-ring:218 100% 62%!important;",
   ].join("");
 
   var lightVars = [
     "--color-background:0 0% 100%!important;",
-    "--color-card:240 20% 97%!important;",
-    "--color-muted:240 19% 94%!important;",
-    "--color-border:240 14% 88%!important;",
-    "--color-input:240 14% 88%!important;",
-    "--color-foreground:240 20% 6%!important;",
-    "--color-card-foreground:240 20% 6%!important;",
-    "--color-muted-foreground:240 14% 40%!important;",
-    "--color-primary:243 80% 61%!important;",
+    "--color-card:220 100% 97%!important;",
+    "--color-muted:220 80% 94%!important;",
+    "--color-border:220 50% 88%!important;",
+    "--color-input:220 50% 88%!important;",
+    "--color-foreground:222 40% 10%!important;",
+    "--color-card-foreground:222 40% 10%!important;",
+    "--color-muted-foreground:222 20% 40%!important;",
+    "--color-primary:222 99% 44%!important;",
     "--color-primary-foreground:0 0% 100%!important;",
-    "--color-primary-hover:243 80% 52%!important;",
-    "--color-accent:243 80% 61%!important;",
+    "--color-primary-hover:222 99% 36%!important;",
+    "--color-accent:222 99% 44%!important;",
     "--color-accent-foreground:0 0% 100%!important;",
-    "--color-secondary:240 20% 94%!important;",
-    "--color-secondary-foreground:240 20% 6%!important;",
-    "--color-ring:243 80% 61%!important;",
+    "--color-secondary:220 80% 94%!important;",
+    "--color-secondary-foreground:222 40% 10%!important;",
+    "--color-ring:222 99% 44%!important;",
   ].join("");
 
   var sharedVars = "--radius-lg:18px!important;--radius-md:14px!important;--radius-sm:10px!important;";
-  var baseBg  = _isDark ? "background:#0a0a0f!important;color:#f0f0f8!important;" : "background:#ffffff!important;color:#0f0f1f!important;";
+  var baseBg  = _isDark ? "background:#060D1F!important;color:#E8EEFF!important;" : "background:#ffffff!important;color:#0A0F1F!important;";
 
   var earlyCSS = [
     ":root,html{", (_isDark ? darkVars : lightVars), sharedVars, "}",

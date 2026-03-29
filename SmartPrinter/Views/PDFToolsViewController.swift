@@ -140,6 +140,9 @@ class PDFToolsViewController: UIViewController,
     /// Called when the user taps Print — opens native print sheet and saves to history.
     var onPrintFile: ((URL) -> Void)?
 
+    /// Called when the user opens a file to process. Return false to deny (paywall shown by caller).
+    var onToolUsed: (() -> Bool)?
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -174,9 +177,14 @@ class PDFToolsViewController: UIViewController,
         title = "PDF Tools"
         navigationController?.navigationBar.tintColor = .appAccent
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.appLabel]
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Done", style: .done, target: self, action: #selector(didTapDone)
+        let homeBtn = UIBarButtonItem(
+            title: "Home", style: .plain, target: self, action: #selector(didTapDone)
         )
+        homeBtn.setTitleTextAttributes(
+            [.font: UIFont.systemFont(ofSize: 17, weight: .semibold)],
+            for: .normal
+        )
+        navigationItem.rightBarButtonItem = homeBtn
     }
 
     @objc private func didTapDone() { onDismiss?() }
@@ -198,6 +206,7 @@ class PDFToolsViewController: UIViewController,
         let cc = WKUserContentController()
         ["openFile", "openMultipleFiles", "saveFile", "sharePDF",
          "printPDF", "saveZip", "requestCamera", "toolDone",
+         "saveFavorites",
          "_jsLog", "_jsError", "_jsWarn", "_jsInfo"].forEach {
             cc.add(self, name: $0)
         }
@@ -209,6 +218,17 @@ class PDFToolsViewController: UIViewController,
             forMainFrameOnly: false
         )
         cc.addUserScript(themeScript)
+
+        // Seed saved favorites so WKWebView localStorage polyfill can restore them
+        let savedFavs = UserDefaults.standard.string(forKey: "smartpdf-favorite-tools") ?? "null"
+        let escapedFavs = savedFavs.replacingOccurrences(of: "\\", with: "\\\\")
+                                   .replacingOccurrences(of: "'", with: "\\'")
+        let favScript = WKUserScript(
+            source: "window._spFavData = '\(escapedFavs)';",
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: false
+        )
+        cc.addUserScript(favScript)
 
         // Inject console bridge — forwards all JS console output to Swift print()
         let consoleBridge = WKUserScript(source: """
@@ -294,7 +314,7 @@ class PDFToolsViewController: UIViewController,
     private func showErrorPlaceholder() {
         let label = UILabel()
         label.text = "PDF Tools bundle not found.\nBuild Smart PDF and copy /out → SmartPrinter/PDFTools/www in Xcode."
-        label.textColor = UIColor(red: 0.56, green: 0.56, blue: 0.69, alpha: 1)
+        label.textColor = UIColor.appLabel.withAlphaComponent(0.5)
         label.font = .systemFont(ofSize: 14)
         label.numberOfLines = 0
         label.textAlignment = .center
@@ -320,14 +340,22 @@ class PDFToolsViewController: UIViewController,
         case "_jsWarn":  NSLog("[JS ⚠️] %@", text)
         case "_jsError": NSLog("[JS ❌] %@", text)
         case "_jsInfo":  NSLog("[JS ℹ️] %@", text)
-        case "openFile":          presentDocumentPicker(multiple: false)
-        case "openMultipleFiles": presentDocumentPicker(multiple: true)
+        case "openFile":
+            if onToolUsed?() ?? true { presentDocumentPicker(multiple: false) }
+        case "openMultipleFiles":
+            if onToolUsed?() ?? true { presentDocumentPicker(multiple: true) }
         case "saveFile":          handleSave(message.body)
         case "sharePDF":          handleShare(message.body)
         case "printPDF":          handlePrint(message.body)
         case "saveZip":           handleSaveZip(message.body)
         case "requestCamera":     presentDocumentCamera()
         case "toolDone":          break
+        case "saveFavorites":
+            if text.isEmpty {
+                UserDefaults.standard.removeObject(forKey: "smartpdf-favorite-tools")
+            } else {
+                UserDefaults.standard.set(text, forKey: "smartpdf-favorite-tools")
+            }
         default:                  break
         }
     }

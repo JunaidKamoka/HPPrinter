@@ -79,55 +79,55 @@ private func uiHex(_ hex: String) -> UIColor {
 }
 
 // MARK: - Color Palette
-// Dark palette  → existing native colors
-// Light palette → clean white/lavender tones matching the accent hue
+// Primary accent: #0149E1 (HP Blue)
+// Light mode: white surfaces + HP blue accents
+// Dark mode:  deep navy surfaces + bright blue accents
 
 extension Color {
 
     // ── Backgrounds ──────────────────────────────────────────────
-    static let bg  = adaptive(dark: uiHex("#0a0a0f"), light: uiHex("#ffffff"))
-    static let bg2 = adaptive(dark: uiHex("#12121a"), light: uiHex("#f3f3f8"))
-    static let bg3 = adaptive(dark: uiHex("#1a1a26"), light: uiHex("#e8e8f0"))
-    static let bg4 = adaptive(dark: uiHex("#22222f"), light: uiHex("#dcdcea"))
+    static let bg  = adaptive(dark: uiHex("#060D1F"), light: uiHex("#FFFFFF"))
+    static let bg2 = adaptive(dark: uiHex("#0B1530"), light: uiHex("#F0F5FF"))
+    static let bg3 = adaptive(dark: uiHex("#111E40"), light: uiHex("#E1EAFD"))
+    static let bg4 = adaptive(dark: uiHex("#172650"), light: uiHex("#D2E1FB"))
 
-    // ── Accent ───────────────────────────────────────────────────
-    static let accent  = adaptive(dark: uiHex("#6c63ff"), light: uiHex("#5b52e8"))
-    static let accent2 = adaptive(dark: uiHex("#8b85ff"), light: uiHex("#6c63ff"))
+    // ── Accent (HP Blue) ─────────────────────────────────────────
+    static let accent  = adaptive(dark: uiHex("#3D7EFF"), light: uiHex("#0149E1"))
+    static let accent2 = adaptive(dark: uiHex("#6699FF"), light: uiHex("#0141C5"))
 
     // ── Text ─────────────────────────────────────────────────────
-    static let textPrimary   = adaptive(dark: uiHex("#f0f0f8"), light: uiHex("#0f0f1f"))
-    static let textSecondary = adaptive(dark: uiHex("#9090b0"), light: uiHex("#50507a"))
-    static let textTertiary  = adaptive(dark: uiHex("#5a5a7a"), light: uiHex("#8080a0"))
+    static let textPrimary   = adaptive(dark: uiHex("#EEF2FF"), light: uiHex("#080E1F"))
+    static let textSecondary = adaptive(dark: uiHex("#7A9DC8"), light: uiHex("#3A5080"))
+    static let textTertiary  = adaptive(dark: uiHex("#3E5878"), light: uiHex("#7090B8"))
 
     // ── Status ───────────────────────────────────────────────────
     static let appGreen = adaptive(dark: uiHex("#34d399"), light: uiHex("#16a34a"))
     static let appAmber = adaptive(dark: uiHex("#fbbf24"), light: uiHex("#d97706"))
     static let appRed   = adaptive(dark: uiHex("#f87171"), light: uiHex("#dc2626"))
-    static let appBlue  = adaptive(dark: uiHex("#60a5fa"), light: uiHex("#2563eb"))
+    static let appBlue  = adaptive(dark: uiHex("#3D7EFF"), light: uiHex("#0149E1"))
 
     // ── Semantic backgrounds ──────────────────────────────────────
     static let greenBg    = Color.appGreen.opacity(0.12)
     static let amberBg    = Color.appAmber.opacity(0.12)
     static let redBg      = Color.appRed.opacity(0.12)
     static let blueBg     = Color.appBlue.opacity(0.12)
-    static let accentGlow = Color.accent.opacity(0.25)
+    static let accentGlow = Color.accent.opacity(0.20)
 
     // ── UI Chrome ─────────────────────────────────────────────────
-    // Adaptive borders / dividers — replaces all Color.white.opacity(0.08/0.14)
     static let cardBorder   = Color(UIColor { t in
         t.userInterfaceStyle == .dark
             ? UIColor.white.withAlphaComponent(0.08)
-            : UIColor.black.withAlphaComponent(0.08)
+            : UIColor(red: 0.004, green: 0.286, blue: 0.882, alpha: 0.12)  // #0149E1 @ 12%
     })
     static let dividerColor = Color(UIColor { t in
         t.userInterfaceStyle == .dark
-            ? UIColor.white.withAlphaComponent(0.08)
-            : UIColor.black.withAlphaComponent(0.08)
+            ? UIColor.white.withAlphaComponent(0.07)
+            : UIColor(red: 0.004, green: 0.286, blue: 0.882, alpha: 0.10)
     })
     static let btnBorder = Color(UIColor { t in
         t.userInterfaceStyle == .dark
-            ? UIColor.white.withAlphaComponent(0.14)
-            : UIColor.black.withAlphaComponent(0.09)
+            ? UIColor.white.withAlphaComponent(0.12)
+            : UIColor(red: 0.004, green: 0.286, blue: 0.882, alpha: 0.18)
     })
 
     // MARK: - Hex init (kept for one-off uses)
@@ -151,18 +151,45 @@ extension Color {
 extension UIColor {
     static let appAccent = UIColor { t in
         t.userInterfaceStyle == .dark
-            ? UIColor(red: 0.424, green: 0.388, blue: 1.0, alpha: 1)   // #6c63ff
-            : UIColor(red: 0.357, green: 0.322, blue: 0.910, alpha: 1)  // #5b52e8
+            ? UIColor(red: 0.239, green: 0.494, blue: 1.000, alpha: 1)  // #3D7EFF
+            : UIColor(red: 0.004, green: 0.286, blue: 0.882, alpha: 1)  // #0149E1
     }
     static let appBackground = UIColor { t in
         t.userInterfaceStyle == .dark
-            ? UIColor(red: 0.039, green: 0.039, blue: 0.059, alpha: 1)  // #0a0a0f
-            : UIColor.systemBackground
+            ? UIColor(red: 0.024, green: 0.051, blue: 0.122, alpha: 1)  // #060D1F
+            : UIColor.white
     }
     static let appLabel = UIColor { t in
         t.userInterfaceStyle == .dark
-            ? UIColor(red: 0.941, green: 0.941, blue: 0.973, alpha: 1)  // #f0f0f8
-            : UIColor.label
+            ? UIColor(red: 0.933, green: 0.949, blue: 1.000, alpha: 1)  // #EEF2FF
+            : UIColor(red: 0.031, green: 0.055, blue: 0.122, alpha: 1)  // #080E1F
+    }
+}
+
+// MARK: - Haptic Service
+
+final class HapticService {
+    static let shared = HapticService()
+    private let key = "hp_haptics_enabled"
+    private init() {}
+
+    var isEnabled: Bool {
+        get {
+            UserDefaults.standard.object(forKey: key) == nil
+                ? true
+                : UserDefaults.standard.bool(forKey: key)
+        }
+        set { UserDefaults.standard.set(newValue, forKey: key) }
+    }
+
+    func impact(_ style: UIImpactFeedbackGenerator.FeedbackStyle = .light) {
+        guard isEnabled else { return }
+        UIImpactFeedbackGenerator(style: style).impactOccurred()
+    }
+
+    func selection() {
+        guard isEnabled else { return }
+        UISelectionFeedbackGenerator().selectionChanged()
     }
 }
 
@@ -197,7 +224,10 @@ struct PrimaryButton: View {
     let title: String
     let action: () -> Void
     var body: some View {
-        Button(action: action) {
+        Button {
+            HapticService.shared.impact(.medium)
+            action()
+        } label: {
             Text(title)
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundColor(.white)
@@ -213,7 +243,10 @@ struct SecondaryButton: View {
     let title: String
     let action: () -> Void
     var body: some View {
-        Button(action: action) {
+        Button {
+            HapticService.shared.impact(.light)
+            action()
+        } label: {
             Text(title)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.textPrimary)

@@ -92,18 +92,24 @@ struct PrintJob: Identifiable, Codable {
         case "docx", "doc", "rtf", "txt":                    return "📝"
         case "pptx", "ppt":                                  return "📊"
         case "html", "htm":                                  return "🌐"
+        case "printer":                                      return "🖨️"
         default:                                             return "📄"
         }
     }
 
+    var isPrinterEvent: Bool { fileType.lowercased() == "printer" }
+
     var sourceIcon: String {
         switch source {
-        case "Forms":       return "doc.text.fill"
-        case "Printables":  return "square.grid.2x2.fill"
-        case "PDF Tools":   return "wand.and.stars"
-        case "Test Print":  return "printer.fill"
-        case "Queue":       return "list.bullet"
-        default:            return "folder.fill"
+        case "Forms":         return "doc.text.fill"
+        case "Printables":    return "square.grid.2x2.fill"
+        case "PDF Tools":     return "wand.and.stars"
+        case "Test Print":    return "printer.fill"
+        case "Queue":         return "list.bullet"
+        case "Printer":       return "printer.fill"
+        case "Writing Paper": return "square.grid.3x3.fill"
+        case "Scan":          return "camera.fill"
+        default:              return "folder.fill"
         }
     }
 

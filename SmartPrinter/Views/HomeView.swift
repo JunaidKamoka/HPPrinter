@@ -1,4 +1,5 @@
 import SwiftUI
+import VisionKit
 
 // MARK: - PDF Tool data for carousel
 private struct PDFToolItem: Identifiable {
@@ -10,19 +11,19 @@ private struct PDFToolItem: Identifiable {
 }
 
 private let featuredTools: [PDFToolItem] = [
-    .init(sfSymbol: "doc.on.doc.fill",                       name: "Merge PDF",   colorA: "#6c63ff", colorB: "#a78bfa"),
+    .init(sfSymbol: "doc.on.doc.fill",                       name: "Merge PDF",   colorA: "#0149E1", colorB: "#3D7EFF"),
     .init(sfSymbol: "scissors",                              name: "Split PDF",   colorA: "#f472b6", colorB: "#fb7185"),
     .init(sfSymbol: "arrow.down.circle.fill",                name: "Compress",    colorA: "#34d399", colorB: "#059669"),
-    .init(sfSymbol: "doc.text.fill",                         name: "To Word",     colorA: "#60a5fa", colorB: "#2563eb"),
+    .init(sfSymbol: "doc.text.fill",                         name: "To Word",     colorA: "#0149E1", colorB: "#6699FF"),
     .init(sfSymbol: "tablecells.fill",                       name: "To Excel",    colorA: "#4ade80", colorB: "#16a34a"),
     .init(sfSymbol: "text.viewfinder",                       name: "OCR PDF",     colorA: "#fbbf24", colorB: "#d97706"),
     .init(sfSymbol: "signature",                             name: "Sign PDF",    colorA: "#f87171", colorB: "#dc2626"),
-    .init(sfSymbol: "lock.fill",                             name: "Protect",     colorA: "#818cf8", colorB: "#4f46e5"),
+    .init(sfSymbol: "lock.fill",                             name: "Protect",     colorA: "#0149E1", colorB: "#0141C5"),
     .init(sfSymbol: "rotate.right.fill",                     name: "Rotate",      colorA: "#fb923c", colorB: "#ea580c"),
-    .init(sfSymbol: "wand.and.stars",                        name: "Edit PDF",    colorA: "#c084fc", colorB: "#9333ea"),
+    .init(sfSymbol: "wand.and.stars",                        name: "Edit PDF",    colorA: "#0149E1", colorB: "#3D7EFF"),
     .init(sfSymbol: "photo.fill",                            name: "To Image",    colorA: "#38bdf8", colorB: "#0284c7"),
     .init(sfSymbol: "rectangle.and.pencil.and.ellipsis",     name: "Annotate",    colorA: "#a3e635", colorB: "#65a30d"),
-    .init(sfSymbol: "lock.open.fill",                        name: "Unlock PDF",  colorA: "#e879f9", colorB: "#a21caf"),
+    .init(sfSymbol: "lock.open.fill",                        name: "Unlock PDF",  colorA: "#3D7EFF", colorB: "#0149E1"),
     .init(sfSymbol: "doc.badge.plus",                        name: "Add Pages",   colorA: "#67e8f9", colorB: "#0891b2"),
     .init(sfSymbol: "rectangle.portrait.and.arrow.right",    name: "Extract",     colorA: "#fda4af", colorB: "#be123c"),
 ]
@@ -31,12 +32,16 @@ private let featuredTools: [PDFToolItem] = [
 
 struct HomeView: View {
     @EnvironmentObject var vm: AppViewModel
+    @EnvironmentObject var subscriptionService: SubscriptionService
     @Environment(\.colorScheme) private var colorScheme
-    @State private var showDocPicker       = false
-    @State private var showPhotoPicker     = false
-    @State private var showTestPrintPicker = false
-    @State private var showWritingPaper    = false
-    @State private var showPDFTools        = false
+    @State private var showDocPicker        = false
+    @State private var showPhotoPicker      = false
+    @State private var showTestPrintPicker  = false
+    @State private var showWritingPaper     = false
+    @State private var showPDFTools         = false
+    @State private var showDocumentScanner  = false
+    @State private var showPaywallFromHome  = false
+    @State private var activePaywallVariant = 0
 
     // Hero animation
     @State private var orbAnimate   = false
@@ -95,25 +100,82 @@ struct HomeView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button { vm.startScan() } label: {
-                        Image(systemName: "arrow.clockwise")
-                            .foregroundColor(.textSecondary)
-                            .frame(width: 36, height: 36)
-                            .background(Color.bg3)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.cardBorder, lineWidth: 1))
+                    Button {
+                        activePaywallVariant = vm.paywallVariant
+                        vm.nextPaywallVariant()
+                        showPaywallFromHome = true
+                    } label: {
+                        ZStack(alignment: .topTrailing) {
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        subscriptionService.isPremium
+                                        ? LinearGradient(colors: [Color(hex: "#0149E1"), Color(hex: "#3D7EFF")], startPoint: .topLeading, endPoint: .bottomTrailing)
+                                        : LinearGradient(colors: [Color.bg3, Color.bg3], startPoint: .topLeading, endPoint: .bottomTrailing)
+                                    )
+                                    .frame(width: 36, height: 36)
+                                    .overlay(Circle().stroke(
+                                        subscriptionService.isPremium ? Color(hex: "#3D7EFF") : Color.cardBorder,
+                                        lineWidth: 1
+                                    ))
+                                Image(systemName: "crown.fill")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(subscriptionService.isPremium ? .white : .textSecondary)
+                            }
+                            // free-tries badge
+                            if !subscriptionService.isPremium {
+                                Text("\(vm.freePrintsRemaining)")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 14, height: 14)
+                                    .background(Color(hex: "#FF9500"))
+                                    .clipShape(Circle())
+                                    .offset(x: 3, y: -3)
+                            }
+                        }
                     }
                 }
             }
+            .fullScreenCover(isPresented: $showPaywallFromHome) {
+                PaywallView(
+                    onDismiss: { showPaywallFromHome = false },
+                    freePrintsRemaining: vm.freePrintsRemaining,
+                    variant: activePaywallVariant
+                )
+                .environmentObject(subscriptionService)
+            }
             .sheet(isPresented: $showDocPicker, onDismiss: {
-                if let url = vm.selectedFileURL { vm.selectedFileURL = nil; vm.printDirectly(url: url) }
+                if let url = vm.selectedFileURL {
+                    let captured = url
+                    vm.selectedFileURL = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                        vm.printDirectly(url: captured)
+                    }
+                }
             }) { DocumentPicker { url in vm.handlePickedFile(url: url) } }
             .sheet(isPresented: $showPhotoPicker, onDismiss: {
-                if let url = vm.selectedFileURL { vm.selectedFileURL = nil; vm.printDirectly(url: url) }
+                if let url = vm.selectedFileURL {
+                    let captured = url
+                    vm.selectedFileURL = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                        vm.printDirectly(url: captured)
+                    }
+                }
             }) { PhotoPicker { url in vm.handlePickedFile(url: url) } }
             .sheet(isPresented: $showTestPrintPicker) { TestPrintPickerSheet() }
             .fullScreenCover(isPresented: $showWritingPaper) { WritingPaperView() }
             .fullScreenCover(isPresented: $showPDFTools) { PDFToolsView() }
+            .fullScreenCover(isPresented: $showDocumentScanner) {
+                DocumentScannerView { pdfURL in
+                    showDocumentScanner = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                        vm.printFile(url: pdfURL, source: "Scan")
+                    }
+                } onCancel: {
+                    showDocumentScanner = false
+                }
+                .ignoresSafeArea()
+            }
             .onAppear {
                 if vm.autoReconnect { vm.startScan() }
                 withAnimation(.easeInOut(duration: 5).repeatForever(autoreverses: true))  { orbAnimate = true }
@@ -136,32 +198,32 @@ struct HomeView: View {
     var heroSection: some View {
         let isLight = colorScheme == .light
         return ZStack(alignment: .topLeading) {
-            // Base gradient — dark: deep navy; light: soft lavender
+            // Base gradient — dark: deep navy; light: clean white/HP-blue tint
             RoundedRectangle(cornerRadius: 26)
                 .fill(LinearGradient(
                     colors: isLight
-                        ? [Color(hex: "#f0eeff"), Color(hex: "#e6e0ff"), Color(hex: "#f3f0ff")]
-                        : [Color(hex: "#0d0b30"), Color(hex: "#180e40"), Color(hex: "#0a1435")],
+                        ? [Color(hex: "#F0F5FF"), Color(hex: "#E1EAFD"), Color(hex: "#FFFFFF")]
+                        : [Color(hex: "#060D1F"), Color(hex: "#0B1530"), Color(hex: "#111E40")],
                     startPoint: .topLeading, endPoint: .bottomTrailing
                 ))
 
-            // Floating orb 1 — purple
+            // Floating orb 1 — HP blue
             Circle()
-                .fill(Color(hex: "#7875f0").opacity(isLight ? 0.18 : 0.38))
+                .fill(Color(hex: "#0149E1").opacity(isLight ? 0.14 : 0.32))
                 .frame(width: 220, height: 220)
                 .blur(radius: 60)
                 .offset(x: orbAnimate ? 120 : 60, y: orbAnimate ? -55 : -95)
 
-            // Floating orb 2 — pink
+            // Floating orb 2 — lighter blue
             Circle()
-                .fill(Color(hex: "#f472b6").opacity(isLight ? 0.10 : 0.22))
+                .fill(Color(hex: "#3D7EFF").opacity(isLight ? 0.08 : 0.18))
                 .frame(width: 150, height: 150)
                 .blur(radius: 44)
                 .offset(x: orbAnimate ? -10 : 30, y: orbAnimate ? 100 : 60)
 
-            // Floating orb 3 — cyan
+            // Floating orb 3 — accent2
             Circle()
-                .fill(Color(hex: "#38bdf8").opacity(isLight ? 0.08 : 0.16))
+                .fill(Color(hex: "#6699FF").opacity(isLight ? 0.06 : 0.12))
                 .frame(width: 120, height: 120)
                 .blur(radius: 36)
                 .offset(x: orbAnimate ? 270 : 230, y: orbAnimate ? 55 : 95)
@@ -176,11 +238,11 @@ struct HomeView: View {
                         .font(.system(size: 10, weight: .bold))
                         .kerning(0.8)
                 }
-                .foregroundColor(isLight ? Color(hex: "#5b52e8") : Color(hex: "#c4b5fd"))
+                .foregroundColor(isLight ? Color(hex: "#0149E1") : Color(hex: "#93BBFF"))
                 .padding(.horizontal, 10).padding(.vertical, 5)
-                .background(Color(hex: "#7875f0").opacity(isLight ? 0.10 : 0.15))
+                .background(Color(hex: "#0149E1").opacity(isLight ? 0.08 : 0.15))
                 .clipShape(Capsule())
-                .overlay(Capsule().stroke(Color(hex: "#7875f0").opacity(isLight ? 0.30 : 0.35), lineWidth: 1))
+                .overlay(Capsule().stroke(Color(hex: "#0149E1").opacity(isLight ? 0.25 : 0.35), lineWidth: 1))
 
                 // Giant animated "99+ PDF Tools"
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
@@ -189,20 +251,20 @@ struct HomeView: View {
                         Text("99+")
                             .font(.system(size: 96, weight: .black, design: .rounded))
                             .foregroundStyle(LinearGradient(
-                                colors: [Color(hex: "#7875f0"), Color(hex: "#a855f7")],
+                                colors: [Color(hex: "#0149E1"), Color(hex: "#3D7EFF")],
                                 startPoint: .topLeading, endPoint: .bottomTrailing
                             ))
                             .blur(radius: numberPulse ? 18 : 10)
-                            .opacity(numberPulse ? (isLight ? 0.35 : 0.65) : (isLight ? 0.18 : 0.35))
+                            .opacity(numberPulse ? (isLight ? 0.30 : 0.60) : (isLight ? 0.15 : 0.30))
                             .scaleEffect(numberPulse ? 1.12 : 1.0)
 
-                        // Main crisp text — white gradient in dark, deep purple in light
+                        // Main crisp text — light blue gradient dark, deep HP blue in light
                         Text("99+")
                             .font(.system(size: 96, weight: .black, design: .rounded))
                             .foregroundStyle(LinearGradient(
                                 colors: isLight
-                                    ? [Color(hex: "#4f46e5"), Color(hex: "#6c63ff"), Color(hex: "#7875f0"), Color(hex: "#5b52e8")]
-                                    : [Color(hex: "#ffffff"), Color(hex: "#e0d7ff"), Color(hex: "#c4b5fd"), Color(hex: "#818cf8")],
+                                    ? [Color(hex: "#0141C5"), Color(hex: "#0149E1"), Color(hex: "#1A5FE8"), Color(hex: "#3D7EFF")]
+                                    : [Color(hex: "#ffffff"), Color(hex: "#D6E8FF"), Color(hex: "#93BBFF"), Color(hex: "#6699FF")],
                                 startPoint: .top, endPoint: .bottom
                             ))
                     }
@@ -212,10 +274,10 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: -2) {
                         Text("PDF")
                             .font(.system(size: 30, weight: .black))
-                            .foregroundColor(isLight ? Color(hex: "#1e1b4b") : .white)
+                            .foregroundColor(isLight ? Color(hex: "#080E1F") : .white)
                         Text("Tools")
                             .font(.system(size: 26, weight: .bold))
-                            .foregroundColor(isLight ? Color(hex: "#5b52e8").opacity(0.6) : .white.opacity(0.5))
+                            .foregroundColor(isLight ? Color(hex: "#0149E1").opacity(0.55) : .white.opacity(0.5))
                     }
                     .padding(.bottom, 8)
                 }
@@ -226,9 +288,9 @@ struct HomeView: View {
                         ForEach(["Merge", "Split", "OCR", "Sign", "Convert", "Compress", "Annotate"], id: \.self) { chip in
                             Text(chip)
                                 .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(isLight ? Color(hex: "#5b52e8") : .white.opacity(0.65))
+                                .foregroundColor(isLight ? Color(hex: "#0149E1") : .white.opacity(0.65))
                                 .padding(.horizontal, 9).padding(.vertical, 4)
-                                .background(Color(hex: "#6c63ff").opacity(isLight ? 0.10 : 0.07))
+                                .background(Color(hex: "#0149E1").opacity(isLight ? 0.08 : 0.07))
                                 .clipShape(Capsule())
                         }
                     }
@@ -245,11 +307,11 @@ struct HomeView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 20).padding(.vertical, 11)
                     .background(LinearGradient(
-                        colors: [Color(hex: "#7875f0"), Color(hex: "#a855f7")],
+                        colors: [Color(hex: "#0149E1"), Color(hex: "#3D7EFF")],
                         startPoint: .leading, endPoint: .trailing
                     ))
                     .clipShape(Capsule())
-                    .shadow(color: Color(hex: "#7875f0").opacity(glowAnimate ? (isLight ? 0.35 : 0.65) : (isLight ? 0.18 : 0.35)),
+                    .shadow(color: Color(hex: "#0149E1").opacity(glowAnimate ? (isLight ? 0.35 : 0.60) : (isLight ? 0.18 : 0.30)),
                             radius: glowAnimate ? 18 : 10, x: 0, y: 4)
                 }
                 .buttonStyle(.plain)
@@ -263,8 +325,8 @@ struct HomeView: View {
             RoundedRectangle(cornerRadius: 26)
                 .stroke(LinearGradient(
                     colors: isLight
-                        ? [Color(hex: "#7875f0").opacity(0.30), Color(hex: "#f472b6").opacity(0.12), Color.clear]
-                        : [Color(hex: "#7875f0").opacity(0.45), Color(hex: "#f472b6").opacity(0.2), Color.clear],
+                        ? [Color(hex: "#0149E1").opacity(0.25), Color(hex: "#3D7EFF").opacity(0.10), Color.clear]
+                        : [Color(hex: "#3D7EFF").opacity(0.40), Color(hex: "#6699FF").opacity(0.15), Color.clear],
                     startPoint: .topLeading, endPoint: .bottomTrailing
                 ), lineWidth: 1)
         )
@@ -398,10 +460,10 @@ struct HomeView: View {
 
     var quickActionsGrid: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-            QuickActionButton(icon: "📂", title: "Print File",    subtitle: "PDF, DOCX, JPG...")  { showDocPicker = true }
-            QuickActionButton(icon: "🖼️", title: "Print Photo",  subtitle: "Camera roll")         { showPhotoPicker = true }
-            QuickActionButton(icon: "📡", title: "Find Printer", subtitle: "Wi-Fi & Bluetooth")   { vm.startScan() }
-            QuickActionButton(icon: "🖨️", title: "Test Print",   subtitle: "B&W, Color, Label...") { showTestPrintPicker = true }
+            QuickActionButton(icon: "📂", title: "Print File",       subtitle: "PDF, DOCX, JPG...")      { showDocPicker = true }
+            QuickActionButton(icon: "🖼️", title: "Print Photo",    subtitle: "Camera roll")             { showPhotoPicker = true }
+            QuickActionButton(icon: "📷", title: "Scan Document",  subtitle: "Camera → PDF → Print")    { showDocumentScanner = true }
+            QuickActionButton(icon: "🖨️", title: "Test Print",     subtitle: "B&W, Color, Label...")    { showTestPrintPicker = true }
         }
     }
 

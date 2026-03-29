@@ -4,6 +4,7 @@ import SwiftUI
 struct SmartPrinterApp: App {
     @StateObject private var viewModel    = AppViewModel()
     @StateObject private var themeManager = ThemeManager()
+    @StateObject private var subscriptionService = SubscriptionService.shared
     @Environment(\.scenePhase) private var scenePhase
     @State private var showRating     = false
     @State private var showSplash     = true
@@ -15,6 +16,18 @@ struct SmartPrinterApp: App {
                 ContentView()
                     .environmentObject(viewModel)
                     .environmentObject(themeManager)
+                    .environmentObject(subscriptionService)
+                    .fullScreenCover(isPresented: $viewModel.showPaywall) {
+                        PaywallView(
+                            onDismiss: { viewModel.showPaywall = false },
+                            freePrintsRemaining: viewModel.freePrintsRemaining,
+                            variant: viewModel.paywallVariant
+                        )
+                        .environmentObject(subscriptionService)
+                    }
+                    .onChange(of: subscriptionService.isPremium) { isPremium in
+                        if isPremium { viewModel.showPaywall = false }
+                    }
 
                 if showRating {
                     AppRatingView(isPresented: $showRating)

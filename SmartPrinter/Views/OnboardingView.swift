@@ -142,14 +142,14 @@ struct OnboardingView: View {
         let isDark = colorScheme == .dark
         let colors: [Color] = {
             switch currentPage {
-            case 0: // Purple/printer
+            case 0: // HP Blue/printer
                 return isDark
-                    ? [Color(hex: "#0a0a1a"), Color(hex: "#0f0f2a"), Color(hex: "#0a0a0f")]
-                    : [Color(hex: "#f8f7ff"), Color(hex: "#ede9ff"), Color(hex: "#ffffff")]
+                    ? [Color(hex: "#060D1F"), Color(hex: "#0B1530"), Color(hex: "#060D1F")]
+                    : [Color(hex: "#F0F5FF"), Color(hex: "#E1EAFD"), Color(hex: "#ffffff")]
             case 1: // Blue/PDF tools
                 return isDark
-                    ? [Color(hex: "#0a0f1a"), Color(hex: "#0a1a2a"), Color(hex: "#0a0a0f")]
-                    : [Color(hex: "#f5f8ff"), Color(hex: "#e8f0ff"), Color(hex: "#ffffff")]
+                    ? [Color(hex: "#060D1F"), Color(hex: "#0B1530"), Color(hex: "#060D1F")]
+                    : [Color(hex: "#F0F5FF"), Color(hex: "#E1EAFD"), Color(hex: "#ffffff")]
             case 2: // Green/discovery
                 return isDark
                     ? [Color(hex: "#0a1a0f"), Color(hex: "#0a2a1a"), Color(hex: "#0a0a0f")]

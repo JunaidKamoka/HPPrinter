@@ -406,6 +406,7 @@ struct PrintableDetailView: View {
 
     private func printItem() {
         guard !isPrinting else { return }
+        guard vm.checkTemplateAccess() else { return }
         printError = nil
         isPrinting = true
 

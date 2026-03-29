@@ -41,6 +41,9 @@
 		AA0000010000000000000093 /* FirebaseStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000092 /* FirebaseStorageService.swift */; };
 		AA0000010000000000000095 /* SpotlightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000094 /* SpotlightService.swift */; };
 		AA0000010000000000000097 /* DocumentReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000000000096 /* DocumentReaderView.swift */; };
+		AA00000100000000000000A0 /* SubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000000000000A1 /* SubscriptionService.swift */; };
+		AA00000100000000000000A2 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000000000000A3 /* PaywallView.swift */; };
+		AA00000100000000000000A4 /* DocumentScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000000000000A5 /* DocumentScannerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -79,6 +82,9 @@
 		AA0000010000000000000092 /* FirebaseStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStorageService.swift; sourceTree = "<group>"; };
 		AA0000010000000000000094 /* SpotlightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightService.swift; sourceTree = "<group>"; };
 		AA0000010000000000000096 /* DocumentReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentReaderView.swift; sourceTree = "<group>"; };
+		AA00000100000000000000A1 /* SubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionService.swift; sourceTree = "<group>"; };
+		AA00000100000000000000A3 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		AA00000100000000000000A5 /* DocumentScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentScannerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,6 +168,8 @@
 				AA000001000000000000008A /* PrintablesView.swift */,
 				AA000001000000000000008C /* WebImage.swift */,
 				AA0000010000000000000096 /* DocumentReaderView.swift */,
+				AA00000100000000000000A3 /* PaywallView.swift */,
+				AA00000100000000000000A5 /* DocumentScannerView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -177,6 +185,7 @@
 				AA0000010000000000000090 /* TemplateDataService.swift */,
 				AA0000010000000000000092 /* FirebaseStorageService.swift */,
 				AA0000010000000000000094 /* SpotlightService.swift */,
+				AA00000100000000000000A1 /* SubscriptionService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -283,6 +292,9 @@
 				AA0000010000000000000091 /* TemplateDataService.swift in Sources */,
 				AA0000010000000000000093 /* FirebaseStorageService.swift in Sources */,
 				AA0000010000000000000095 /* SpotlightService.swift in Sources */,
+				AA00000100000000000000A0 /* SubscriptionService.swift in Sources */,
+				AA00000100000000000000A2 /* PaywallView.swift in Sources */,
+				AA00000100000000000000A4 /* DocumentScannerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,8 +417,10 @@
 		AA0000010000000000000052 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon1 AppIcon2 AppIcon3 AppIcon4 AppIcon5";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 44AXYL9JVD;
@@ -415,7 +429,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "HP Smart Printer App : AiPrint";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
-				INFOPLIST_KEY_NSCameraUsageDescription = "PrintMate uses the camera to scan documents to PDF.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "HP Smart Printer uses the camera to scan documents to PDF.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "HP Smart Printer needs local network access to discover printers on your Wi-Fi network.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "HP Smart Printer needs photo access to print your photos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -430,7 +444,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = hp.smart.printer.app.ac;
 				PRODUCT_NAME = "HP Smart Printer App : AiPrint";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -442,8 +456,10 @@
 		AA0000010000000000000053 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon1 AppIcon2 AppIcon3 AppIcon4 AppIcon5";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 44AXYL9JVD;
@@ -452,7 +468,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "HP Smart Printer App : AiPrint";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSBonjourServices = _ipp._tcp.;
-				INFOPLIST_KEY_NSCameraUsageDescription = "PrintMate uses the camera to scan documents to PDF.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "HP Smart Printer uses the camera to scan documents to PDF.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "HP Smart Printer needs local network access to discover printers on your Wi-Fi network.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "HP Smart Printer needs photo access to print your photos.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -467,7 +483,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = hp.smart.printer.app.ac;
 				PRODUCT_NAME = "HP Smart Printer App : AiPrint";
 				SWIFT_EMIT_LOC_STRINGS = YES;

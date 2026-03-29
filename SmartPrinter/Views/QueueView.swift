@@ -60,18 +60,24 @@ struct QueueView: View {
             }
             .sheet(isPresented: $showDocPicker, onDismiss: {
                 if let url = vm.selectedFileURL {
+                    let captured = url
                     vm.selectedFileURL = nil
-                    vm.addToQueue(url: url)
-                    vm.printDirectly(url: url)
+                    vm.addToQueue(url: captured)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                        vm.printDirectly(url: captured, source: "Queue")
+                    }
                 }
             }) {
                 DocumentPicker { url in vm.handlePickedFile(url: url) }
             }
             .sheet(isPresented: $showPhotoPicker, onDismiss: {
                 if let url = vm.selectedFileURL {
+                    let captured = url
                     vm.selectedFileURL = nil
-                    vm.addToQueue(url: url)
-                    vm.printDirectly(url: url)
+                    vm.addToQueue(url: captured)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
+                        vm.printDirectly(url: captured, source: "Queue")
+                    }
                 }
             }) {
                 PhotoPicker { url in vm.handlePickedFile(url: url) }

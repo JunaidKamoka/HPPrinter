@@ -106,10 +106,8 @@ struct HistoryRow: View {
             .background(Color.bg3)
             .clipShape(RoundedRectangle(cornerRadius: 8))
 
-            // Tap to reprint
-            Button {
-                vm.reprintFromHistory(job)
-            } label: {
+            // Content — printer events are not re-printable
+            if job.isPrinterEvent {
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 5) {
                         Text(job.fileName)
@@ -117,7 +115,6 @@ struct HistoryRow: View {
                             .foregroundColor(.textPrimary)
                             .lineLimit(1)
                         Spacer(minLength: 0)
-                        // Source badge
                         HStack(spacing: 3) {
                             Image(systemName: job.sourceIcon)
                                 .font(.system(size: 8, weight: .semibold))
@@ -129,16 +126,48 @@ struct HistoryRow: View {
                         .background(Color.accent.opacity(0.12))
                         .clipShape(Capsule())
                     }
-                    Text("\(job.pageCount) pg · \(job.copies) cop\(job.copies > 1 ? "ies" : "y") · \(job.colorMode) · \(job.printerName)")
-                        .font(.system(size: 11)).foregroundColor(.textSecondary).lineLimit(1)
+                    Text("Printer event")
+                        .font(.system(size: 11)).foregroundColor(.textSecondary)
                     Text(job.formattedDate)
                         .font(.system(size: 11)).foregroundColor(.textTertiary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                // Tap to reprint
+                Button {
+                    vm.reprintFromHistory(job)
+                } label: {
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 5) {
+                            Text(job.fileName)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.textPrimary)
+                                .lineLimit(1)
+                            Spacer(minLength: 0)
+                            HStack(spacing: 3) {
+                                Image(systemName: job.sourceIcon)
+                                    .font(.system(size: 8, weight: .semibold))
+                                Text(job.source)
+                                    .font(.system(size: 9, weight: .semibold))
+                            }
+                            .foregroundColor(.accent)
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(Color.accent.opacity(0.12))
+                            .clipShape(Capsule())
+                        }
+                        Text("\(job.pageCount) pg · \(job.copies) cop\(job.copies > 1 ? "ies" : "y") · \(job.colorMode) · \(job.printerName)")
+                            .font(.system(size: 11)).foregroundColor(.textSecondary).lineLimit(1)
+                        Text(job.formattedDate)
+                            .font(.system(size: 11)).foregroundColor(.textTertiary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
 
-            if job.status == .done {
+            if job.isPrinterEvent {
+                BadgeView(text: "🖨️", fg: .accent, bg: Color.accent.opacity(0.12))
+            } else if job.status == .done {
                 BadgeView(text: "✓", fg: .appGreen, bg: .greenBg)
             } else {
                 BadgeView(text: "✗", fg: .appRed, bg: .redBg)

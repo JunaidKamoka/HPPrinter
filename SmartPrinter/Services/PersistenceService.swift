@@ -104,4 +104,5 @@ struct PrintSettings: Codable {
     var notificationsEnabled: Bool = true
     var autoReconnect: Bool = true
     var saveHistory: Bool = true
+    var hapticsEnabled: Bool = true
 }
