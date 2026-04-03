@@ -52,6 +52,13 @@ struct ContentView: View {
                 .animation(.spring(response: 0.35, dampingFraction: 0.8), value: vm.showToast)
                 .allowsHitTesting(false)
             }
+
+            // Rating overlay (triggered after successful actions)
+            if vm.showRating {
+                AppRatingView(isPresented: $vm.showRating)
+                    .transition(.opacity)
+                    .zIndex(100)
+            }
         }
     }
 }

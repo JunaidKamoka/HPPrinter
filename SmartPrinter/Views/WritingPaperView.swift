@@ -90,17 +90,25 @@ struct WritingPaperWebViewRepresentable: UIViewRepresentable {
             _ userContentController: WKUserContentController,
             didReceive message: WKScriptMessage
         ) {
+            NSLog("[WritingPaper] ── printPaper message received ──")
             guard message.name == "printPaper",
                   let base64 = message.body as? String,
-                  let data = Data(base64Encoded: base64) else { return }
+                  let data = Data(base64Encoded: base64) else {
+                NSLog("[WritingPaper]   ❌ Invalid message format")
+                return
+            }
+            NSLog("[WritingPaper]   decoded data: %d bytes", data.count)
 
             DispatchQueue.main.async {
                 let fileName = "writing_paper_\(UUID().uuidString).pdf"
                 let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
                 do {
                     try data.write(to: tempURL)
+                    NSLog("[WritingPaper]   ✅ Saved to: %@", tempURL.path)
                     self.vm.printDirectly(url: tempURL, source: "Writing Paper")
+                    self.vm.recordActionAndMaybeRate()
                 } catch {
+                    NSLog("[WritingPaper]   ❌ Write failed: %@", error.localizedDescription)
                     self.vm.showToastMessage("Failed to prepare PDF for printing")
                 }
             }

@@ -13,7 +13,10 @@ struct PDFToolsView: View {
             theme: themeManager.current,
             onDismiss: { dismiss() },
             onPrintFile: { url in vm.printFile(url: url, source: "PDF Tools") },
-            onToolUsed: { vm.checkAccess() }
+            onToolUsed: { vm.checkAccess() },
+            onToolCompleted: { vm.recordActionAndMaybeRate() },
+            onAccessCheck: { vm.checkAccess() },
+            onConsumeTry: { vm.consumeFreeTry() }
         )
         .ignoresSafeArea()
     }
@@ -26,6 +29,9 @@ private struct PDFToolsRepresentable: UIViewControllerRepresentable {
     let onDismiss: () -> Void
     let onPrintFile: (URL) -> Void
     let onToolUsed: () -> Bool
+    let onToolCompleted: () -> Void
+    let onAccessCheck: () -> Bool
+    let onConsumeTry: () -> Void
 
     func makeUIViewController(context: Context) -> UINavigationController {
         let vc = PDFToolsViewController()
@@ -33,6 +39,9 @@ private struct PDFToolsRepresentable: UIViewControllerRepresentable {
         vc.onDismiss  = onDismiss
         vc.onPrintFile = onPrintFile
         vc.onToolUsed  = onToolUsed
+        vc.onToolCompleted = onToolCompleted
+        vc.onAccessCheck = onAccessCheck
+        vc.onConsumeTry = onConsumeTry
 
         let nav = UINavigationController(rootViewController: vc)
         nav.navigationBar.prefersLargeTitles = false

@@ -437,13 +437,27 @@ struct FormDetailView: View {
 
     // MARK: - Print form — downloads ALL page images → composes a PDF → AirPrint in one job
     private func printForm() {
-        guard !isPrinting else { return }
-        guard vm.checkAccess() else { return }
+        NSLog("[Forms] ══════════════════════════════════")
+        NSLog("[Forms] ── printForm() ──")
+        NSLog("[Forms]   form: %@", form.displayTitle)
+        NSLog("[Forms]   isPrinting: %@", isPrinting ? "YES (blocked)" : "NO")
+
+        guard !isPrinting else {
+            NSLog("[Forms]   ❌ ABORT — already printing")
+            return
+        }
+        NSLog("[Forms]   checking access...")
+        guard vm.checkAccess() else {
+            NSLog("[Forms]   ❌ ABORT — access denied (paywall)")
+            return
+        }
         printError = nil
         isPrinting = true
 
         let pageCount = form.images.count
+        NSLog("[Forms]   pageCount: %d", pageCount)
         guard pageCount > 0 else {
+            NSLog("[Forms]   ❌ ABORT — no pages")
             printError = "No pages available to print."
             isPrinting = false
             return
@@ -521,15 +535,19 @@ struct FormDetailView: View {
                     }
                 }
 
+                NSLog("[Forms]   PDF composed: %d bytes", pdfData.count)
                 guard UIPrintInteractionController.canPrint(pdfData) else {
+                    NSLog("[Forms]   ❌ canPrint(pdfData) returned false")
                     printError = "This file cannot be printed."
                     return
                 }
+                NSLog("[Forms]   ✅ canPrint passed")
 
                 // Save to temp file so PrintJobService can track it
                 let tempURL = FileManager.default.temporaryDirectory
                     .appendingPathComponent("form_\(form.id)_all.pdf")
                 try? pdfData.write(to: tempURL, options: .atomic)
+                NSLog("[Forms]   temp file: %@", tempURL.path)
 
                 let controller = UIPrintInteractionController.shared
                 let info       = UIPrintInfo.printInfo()
@@ -539,8 +557,12 @@ struct FormDetailView: View {
                 controller.printingItem                     = pdfData
                 controller.showsNumberOfCopies              = true
                 controller.showsPaperSelectionForLoadedPapers = true
+                NSLog("[Forms]   presenting print sheet...")
                 controller.present(animated: true) { _, completed, _ in
+                    NSLog("[Forms]   ── RESULT ──")
+                    NSLog("[Forms]   completed: %@", completed ? "YES (printed)" : "NO (cancelled)")
                     if completed {
+                        vm.consumeFreeTry()
                         vm.logHistory(
                             fileName: form.displayTitle,
                             fileType: "pdf",
@@ -549,6 +571,7 @@ struct FormDetailView: View {
                             fileURL: tempURL
                         )
                         vm.showToastMessage("Printed: \(form.displayTitle)")
+                        vm.recordActionAndMaybeRate()
                     }
                 }
             }

@@ -220,7 +220,7 @@ struct SettingsView: View {
                                 Divider().background(Color.dividerColor).padding(.leading, 16)
 
                                 Button {
-                                    openMail(to: "contact@appchunks.com",
+                                    openMail(to: "i@appchunks.com",
                                              subject: "HP Smart Printer - Issue Report",
                                              body: deviceInfoBody())
                                 } label: {

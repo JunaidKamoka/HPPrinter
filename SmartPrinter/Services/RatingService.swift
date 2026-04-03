@@ -56,6 +56,15 @@ final class RatingService {
         return true
     }
 
+    /// Check if we should show the rating prompt right after a successful user action
+    /// (print, scan, add printer, etc.). Shows after every Nth action within cooldown rules.
+    func shouldShowAfterAction() -> Bool {
+        guard canShowPrompt() else { return false }
+        guard launchCount > 0 else { return false } // not on very first launch
+        // Show after every 2nd action in a session
+        return sessionActions > 0 && sessionActions % 2 == 0
+    }
+
     // MARK: - Record prompt shown
 
     func recordPromptShown(isBackground: Bool = false) {

@@ -142,6 +142,11 @@ class PDFToolsViewController: UIViewController,
 
     /// Called when the user opens a file to process. Return false to deny (paywall shown by caller).
     var onToolUsed: (() -> Bool)?
+    var onToolCompleted: (() -> Void)?
+    /// Called before save/share/print/download — returns true if access is allowed.
+    var onAccessCheck: (() -> Bool)?
+    /// Called to consume a free try after a successful action.
+    var onConsumeTry: (() -> Void)?
 
     // MARK: - Lifecycle
 
@@ -341,13 +346,19 @@ class PDFToolsViewController: UIViewController,
         case "_jsError": NSLog("[JS ❌] %@", text)
         case "_jsInfo":  NSLog("[JS ℹ️] %@", text)
         case "openFile":
-            if onToolUsed?() ?? true { presentDocumentPicker(multiple: false) }
+            presentDocumentPicker(multiple: false)
         case "openMultipleFiles":
-            if onToolUsed?() ?? true { presentDocumentPicker(multiple: true) }
-        case "saveFile":          handleSave(message.body)
-        case "sharePDF":          handleShare(message.body)
-        case "printPDF":          handlePrint(message.body)
-        case "saveZip":           handleSaveZip(message.body)
+            presentDocumentPicker(multiple: true)
+        case "saveFile":
+            if onAccessCheck?() ?? true { handleSave(message.body) }
+        case "sharePDF":
+            if onAccessCheck?() ?? true { handleShare(message.body) }
+        case "printPDF":
+            // printPDF → onPrintFile → vm.printFile which has its own checkAccess,
+            // so we only gate here for the direct-print fallback path
+            handlePrint(message.body)
+        case "saveZip":
+            if onAccessCheck?() ?? true { handleSaveZip(message.body) }
         case "requestCamera":     presentDocumentCamera()
         case "toolDone":          break
         case "saveFavorites":
@@ -460,7 +471,9 @@ class PDFToolsViewController: UIViewController,
             let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
 
             sheet.addAction(UIAlertAction(title: "Save to Files", style: .default) { [weak self] _ in
+                self?.onConsumeTry?()
                 self?.present(UIDocumentPickerViewController(forExporting: [tmp], asCopy: true), animated: true)
+                self?.onToolCompleted?()
             })
 
             sheet.addAction(UIAlertAction(title: "Print", style: .default) { [weak self] _ in
@@ -503,6 +516,12 @@ class PDFToolsViewController: UIViewController,
         guard (try? data.write(to: tmp)) != nil else { return }
         DispatchQueue.main.async {
             let activity = UIActivityViewController(activityItems: [tmp], applicationActivities: nil)
+            activity.completionWithItemsHandler = { [weak self] _, completed, _, _ in
+                if completed {
+                    self?.onConsumeTry?()
+                    self?.onToolCompleted?()
+                }
+            }
             if let pop = activity.popoverPresentationController {
                 pop.sourceView = self.view
                 pop.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
@@ -515,21 +534,40 @@ class PDFToolsViewController: UIViewController,
     // MARK: - Print PDF
 
     private func handlePrint(_ body: Any) {
+        NSLog("[PDFTools] ══════════════════════════════════")
+        NSLog("[PDFTools] ── handlePrint() ──")
         let b64: String
         let jobName: String
         if let str = body as? String {
             b64 = str; jobName = "PrintMate PDF"
+            NSLog("[PDFTools]   body type: raw string")
         } else if let dict = body as? [String: Any], let s = dict["data"] as? String {
             b64 = s
             jobName = (dict["filename"] as? String) ?? "PrintMate PDF"
-        } else { return }
-        guard let data = Data(base64Encoded: b64) else { return }
+            NSLog("[PDFTools]   body type: dict, filename=%@", jobName)
+        } else {
+            NSLog("[PDFTools]   ❌ ABORT — unrecognized body format")
+            return
+        }
+        guard let data = Data(base64Encoded: b64) else {
+            NSLog("[PDFTools]   ❌ ABORT — base64 decode failed")
+            return
+        }
+        NSLog("[PDFTools]   decoded data: %d bytes", data.count)
+        NSLog("[PDFTools]   jobName: %@", jobName)
+        NSLog("[PDFTools]   hasOnPrintFile callback: %@", onPrintFile != nil ? "YES" : "NO")
 
         DispatchQueue.main.async {
             let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(jobName)
             if let onPrint = self.onPrintFile, (try? data.write(to: tmp)) != nil {
+                NSLog("[PDFTools]   ✅ Using onPrintFile callback → printFile()")
                 onPrint(tmp)
             } else {
+                NSLog("[PDFTools]   ⚠️ No onPrintFile or write failed — using direct print sheet")
+                guard self.onAccessCheck?() ?? true else {
+                    NSLog("[PDFTools]   ❌ Access denied — paywall shown")
+                    return
+                }
                 let info = UIPrintInfo.printInfo()
                 info.outputType = .general
                 info.jobName = jobName
@@ -537,8 +575,12 @@ class PDFToolsViewController: UIViewController,
                 ctrl.printInfo = info
                 ctrl.printingItem = data
                 ctrl.present(animated: true) { [weak self] _, completed, _ in
-                    if completed, (try? data.write(to: tmp)) != nil {
-                        self?.onPrintFile?(tmp)
+                    NSLog("[PDFTools]   ── RESULT: %@", completed ? "PRINTED" : "CANCELLED")
+                    if completed {
+                        self?.onConsumeTry?()
+                        if (try? data.write(to: tmp)) != nil {
+                            self?.onPrintFile?(tmp)
+                        }
                     }
                 }
             }
@@ -564,7 +606,9 @@ class PDFToolsViewController: UIViewController,
         let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
         guard (try? data.write(to: tmp)) != nil else { return }
         DispatchQueue.main.async {
+            self.onConsumeTry?()
             self.present(UIDocumentPickerViewController(forExporting: [tmp], asCopy: true), animated: true)
+            self.onToolCompleted?()
         }
     }
 }

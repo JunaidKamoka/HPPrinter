@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>HP Smart Printer App - HPSmart.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>1</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>896432616C1E9FF3F47834CBC9E5FFF0CE1E9E77</string>
+				<key>dateExpires</key>
+				<string>24/08/2026</string>
+				<key>type</key>
+				<string>Apple Development</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>44AXYL9JVD.hp.smart.printer.app.ac</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>44AXYL9JVD</string>
+				<key>get-task-allow</key>
+				<true/>
+			</dict>
+			<key>name</key>
+			<string>HP Smart Printer App - HPSmart.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>328f233e-d551-4adb-bb7e-1b774da19137</string>
+				<key>dateExpires</key>
+				<string>18/03/2027</string>
+				<key>name</key>
+				<string>iOS Team Provisioning Profile: hp.smart.printer.app.ac</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>44AXYL9JVD</string>
+				<key>name</key>
+				<string>App Chunks</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>1.0.4</string>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -36,24 +36,36 @@ final class SubscriptionService: ObservableObject {
     // MARK: - Load products from App Store
 
     func loadProducts() async {
+        NSLog("[Sub] ── loadProducts() ──")
+        NSLog("[Sub]   requested IDs: %@", allIDs.joined(separator: ", "))
         guard products.isEmpty else {
+            NSLog("[Sub]   products already loaded (%d), refreshing entitlements...", products.count)
             await refreshEntitlements(); return
         }
         isLoading = true
         defer { isLoading = false }
         do {
             let fetched = try await Product.products(for: allIDs)
+            NSLog("[Sub]   fetched %d products from App Store", fetched.count)
+            for p in fetched {
+                NSLog("[Sub]     → %@ | %@ | trial=%@", p.id, p.displayPrice,
+                      hasFreeTrial(for: p) ? "\(trialDays(for: p) ?? 0)d" : "none")
+            }
             // preserve declared order
             products = allIDs.compactMap { id in fetched.first { $0.id == id } }
+            NSLog("[Sub]   ordered products: %d", products.count)
             await refreshEntitlements()
         } catch {
-            NSLog("[Sub] loadProducts error: %@", error.localizedDescription)
+            NSLog("[Sub]   ❌ loadProducts error: %@", error.localizedDescription)
         }
     }
 
     // MARK: - Purchase
 
     func purchase(_ product: Product) async -> Bool {
+        NSLog("[Sub] ── purchase() ──")
+        NSLog("[Sub]   product: %@", product.id)
+        NSLog("[Sub]   price: %@", product.displayPrice)
         isLoading = true
         purchaseError = nil
         defer { isLoading = false }
@@ -61,18 +73,24 @@ final class SubscriptionService: ObservableObject {
             let result = try await product.purchase()
             switch result {
             case .success(let verification):
+                NSLog("[Sub]   ✅ Purchase SUCCESS")
                 let tx = try verified(verification)
                 await tx.finish()
                 await refreshEntitlements()
+                NSLog("[Sub]   isPremium after purchase: %@", isPremium ? "YES" : "NO")
                 return true
             case .userCancelled:
+                NSLog("[Sub]   ❌ User CANCELLED purchase")
                 return false
             case .pending:
+                NSLog("[Sub]   ⏳ Purchase PENDING (ask to buy / payment processing)")
                 return false
             @unknown default:
+                NSLog("[Sub]   ⚠️ Unknown purchase result")
                 return false
             }
         } catch {
+            NSLog("[Sub]   ❌ Purchase ERROR: %@", error.localizedDescription)
             purchaseError = error.localizedDescription
             return false
         }
@@ -81,6 +99,7 @@ final class SubscriptionService: ObservableObject {
     // MARK: - Restore
 
     func restorePurchases() async {
+        NSLog("[Sub] ── restorePurchases() ──")
         isLoading = true
         purchaseError = nil
         didRestoreSuccessfully = false
@@ -89,7 +108,9 @@ final class SubscriptionService: ObservableObject {
             try await AppStore.sync()
             await refreshEntitlements()
             didRestoreSuccessfully = isPremium
+            NSLog("[Sub]   restore result — isPremium: %@", isPremium ? "YES" : "NO")
         } catch {
+            NSLog("[Sub]   ❌ Restore ERROR: %@", error.localizedDescription)
             purchaseError = error.localizedDescription
         }
     }
@@ -104,6 +125,8 @@ final class SubscriptionService: ObservableObject {
             active.insert(tx.productID)
         }
         purchasedIDs = active
+        NSLog("[Sub] refreshEntitlements — purchasedIDs: %@", active.isEmpty ? "NONE (free user)" : active.joined(separator: ", "))
+        NSLog("[Sub]   isPremium: %@", isPremium ? "YES" : "NO")
     }
 
     // MARK: - Transaction Listener

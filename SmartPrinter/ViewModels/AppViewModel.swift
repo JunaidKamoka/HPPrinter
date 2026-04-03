@@ -37,46 +37,60 @@ class AppViewModel: ObservableObject {
     @MainActor var isPremium: Bool { SubscriptionService.shared.isPremium }
 
     /// Returns true if the action is allowed (premium or has free tries left).
-    /// Increments the try counter and shows the paywall when tries are exhausted.
-    /// In DEBUG builds all actions are always allowed.
+    /// Does NOT consume a try — call `consumeFreeTry()` only after the action succeeds.
+    /// Shows the paywall when tries are exhausted.
+    /// This is the SINGLE gate for ALL paid actions across the entire app:
+    /// printing, PDF tools, forms, printables, writing paper — everything.
     @MainActor @discardableResult
     func checkAccess() -> Bool {
-        #if DEBUG
-        return true
-        #else
-        if SubscriptionService.shared.isPremium { return true }
+        NSLog("[Access] ── checkAccess() ──")
+        NSLog("[Access]   isPremium: %@", SubscriptionService.shared.isPremium ? "YES" : "NO")
+        NSLog("[Access]   freePrintsUsed: %d / %d", freePrintsUsed, Self.freeTriesLimit)
+        NSLog("[Access]   freePrintsRemaining: %d", freePrintsRemaining)
+        if SubscriptionService.shared.isPremium {
+            NSLog("[Access]   ✅ Premium user — access granted")
+            return true
+        }
+        if freePrintsUsed < Self.freeTriesLimit {
+            NSLog("[Access]   ✅ Free tries available (%d remaining) — access granted (not consumed yet)", freePrintsRemaining)
+            return true
+        }
+        NSLog("[Access]   ❌ No free tries left — showing paywall")
+        showPaywall = true
+        return false
+    }
+
+    /// Consume one free try. Call ONLY after the action actually succeeds.
+    /// Premium users are not affected.
+    @MainActor func consumeFreeTry() {
+        if SubscriptionService.shared.isPremium { return }
         if freePrintsUsed < Self.freeTriesLimit {
             freePrintsUsed += 1
-            return true
+            NSLog("[Access] 🔥 Free try CONSUMED → now %d/%d used (%d remaining)", freePrintsUsed, Self.freeTriesLimit, freePrintsRemaining)
         }
-        showPaywall = true
-        return false
-        #endif
     }
 
-    // MARK: - Template Access (first template is free; rest require premium)
-
-    private let freeTemplateKey = "hp_free_template_used"
-
-    var freeTemplateUsed: Bool {
-        get { UserDefaults.standard.bool(forKey: freeTemplateKey) }
-        set { UserDefaults.standard.set(newValue, forKey: freeTemplateKey); objectWillChange.send() }
-    }
-
-    /// First template print is always free. Subsequent prints require premium.
+    /// Alias kept for backward compatibility — routes to the single checkAccess().
     @MainActor @discardableResult
     func checkTemplateAccess() -> Bool {
-        #if DEBUG
-        return true
-        #else
-        if SubscriptionService.shared.isPremium { return true }
-        if !freeTemplateUsed {
-            freeTemplateUsed = true
-            return true
+        NSLog("[Access] checkTemplateAccess() → forwarding to checkAccess()")
+        return checkAccess()
+    }
+
+    // MARK: - Rating
+    @Published var showRating: Bool = false
+
+    /// Call after any successful user action to record it and maybe show the rating prompt.
+    func recordActionAndMaybeRate() {
+        RatingService.shared.recordAction()
+        NSLog("[Rating] recordActionAndMaybeRate — shouldShowAfterAction: %@", RatingService.shared.shouldShowAfterAction() ? "YES" : "NO")
+        if RatingService.shared.shouldShowAfterAction() {
+            RatingService.shared.recordPromptShown()
+            NSLog("[Rating]   → showing rating prompt after 1s delay")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                withAnimation { self.showRating = true }
+            }
         }
-        showPaywall = true
-        return false
-        #endif
     }
 
     // MARK: - UI State
@@ -207,6 +221,7 @@ class AppViewModel: ObservableObject {
         persistence.savePrinters(savedPrinters)
         showToastMessage("Printer added: \(p.name)")
         logPrinterEvent(event: "Added: \(p.name)", printerName: p.name)
+        recordActionAndMaybeRate()
     }
 
     func removePrinter(_ printer: Printer) {
@@ -252,6 +267,11 @@ class AppViewModel: ObservableObject {
     // MARK: - File Handling
 
     func handlePickedFile(url: URL) {
+        NSLog("[Flow] ── handlePickedFile ──")
+        NSLog("[Flow]   file: %@", url.lastPathComponent)
+        NSLog("[Flow]   ext:  %@", url.pathExtension.lowercased())
+        NSLog("[Flow]   path: %@", url.path)
+        NSLog("[Flow]   exists: %@", FileManager.default.fileExists(atPath: url.path) ? "YES" : "NO")
         selectedFileURL = url
         RatingService.shared.recordAction()
     }
@@ -297,14 +317,49 @@ class AppViewModel: ObservableObject {
     // MARK: - Printing (native sheet handles everything)
 
     /// Opens the native iOS print sheet for any file URL and logs to history on completion.
+    /// Access is gated — costs 1 free try if not premium.
     func printFile(url: URL, source: String = "Documents") {
+        NSLog("[Flow] ══════════════════════════════════")
+        NSLog("[Flow] ── printFile() CALLED ──")
+        NSLog("[Flow]   source:  %@", source)
+        NSLog("[Flow]   file:    %@", url.lastPathComponent)
+        NSLog("[Flow]   ext:     %@", url.pathExtension.lowercased())
+        NSLog("[Flow]   path:    %@", url.path)
+        NSLog("[Flow]   exists:  %@", FileManager.default.fileExists(atPath: url.path) ? "YES" : "NO")
+        NSLog("[Flow]   printer: %@", primaryPrinter?.name ?? "NONE")
+        NSLog("[Flow]   freeTriesRemaining: %d", freePrintsRemaining)
+
+        // ── Access gate: 3 free tries, then paywall ──
+        let allowed = MainActor.assumeIsolated { checkAccess() }
+        guard allowed else {
+            NSLog("[Flow]   ❌ ABORT — access denied, paywall shown")
+            return
+        }
+
+        guard PrintService.canPrint(url) else {
+            NSLog("[Flow]   ❌ ABORT — unsupported file format")
+            showToastMessage("Unsupported file format")
+            return
+        }
+        NSLog("[Flow]   ✅ canPrint passed — presenting print sheet...")
+
         PrintService.presentPrintSheet(url: url) { [weak self] completed, pageCount in
-            guard let self else { return }
+            guard let self else {
+                NSLog("[Flow]   ⚠️ self is nil in completion")
+                return
+            }
             DispatchQueue.main.async {
+                NSLog("[Flow] ── printFile COMPLETION ──")
+                NSLog("[Flow]   completed: %@", completed ? "YES" : "NO")
+                NSLog("[Flow]   pageCount: %d", pageCount)
+
                 guard completed else {
+                    NSLog("[Flow]   ❌ User CANCELLED print — free try NOT consumed")
                     self.showToastMessage("Print cancelled")
                     return
                 }
+                NSLog("[Flow]   ✅ User CONFIRMED print — consuming try & logging to history")
+                self.consumeFreeTry()
                 self.logHistory(
                     fileName: url.lastPathComponent,
                     fileType: url.pathExtension.lowercased(),
@@ -313,6 +368,7 @@ class AppViewModel: ObservableObject {
                     fileURL: url
                 )
                 self.showToastMessage("Printed: \(url.lastPathComponent)")
+                self.recordActionAndMaybeRate()
             }
         }
     }
@@ -327,7 +383,17 @@ class AppViewModel: ObservableObject {
         status: JobStatus = .done,
         fileURL: URL? = nil
     ) {
-        guard saveHistory else { return }
+        NSLog("[History] ── logHistory() ──")
+        NSLog("[History]   file:   %@", fileName)
+        NSLog("[History]   type:   %@", fileType)
+        NSLog("[History]   pages:  %d", pageCount)
+        NSLog("[History]   source: %@", source)
+        NSLog("[History]   status: %@", status == .done ? "done" : "other")
+        NSLog("[History]   saveHistory enabled: %@", saveHistory ? "YES" : "NO")
+        guard saveHistory else {
+            NSLog("[History]   ⚠️ saveHistory is OFF — skipping")
+            return
+        }
         let job = PrintJob(
             fileName: fileName,
             fileType: fileType,
@@ -350,14 +416,21 @@ class AppViewModel: ObservableObject {
     }
 
     func printFromQueue(_ job: PrintJob) {
+        NSLog("[Flow] ── printFromQueue() ──")
+        NSLog("[Flow]   job: %@", job.fileName)
+        NSLog("[Flow]   hasBookmark: %@", job.fileBookmark != nil ? "YES" : "NO")
+
         guard let bookmark = job.fileBookmark,
               var isStale = Optional(false),
               let url = try? URL(resolvingBookmarkData: bookmark, bookmarkDataIsStale: &isStale) else {
+            NSLog("[Flow]   ❌ ABORT — file bookmark could not be resolved")
             showToastMessage("File no longer available")
             queue.removeAll { $0.id == job.id }
             persistence.saveQueue(queue)
             return
         }
+        NSLog("[Flow]   resolved URL: %@", url.path)
+        NSLog("[Flow]   isStale: %@", isStale ? "YES" : "NO")
 
         printFile(url: url, source: "Queue")
         queue.removeAll { $0.id == job.id }
@@ -365,6 +438,8 @@ class AppViewModel: ObservableObject {
     }
 
     func printDirectly(url: URL, source: String = "Documents") {
+        NSLog("[Flow] ── printDirectly() → forwarding to printFile() ──")
+        NSLog("[Flow]   source: %@", source)
         printFile(url: url, source: source)
     }
 
@@ -383,14 +458,20 @@ class AppViewModel: ObservableObject {
     }
 
     func reprintFromHistory(_ job: PrintJob) {
+        NSLog("[Flow] ── reprintFromHistory() ──")
+        NSLog("[Flow]   job: %@", job.fileName)
+        NSLog("[Flow]   hasBookmark: %@", job.fileBookmark != nil ? "YES" : "NO")
+
         guard let bookmark = job.fileBookmark,
               var isStale = Optional(false),
               let url = try? URL(resolvingBookmarkData: bookmark, bookmarkDataIsStale: &isStale),
               FileManager.default.fileExists(atPath: url.path) else {
+            NSLog("[Flow]   ❌ ABORT — file not available (no bookmark or file missing)")
             showToastMessage("File no longer available — pick it again to print")
             return
         }
-        printFile(url: url)
+        NSLog("[Flow]   resolved URL: %@", url.path)
+        printFile(url: url, source: "Reprint")
     }
 
     // MARK: - Settings
@@ -479,6 +560,12 @@ class AppViewModel: ObservableObject {
     @Published var isDownloadingTestPrint = false
 
     func sendTestPrint(_ testPrint: TestPrint) {
+        NSLog("[Flow] ══════════════════════════════════")
+        NSLog("[Flow] ── sendTestPrint() ──")
+        NSLog("[Flow]   name: %@", testPrint.name)
+        NSLog("[Flow]   file: %@", testPrint.fileName)
+        NSLog("[Flow]   url:  %@", testPrint.remoteURL)
+
         let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
             .first!.appendingPathComponent("TestPrints", isDirectory: true)
         try? FileManager.default.createDirectory(at: cacheDir, withIntermediateDirectories: true)
@@ -486,44 +573,65 @@ class AppViewModel: ObservableObject {
 
         // Use cached file if available
         if FileManager.default.fileExists(atPath: localURL.path) {
+            NSLog("[Flow]   ✅ Cached file found — printing directly")
             printFile(url: localURL, source: "Test Print")
             return
         }
 
         // Download then print
-        guard let url = URL(string: testPrint.remoteURL) else { return }
+        guard let url = URL(string: testPrint.remoteURL) else {
+            NSLog("[Flow]   ❌ ABORT — invalid remote URL")
+            return
+        }
         isDownloadingTestPrint = true
+        NSLog("[Flow]   ⏳ Downloading from remote...")
         showToastMessage("Downloading \(testPrint.name)...")
 
         URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 self?.isDownloadingTestPrint = false
 
+                if let error = error {
+                    NSLog("[Flow]   ❌ Download error: %@", error.localizedDescription)
+                }
+
                 guard let data = data, error == nil, !data.isEmpty else {
+                    NSLog("[Flow]   ❌ Download failed — no data or error")
                     self?.showToastMessage("Download failed — check internet connection")
                     return
                 }
 
+                NSLog("[Flow]   Downloaded %d bytes", data.count)
+
                 // Verify we got a valid response (not an error page)
-                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
-                    self?.showToastMessage("Download failed (HTTP \(httpResponse.statusCode))")
-                    return
+                if let httpResponse = response as? HTTPURLResponse {
+                    NSLog("[Flow]   HTTP status: %d", httpResponse.statusCode)
+                    if httpResponse.statusCode != 200 {
+                        NSLog("[Flow]   ❌ Download failed — non-200 status")
+                        self?.showToastMessage("Download failed (HTTP \(httpResponse.statusCode))")
+                        return
+                    }
                 }
 
                 do {
                     try data.write(to: localURL, options: .atomic)
+                    NSLog("[Flow]   ✅ Saved to cache, printing...")
                     self?.printFile(url: localURL, source: "Test Print")
                 } catch {
+                    NSLog("[Flow]   ⚠️ Cache write failed: %@, using data fallback", error.localizedDescription)
                     // Fallback: print directly from data if file write fails
                     PrintService.presentPrintSheet(data: data, jobName: testPrint.name) { completed in
                         DispatchQueue.main.async {
+                            NSLog("[Flow]   Test print (data fallback) completed: %@", completed ? "YES" : "NO")
                             if completed {
+                                self?.consumeFreeTry()
                                 self?.logHistory(
                                     fileName: testPrint.name,
                                     fileType: "pdf",
                                     pageCount: 1,
                                     source: "Test Print"
                                 )
+                                self?.recordActionAndMaybeRate()
                             }
                             self?.showToastMessage(completed ? "\(testPrint.name) sent" : "Print cancelled")
                         }

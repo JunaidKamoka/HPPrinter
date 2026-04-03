@@ -100,37 +100,31 @@ struct HomeView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        activePaywallVariant = vm.paywallVariant
-                        vm.nextPaywallVariant()
-                        showPaywallFromHome = true
-                    } label: {
-                        ZStack(alignment: .topTrailing) {
-                            ZStack {
-                                Circle()
-                                    .fill(
-                                        subscriptionService.isPremium
-                                        ? LinearGradient(colors: [Color(hex: "#0149E1"), Color(hex: "#3D7EFF")], startPoint: .topLeading, endPoint: .bottomTrailing)
-                                        : LinearGradient(colors: [Color.bg3, Color.bg3], startPoint: .topLeading, endPoint: .bottomTrailing)
-                                    )
-                                    .frame(width: 36, height: 36)
-                                    .overlay(Circle().stroke(
-                                        subscriptionService.isPremium ? Color(hex: "#3D7EFF") : Color.cardBorder,
-                                        lineWidth: 1
-                                    ))
-                                Image(systemName: "crown.fill")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .foregroundColor(subscriptionService.isPremium ? .white : .textSecondary)
-                            }
-                            // free-tries badge
-                            if !subscriptionService.isPremium {
-                                Text("\(vm.freePrintsRemaining)")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .frame(width: 14, height: 14)
-                                    .background(Color(hex: "#FF9500"))
-                                    .clipShape(Circle())
-                                    .offset(x: 3, y: -3)
+                    Group {
+                        if !subscriptionService.isPremium {
+                            Button {
+                                activePaywallVariant = vm.paywallVariant
+                                vm.nextPaywallVariant()
+                                showPaywallFromHome = true
+                            } label: {
+                                ZStack(alignment: .topTrailing) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(LinearGradient(colors: [Color.bg3, Color.bg3], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                            .frame(width: 36, height: 36)
+                                            .overlay(Circle().stroke(Color.cardBorder, lineWidth: 1))
+                                        Image(systemName: "crown.fill")
+                                            .font(.system(size: 15, weight: .semibold))
+                                            .foregroundColor(.textSecondary)
+                                    }
+                                    Text("\(vm.freePrintsRemaining)")
+                                        .font(.system(size: 9, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 14, height: 14)
+                                        .background(Color(hex: "#FF9500"))
+                                        .clipShape(Circle())
+                                        .offset(x: 3, y: -3)
+                                }
                             }
                         }
                     }
@@ -144,34 +138,34 @@ struct HomeView: View {
                 )
                 .environmentObject(subscriptionService)
             }
-            .sheet(isPresented: $showDocPicker, onDismiss: {
-                if let url = vm.selectedFileURL {
-                    let captured = url
-                    vm.selectedFileURL = nil
+            .sheet(isPresented: $showDocPicker) {
+                DocumentPicker { url in
+                    NSLog("[Home] DocPicker selected: %@", url.lastPathComponent)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                        vm.printDirectly(url: captured)
+                        vm.printDirectly(url: url)
                     }
                 }
-            }) { DocumentPicker { url in vm.handlePickedFile(url: url) } }
-            .sheet(isPresented: $showPhotoPicker, onDismiss: {
-                if let url = vm.selectedFileURL {
-                    let captured = url
-                    vm.selectedFileURL = nil
+            }
+            .sheet(isPresented: $showPhotoPicker) {
+                PhotoPicker { url in
+                    NSLog("[Home] PhotoPicker selected: %@", url.lastPathComponent)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                        vm.printDirectly(url: captured)
+                        vm.printDirectly(url: url)
                     }
                 }
-            }) { PhotoPicker { url in vm.handlePickedFile(url: url) } }
+            }
             .sheet(isPresented: $showTestPrintPicker) { TestPrintPickerSheet() }
             .fullScreenCover(isPresented: $showWritingPaper) { WritingPaperView() }
             .fullScreenCover(isPresented: $showPDFTools) { PDFToolsView() }
             .fullScreenCover(isPresented: $showDocumentScanner) {
                 DocumentScannerView { pdfURL in
+                    NSLog("[Home] Scanner completed — PDF: %@", pdfURL.lastPathComponent)
                     showDocumentScanner = false
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                         vm.printFile(url: pdfURL, source: "Scan")
                     }
                 } onCancel: {
+                    NSLog("[Home] Scanner cancelled by user")
                     showDocumentScanner = false
                 }
                 .ignoresSafeArea()

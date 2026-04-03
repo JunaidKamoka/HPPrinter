@@ -58,29 +58,23 @@ struct QueueView: View {
                 Button("Photos") { showPhotoPicker = true }
                 Button("Cancel", role: .cancel) {}
             }
-            .sheet(isPresented: $showDocPicker, onDismiss: {
-                if let url = vm.selectedFileURL {
-                    let captured = url
-                    vm.selectedFileURL = nil
-                    vm.addToQueue(url: captured)
+            .sheet(isPresented: $showDocPicker) {
+                DocumentPicker { url in
+                    NSLog("[Queue] DocPicker selected: %@", url.lastPathComponent)
+                    vm.addToQueue(url: url)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                        vm.printDirectly(url: captured, source: "Queue")
+                        vm.printDirectly(url: url, source: "Queue")
                     }
                 }
-            }) {
-                DocumentPicker { url in vm.handlePickedFile(url: url) }
             }
-            .sheet(isPresented: $showPhotoPicker, onDismiss: {
-                if let url = vm.selectedFileURL {
-                    let captured = url
-                    vm.selectedFileURL = nil
-                    vm.addToQueue(url: captured)
+            .sheet(isPresented: $showPhotoPicker) {
+                PhotoPicker { url in
+                    NSLog("[Queue] PhotoPicker selected: %@", url.lastPathComponent)
+                    vm.addToQueue(url: url)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                        vm.printDirectly(url: captured, source: "Queue")
+                        vm.printDirectly(url: url, source: "Queue")
                     }
                 }
-            }) {
-                PhotoPicker { url in vm.handlePickedFile(url: url) }
             }
         }
         .navigationViewStyle(.stack)

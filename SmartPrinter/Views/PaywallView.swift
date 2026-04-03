@@ -185,9 +185,15 @@ struct PaywallMinimal: View {
     }
 
     var minimalPlanCards: some View {
-        HStack(spacing: 12) {
-            if let w = sub.weeklyProduct  { minCard(w, label: "Weekly",  best: false) } else { Color.clear }
-            if let m = sub.monthlyProduct { minCard(m, label: "Monthly", best: true)  } else { Color.clear }
+        Group {
+            if sub.weeklyProduct != nil || sub.monthlyProduct != nil {
+                HStack(spacing: 12) {
+                    if let w = sub.weeklyProduct  { minCard(w, label: "Weekly",  best: false) }
+                    if let m = sub.monthlyProduct { minCard(m, label: "Monthly", best: true)  }
+                }
+            } else {
+                planLoadingPlaceholder(fg: fg, fg2: fg2, card: card, line: line)
+            }
         }
     }
 
@@ -397,9 +403,15 @@ struct PaywallDark: View {
     }
 
     var darkPlanCards: some View {
-        HStack(spacing: 12) {
-            if let w = sub.weeklyProduct  { darkCard(w, label: "Weekly",  best: false) } else { Color.clear }
-            if let m = sub.monthlyProduct { darkCard(m, label: "Monthly", best: true)  } else { Color.clear }
+        Group {
+            if sub.weeklyProduct != nil || sub.monthlyProduct != nil {
+                HStack(spacing: 12) {
+                    if let w = sub.weeklyProduct  { darkCard(w, label: "Weekly",  best: false) }
+                    if let m = sub.monthlyProduct { darkCard(m, label: "Monthly", best: true)  }
+                }
+            } else {
+                planLoadingPlaceholder(fg: .white, fg2: .white.opacity(0.5), card: Color.white.opacity(0.07), line: Color.white.opacity(0.12))
+            }
         }
     }
 
@@ -576,9 +588,15 @@ struct PaywallFocused: View {
                         .padding(.horizontal, 20).padding(.top, 22)
 
                         // Plan cards
-                        HStack(spacing: 12) {
-                            if let w = sub.weeklyProduct  { focusedCard(w, label: "Weekly",  best: false) } else { Color.clear }
-                            if let m = sub.monthlyProduct { focusedCard(m, label: "Monthly", best: true)  } else { Color.clear }
+                        Group {
+                            if sub.weeklyProduct != nil || sub.monthlyProduct != nil {
+                                HStack(spacing: 12) {
+                                    if let w = sub.weeklyProduct  { focusedCard(w, label: "Weekly",  best: false) }
+                                    if let m = sub.monthlyProduct { focusedCard(m, label: "Monthly", best: true)  }
+                                }
+                            } else {
+                                planLoadingPlaceholder(fg: fg, fg2: fg2, card: card, line: line)
+                            }
                         }
                         .padding(.horizontal, 20).padding(.top, 22)
                         .opacity(appeared ? 1 : 0).offset(y: appeared ? 0 : 20)
@@ -667,6 +685,21 @@ private var safeTop: CGFloat {
         .first?.windows.first?.safeAreaInsets.top ?? 44
 }
 
+private func planLoadingPlaceholder(fg: Color, fg2: Color, card: Color, line: Color) -> some View {
+    VStack(spacing: 12) {
+        ProgressView()
+            .tint(fg2)
+        Text("Loading plans...")
+            .font(.system(size: 13, weight: .medium))
+            .foregroundColor(fg2)
+    }
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, 32)
+    .background(card)
+    .clipShape(RoundedRectangle(cornerRadius: 16))
+    .overlay(RoundedRectangle(cornerRadius: 16).stroke(line, lineWidth: 1))
+}
+
 private func paywallFooter(fg2: Color, isRestoring: Bool, onRestore: @escaping () -> Void, onDismiss: @escaping () -> Void) -> some View {
     HStack(spacing: 16) {
         Button {
@@ -679,13 +712,13 @@ private func paywallFooter(fg2: Color, isRestoring: Bool, onRestore: @escaping (
         }
         Text("·").foregroundColor(fg2).font(.system(size: 12))
         Button {
-            UIApplication.shared.open(URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+            UIApplication.shared.open(URL(string: "https://appchunks.com/terms")!)
         } label: {
             Text("Terms").font(.system(size: 12, weight: .medium)).foregroundColor(fg2)
         }
         Text("·").foregroundColor(fg2).font(.system(size: 12))
         Button {
-            UIApplication.shared.open(URL(string: "https://www.apple.com/legal/privacy/")!)
+            UIApplication.shared.open(URL(string: "https://appchunks.com/privacy")!)
         } label: {
             Text("Privacy").font(.system(size: 12, weight: .medium)).foregroundColor(fg2)
         }

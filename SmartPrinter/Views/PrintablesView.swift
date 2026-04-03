@@ -405,12 +405,25 @@ struct PrintableDetailView: View {
     // MARK: - Print: prefers PDF, falls back to current page image
 
     private func printItem() {
-        guard !isPrinting else { return }
-        guard vm.checkTemplateAccess() else { return }
+        NSLog("[Printables] ══════════════════════════════════")
+        NSLog("[Printables] ── printItem() ──")
+        NSLog("[Printables]   item: %@", item.categoryName)
+        NSLog("[Printables]   isPrinting: %@", isPrinting ? "YES (blocked)" : "NO")
+
+        guard !isPrinting else {
+            NSLog("[Printables]   ❌ ABORT — already printing")
+            return
+        }
+        NSLog("[Printables]   checking template access...")
+        guard vm.checkTemplateAccess() else {
+            NSLog("[Printables]   ❌ ABORT — template access denied (paywall)")
+            return
+        }
         printError = nil
         isPrinting = true
 
         let jobName = item.categoryName
+        NSLog("[Printables]   hasPdf: %@", item.hasPdf ? "YES" : "NO")
 
         if item.hasPdf, let pdfName = item.pdfs.first,
            let url = FirebaseStorageService.pdfURL(storagePath: item.storagePath, filename: pdfName) {
@@ -429,6 +442,7 @@ struct PrintableDetailView: View {
     /// Downloads the file and sends it directly to the print controller from memory.
     /// Avoids disk I/O so `canPrint` never gets a missing-file URL.
     private func downloadAndPrint(remoteURL: URL, jobName: String) {
+        NSLog("[Printables]   downloading: %@", remoteURL.absoluteString)
         var request = URLRequest(url: remoteURL, cachePolicy: .returnCacheDataElseLoad,
                                  timeoutInterval: 20)
         request.setValue("application/pdf, image/*, */*", forHTTPHeaderField: "Accept")
@@ -438,16 +452,23 @@ struct PrintableDetailView: View {
                 isPrinting = false
 
                 guard let data, !data.isEmpty, error == nil else {
+                    NSLog("[Printables]   ❌ Download failed: %@", error?.localizedDescription ?? "no data")
                     printError = "Download failed. Check your connection."
                     return
                 }
-                if let http = response as? HTTPURLResponse, http.statusCode != 200 {
-                    printError = "Server error (\(http.statusCode))."
-                    return
+                NSLog("[Printables]   downloaded %d bytes", data.count)
+                if let http = response as? HTTPURLResponse {
+                    NSLog("[Printables]   HTTP status: %d", http.statusCode)
+                    if http.statusCode != 200 {
+                        printError = "Server error (\(http.statusCode))."
+                        return
+                    }
                 }
 
                 // Print directly from data — no temp-file needed
-                guard UIPrintInteractionController.canPrint(data) else {
+                let canPrintResult = UIPrintInteractionController.canPrint(data)
+                NSLog("[Printables]   canPrint(data): %@", canPrintResult ? "YES" : "NO")
+                guard canPrintResult else {
                     printError = "This file type cannot be printed."
                     return
                 }
@@ -460,8 +481,11 @@ struct PrintableDetailView: View {
                 controller.printingItem = data
                 controller.showsNumberOfCopies = true
                 controller.showsPaperSelectionForLoadedPapers = true
+                NSLog("[Printables]   presenting print sheet...")
                 controller.present(animated: true) { _, completed, _ in
+                    NSLog("[Printables]   ── RESULT: %@", completed ? "PRINTED" : "CANCELLED")
                     if completed {
+                        vm.consumeFreeTry()
                         let ext     = data.isPDF ? "pdf" : "png"
                         let tempURL = FileManager.default.temporaryDirectory
                             .appendingPathComponent("\(jobName).\(ext)")
@@ -478,6 +502,7 @@ struct PrintableDetailView: View {
                             fileURL: tempURL
                         )
                         vm.showToastMessage("Printed: \(jobName)")
+                        vm.recordActionAndMaybeRate()
                     }
                 }
             }
