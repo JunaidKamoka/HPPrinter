@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 
 @main
 struct SmartPrinterApp: App {
@@ -6,7 +7,6 @@ struct SmartPrinterApp: App {
     @StateObject private var themeManager = ThemeManager()
     @StateObject private var subscriptionService = SubscriptionService.shared
     @Environment(\.scenePhase) private var scenePhase
-    @State private var showRating     = false
     @State private var showSplash     = true
     @State private var showOnboarding = !UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
 
@@ -29,11 +29,12 @@ struct SmartPrinterApp: App {
                         if isPremium { viewModel.showPaywall = false }
                     }
 
-                if showRating {
-                    AppRatingView(isPresented: $showRating)
-                        .transition(.opacity)
-                        .zIndex(100)
-                }
+                // Custom rating popup hidden — using native review instead
+                // if showRating {
+                //     AppRatingView(isPresented: $showRating)
+                //         .transition(.opacity)
+                //         .zIndex(100)
+                // }
 
                 if showOnboarding && !showSplash {
                     OnboardingView(isPresented: $showOnboarding)
@@ -57,21 +58,26 @@ struct SmartPrinterApp: App {
                     if rating.shouldShowOnLaunch() {
                         rating.recordPromptShown()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            withAnimation { showRating = true }
+                            requestNativeReview()
                         }
                     }
                 case .inactive:
-                    if !showRating {
-                        let rating = RatingService.shared
-                        if rating.shouldShowOnBackground() {
-                            rating.recordPromptShown(isBackground: true)
-                            withAnimation { showRating = true }
-                        }
+                    let rating = RatingService.shared
+                    if rating.shouldShowOnBackground() {
+                        rating.recordPromptShown(isBackground: true)
+                        requestNativeReview()
                     }
                 default:
                     break
                 }
             }
+        }
+    }
+
+    private func requestNativeReview() {
+        if let scene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: scene)
         }
     }
 }

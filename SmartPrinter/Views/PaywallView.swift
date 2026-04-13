@@ -218,7 +218,10 @@ struct PaywallMinimal: View {
                     if !best && trial == nil { Color.clear.frame(height: 18) }
                 }.frame(height: 18)
                 Text(label).font(.system(size: 13, weight: .semibold)).foregroundColor(sel ? blue : fg2)
-                Text(sub.periodLabel(for: product)).font(.system(size: 17, weight: .bold)).foregroundColor(fg).minimumScaleFactor(0.7).lineLimit(1)
+                Text(sub.billedAmountLabel(for: product)).font(.system(size: 17, weight: .bold)).foregroundColor(fg).minimumScaleFactor(0.7).lineLimit(1)
+                if let daily = sub.dailyEquivalentLabel(for: product) {
+                    Text(daily).font(.system(size: 10)).foregroundColor(fg2).lineLimit(1)
+                }
             }
             .frame(maxWidth: .infinity).padding(.vertical, 16).padding(.horizontal, 10)
             .background(card)
@@ -437,9 +440,12 @@ struct PaywallDark: View {
                         .background(Color(hex:"#34C759").opacity(0.15)).clipShape(Capsule())
                 }
 
-                Text(sub.periodLabel(for: product)).font(.system(size: 16, weight: .heavy))
+                Text(sub.billedAmountLabel(for: product)).font(.system(size: 16, weight: .heavy))
                     .foregroundColor(sel ? .white : .white.opacity(0.55))
                     .minimumScaleFactor(0.7).lineLimit(1)
+                if let daily = sub.dailyEquivalentLabel(for: product) {
+                    Text(daily).font(.system(size: 10)).foregroundColor(.white.opacity(0.40)).lineLimit(1)
+                }
             }
             .frame(maxWidth: .infinity).padding(.vertical, 16).padding(.horizontal, 10)
             .background(sel
@@ -666,7 +672,10 @@ struct PaywallFocused: View {
                     if !best && trial == nil { Color.clear.frame(height: 18) }
                 }.frame(height: 18)
                 Text(label).font(.system(size: 13, weight: .semibold)).foregroundColor(sel ? blue : fg2)
-                Text(sub.periodLabel(for: product)).font(.system(size: 17, weight: .bold)).foregroundColor(fg).minimumScaleFactor(0.7).lineLimit(1)
+                Text(sub.billedAmountLabel(for: product)).font(.system(size: 17, weight: .bold)).foregroundColor(fg).minimumScaleFactor(0.7).lineLimit(1)
+                if let daily = sub.dailyEquivalentLabel(for: product) {
+                    Text(daily).font(.system(size: 10)).foregroundColor(fg2).lineLimit(1)
+                }
             }
             .frame(maxWidth: .infinity).padding(.vertical, 16).padding(.horizontal, 10)
             .background(card)

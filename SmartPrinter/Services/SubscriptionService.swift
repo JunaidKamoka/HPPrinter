@@ -187,20 +187,57 @@ final class SubscriptionService: ObservableObject {
     /// Sub-label under button (trial → "then X/period", else empty)
     func subLabel(for product: Product) -> String? {
         guard let days = trialDays(for: product) else { return nil }
-        return "Free for \(days) days, then \(product.displayPrice)"
+        return "Free for \(days) days, then \(billedAmountLabel(for: product))"
     }
 
-    /// Per-period price string, e.g. "$3.99/wk" or "$19.99/yr"
-    func periodLabel(for product: Product) -> String {
+    /// Actual billed amount per billing period — this MUST be the most prominent price.
+    /// e.g. "$4.99/wk", "$11.99/mo"
+    func billedAmountLabel(for product: Product) -> String {
         guard let sub = product.subscription else { return product.displayPrice }
+        let period = sub.subscriptionPeriod
         let unit: String
-        switch sub.subscriptionPeriod.unit {
-        case .day:   unit = "day"
-        case .week:  unit = "wk"
-        case .month: unit = "mo"
-        case .year:  unit = "yr"
+        switch period.unit {
+        case .day:
+            if period.value == 7 {
+                unit = "wk"
+            } else if period.value >= 28 && period.value <= 31 {
+                unit = "mo"
+            } else {
+                unit = period.value == 1 ? "day" : "\(period.value) days"
+            }
+        case .week:  unit = period.value == 1 ? "wk" : "\(period.value) wks"
+        case .month: unit = period.value == 1 ? "mo" : "\(period.value) mos"
+        case .year:  unit = period.value == 1 ? "yr" : "\(period.value) yrs"
         @unknown default: unit = "period"
         }
         return "\(product.displayPrice)/\(unit)"
+    }
+
+    /// Calculated daily equivalent in subordinate position — e.g. "Just $0.71/day"
+    /// Returns nil if the product is already billed daily (1 day period).
+    func dailyEquivalentLabel(for product: Product) -> String? {
+        guard let sub = product.subscription else { return nil }
+        let period = sub.subscriptionPeriod
+        let totalDays: Int
+        switch period.unit {
+        case .day:   totalDays = period.value
+        case .week:  totalDays = period.value * 7
+        case .month: totalDays = period.value * 30
+        case .year:  totalDays = period.value * 365
+        @unknown default: return nil
+        }
+        guard totalDays > 1 else { return nil }
+        let daily = product.price / Decimal(totalDays)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = product.priceFormatStyle.locale
+        formatter.maximumFractionDigits = 2
+        guard let str = formatter.string(from: daily as NSDecimalNumber) else { return nil }
+        return "Just \(str)/day"
+    }
+
+    /// Keep old name as alias for compatibility
+    func periodLabel(for product: Product) -> String {
+        billedAmountLabel(for: product)
     }
 }

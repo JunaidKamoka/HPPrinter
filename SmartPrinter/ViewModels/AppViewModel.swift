@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 import Combine
 
 class AppViewModel: ObservableObject {
@@ -80,16 +81,23 @@ class AppViewModel: ObservableObject {
     // MARK: - Rating
     @Published var showRating: Bool = false
 
-    /// Call after any successful user action to record it and maybe show the rating prompt.
+    /// Call after any successful user action to record it and maybe show the native rating prompt.
     func recordActionAndMaybeRate() {
         RatingService.shared.recordAction()
         NSLog("[Rating] recordActionAndMaybeRate — shouldShowAfterAction: %@", RatingService.shared.shouldShowAfterAction() ? "YES" : "NO")
         if RatingService.shared.shouldShowAfterAction() {
             RatingService.shared.recordPromptShown()
-            NSLog("[Rating]   → showing rating prompt after 1s delay")
+            NSLog("[Rating]   → showing native rating prompt after 1s delay")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                withAnimation { self.showRating = true }
+                self.requestNativeReview()
             }
+        }
+    }
+
+    private func requestNativeReview() {
+        if let scene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: scene)
         }
     }
 

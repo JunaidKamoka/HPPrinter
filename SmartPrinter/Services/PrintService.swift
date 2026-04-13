@@ -137,19 +137,29 @@ class PrintService {
         }
 
         NSLog("[Print]   windowScene state: %ld", windowScene.activationState.rawValue)
-
-        // Walk the presentation chain to find the topmost VC
-        var topVC = rootVC
-        var depth = 0
-        while let presented = topVC.presentedViewController {
-            topVC = presented
-            depth += 1
-        }
         NSLog("[Print]   rootVC: %@", String(describing: type(of: rootVC)))
-        NSLog("[Print]   topVC:  %@ (depth=%d)", String(describing: type(of: topVC)), depth)
 
-        let presented = controller.present(from: topVC.view.bounds,
-                                           in: topVC.view,
+        // If another VC is presented (e.g. photo picker sheet), dismiss it first
+        // then present the print sheet from the root VC.
+        if rootVC.presentedViewController != nil {
+            NSLog("[Print]   ⚠️ Dismissing presented VC before showing print sheet...")
+            rootVC.dismiss(animated: true) {
+                NSLog("[Print]   ✅ Dismissed — now presenting print sheet")
+                Self.showController(controller, from: rootVC, completion: completion, retryCount: retryCount)
+            }
+        } else {
+            Self.showController(controller, from: rootVC, completion: completion, retryCount: retryCount)
+        }
+    }
+
+    private static func showController(
+        _ controller: UIPrintInteractionController,
+        from rootVC: UIViewController,
+        completion: @escaping (Bool) -> Void,
+        retryCount: Int
+    ) {
+        let presented = controller.present(from: rootVC.view.bounds,
+                                           in: rootVC.view,
                                            animated: true) { _, completed, error in
             if let error = error {
                 NSLog("[Print]   ⚠️ print error: %@", error.localizedDescription)
@@ -158,7 +168,6 @@ class PrintService {
         }
         NSLog("[Print]   present() returned: %@", presented ? "true (sheet shown)" : "false (sheet NOT shown)")
         if !presented {
-            // If present() fails, retry once — the scene might not be fully ready
             if retryCount < 2 {
                 NSLog("[Print]   ⏳ present() failed, retrying in 0.5s...")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

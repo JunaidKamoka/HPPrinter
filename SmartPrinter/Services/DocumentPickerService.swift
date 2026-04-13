@@ -75,9 +75,11 @@ struct PhotoPicker: UIViewControllerRepresentable {
                         .appendingPathExtension(url.pathExtension)
                     try? FileManager.default.copyItem(at: url, to: dest)
                     DispatchQueue.main.async {
-                        // Set the URL first, then dismiss so onDismiss fires with URL already set
-                        self.onPick(dest)
-                        picker.dismiss(animated: true)
+                        // Dismiss picker first, then call onPick after dismiss completes
+                        // to avoid "view not in window hierarchy" when presenting print sheet
+                        picker.dismiss(animated: true) {
+                            self.onPick(dest)
+                        }
                     }
                 }
             } else {

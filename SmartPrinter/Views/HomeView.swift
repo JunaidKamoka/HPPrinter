@@ -42,6 +42,7 @@ struct HomeView: View {
     @State private var showDocumentScanner  = false
     @State private var showPaywallFromHome  = false
     @State private var activePaywallVariant = 0
+    @State private var pendingPrintURL: URL? = nil
 
     // Hero animation
     @State private var orbAnimate   = false
@@ -125,7 +126,10 @@ struct HomeView: View {
                                         .clipShape(Circle())
                                         .offset(x: 3, y: -3)
                                 }
+                                .frame(width: 42, height: 42)
                             }
+                            .contentShape(Rectangle())
+                            .alignmentGuide(.firstTextBaseline) { d in d[.bottom] }
                         }
                     }
                 }
@@ -141,17 +145,15 @@ struct HomeView: View {
             .sheet(isPresented: $showDocPicker) {
                 DocumentPicker { url in
                     NSLog("[Home] DocPicker selected: %@", url.lastPathComponent)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                        vm.printDirectly(url: url)
-                    }
+                    pendingPrintURL = url
+                    showDocPicker = false
                 }
             }
             .sheet(isPresented: $showPhotoPicker) {
                 PhotoPicker { url in
                     NSLog("[Home] PhotoPicker selected: %@", url.lastPathComponent)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                        vm.printDirectly(url: url)
-                    }
+                    pendingPrintURL = url
+                    showPhotoPicker = false
                 }
             }
             .sheet(isPresented: $showTestPrintPicker) { TestPrintPickerSheet() }
@@ -160,15 +162,21 @@ struct HomeView: View {
             .fullScreenCover(isPresented: $showDocumentScanner) {
                 DocumentScannerView { pdfURL in
                     NSLog("[Home] Scanner completed — PDF: %@", pdfURL.lastPathComponent)
+                    pendingPrintURL = pdfURL
                     showDocumentScanner = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                        vm.printFile(url: pdfURL, source: "Scan")
-                    }
                 } onCancel: {
                     NSLog("[Home] Scanner cancelled by user")
                     showDocumentScanner = false
                 }
                 .ignoresSafeArea()
+            }
+            .onChange(of: pendingPrintURL) { url in
+                guard let url = url else { return }
+                pendingPrintURL = nil
+                // Delay slightly to ensure any sheet/cover dismiss animation completes
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    vm.printDirectly(url: url)
+                }
             }
             .onAppear {
                 if vm.autoReconnect { vm.startScan() }

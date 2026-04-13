@@ -53,12 +53,12 @@ struct ContentView: View {
                 .allowsHitTesting(false)
             }
 
-            // Rating overlay (triggered after successful actions)
-            if vm.showRating {
-                AppRatingView(isPresented: $vm.showRating)
-                    .transition(.opacity)
-                    .zIndex(100)
-            }
+            // Custom rating popup hidden — using native review instead
+            // if vm.showRating {
+            //     AppRatingView(isPresented: $vm.showRating)
+            //         .transition(.opacity)
+            //         .zIndex(100)
+            // }
         }
     }
 }

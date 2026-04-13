@@ -481,14 +481,8 @@ class PDFToolsViewController: UIViewController,
                 if let onPrint = self.onPrintFile {
                     onPrint(tmp)
                 } else {
-                    let info = UIPrintInfo.printInfo()
-                    info.outputType = .general
-                    info.jobName = name
-                    let ctrl = UIPrintInteractionController.shared
-                    ctrl.printInfo = info
-                    ctrl.printingItem = tmp
-                    ctrl.present(animated: true) { [weak self] _, completed, _ in
-                        if completed { self?.onPrintFile?(tmp) }
+                    PrintService.presentPrintSheet(url: tmp, jobName: name) { completed, _ in
+                        if completed { self.onPrintFile?(tmp) }
                     }
                 }
             })
@@ -568,13 +562,7 @@ class PDFToolsViewController: UIViewController,
                     NSLog("[PDFTools]   ❌ Access denied — paywall shown")
                     return
                 }
-                let info = UIPrintInfo.printInfo()
-                info.outputType = .general
-                info.jobName = jobName
-                let ctrl = UIPrintInteractionController.shared
-                ctrl.printInfo = info
-                ctrl.printingItem = data
-                ctrl.present(animated: true) { [weak self] _, completed, _ in
+                PrintService.presentPrintSheet(data: data, jobName: jobName) { [weak self] completed in
                     NSLog("[PDFTools]   ── RESULT: %@", completed ? "PRINTED" : "CANCELLED")
                     if completed {
                         self?.onConsumeTry?()

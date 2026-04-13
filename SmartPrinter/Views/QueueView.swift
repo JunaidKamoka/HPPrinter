@@ -5,6 +5,7 @@ struct QueueView: View {
     @State private var showDocPicker = false
     @State private var showPhotoPicker = false
     @State private var showSourcePicker = false
+    @State private var pendingPrintURL: URL? = nil
 
     var body: some View {
         NavigationView {
@@ -62,18 +63,23 @@ struct QueueView: View {
                 DocumentPicker { url in
                     NSLog("[Queue] DocPicker selected: %@", url.lastPathComponent)
                     vm.addToQueue(url: url)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                        vm.printDirectly(url: url, source: "Queue")
-                    }
+                    pendingPrintURL = url
+                    showDocPicker = false
                 }
             }
             .sheet(isPresented: $showPhotoPicker) {
                 PhotoPicker { url in
                     NSLog("[Queue] PhotoPicker selected: %@", url.lastPathComponent)
                     vm.addToQueue(url: url)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.65) {
-                        vm.printDirectly(url: url, source: "Queue")
-                    }
+                    pendingPrintURL = url
+                    showPhotoPicker = false
+                }
+            }
+            .onChange(of: pendingPrintURL) { url in
+                guard let url = url else { return }
+                pendingPrintURL = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    vm.printDirectly(url: url, source: "Queue")
                 }
             }
         }
